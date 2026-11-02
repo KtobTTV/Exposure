@@ -10,6 +10,7 @@ calls build_dashboard() on every run to keep the name table fresh.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -41,6 +42,8 @@ def build_dashboard(uid: str, out: Path = OUT) -> Path:
     except Exception:
         tank = []
     html = html.replace("__TANK__", json.dumps(tank)).replace("__UID__", str(uid)).replace("__PLAYERS__", json.dumps(table, separators=(",", ":")))
+    # Build id of this exact page, so an open copy can tell when a newer one is published.
+    html = html.replace("__BUILD__", hashlib.sha256(html.encode("utf-8")).hexdigest()[:12])
     out.parent.mkdir(exist_ok=True)
     out.write_text(html, encoding="utf-8")
     return out

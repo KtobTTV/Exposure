@@ -4,9 +4,9 @@
 <title>Root For or Against</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--mute:#5d6877;--line:#e1e5eb;--good:#0d7a3f;--goodbg:#e2f5e9;
---bad:#b3261e;--badbg:#fbe7e5;--warn:#8a5a00;--warnbg:#fff1d6;--info:#1f5fbf;--infobg:#e4eefc;--rbar:#f0b4af;--gbar:#1f9d55}
+--bad:#b3261e;--badbg:#fbe7e5;--warn:#8a5a00;--warnbg:#fff1d6;--info:#1f5fbf;--infobg:#e4eefc;--btrk:#dbe3f1;--bfill:#2f6fdb}
 @media (prefers-color-scheme:dark){:root{--bg:#0f1216;--card:#171c22;--ink:#e7ecf2;--mute:#8b98a5;--line:#262d36;
---good:#6ee7a0;--goodbg:#123d1e;--bad:#ff9ca3;--badbg:#47161a;--warn:#f0c36a;--warnbg:#3d2f0e;--info:#7fb3ff;--infobg:#14284a;--rbar:#7a2a2f;--gbar:#3ecf7a}}
+--good:#6ee7a0;--goodbg:#123d1e;--bad:#ff9ca3;--badbg:#47161a;--warn:#f0c36a;--warnbg:#3d2f0e;--info:#7fb3ff;--infobg:#14284a;--btrk:#2a3a55;--bfill:#6aa5ff}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
 .wrap{max-width:720px;margin:0 auto;padding:0 16px 70px}
@@ -47,15 +47,22 @@ border-radius:10px;padding:10px 12px;-webkit-appearance:none}
 .empty,.err{color:var(--mute);text-align:center;padding:30px 10px}
 .err{color:var(--bad)}
 .bars{padding:2px 0 8px}
-.bar{margin:7px 0}.bh{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px}
-.bh b{font-weight:700}.bh b.ov{color:var(--good)}
+.bar{margin:8px 0}.bh{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:3px}
+.bh b{font-weight:700}
+.ovr{font-size:11px;font-weight:700;letter-spacing:.03em;margin-left:4px}
+.eff{font-weight:700}.eff.g{color:var(--good)}.eff.b{color:var(--bad)}
 .bw{display:flex;align-items:center}
-.trk{position:relative;flex:1;height:14px;background:var(--rbar);border-radius:7px;overflow:hidden}
-.fl{height:100%;background:var(--gbar)}
-.lt{position:absolute;right:6px;top:0;font-size:10px;line-height:14px;font-weight:700;color:#fff;text-shadow:0 0 2px rgba(0,0,0,.6)}
-.gut{width:38px;display:flex;align-items:center;flex:none}
-.brk{width:5px;height:20px;background:var(--card);transform:skewX(-25deg);margin:0 2px 0 4px;flex:none}
-.ext{height:14px;background:var(--gbar);border-radius:0 7px 7px 0}
+.trk{flex:1;height:14px;background:var(--btrk);border-radius:7px 0 0 7px;overflow:hidden}
+.fl{height:100%;background:var(--bfill)}
+.tick{width:2px;height:22px;background:var(--ink);flex:none;border-radius:1px}
+.gut{width:44px;display:flex;align-items:center;flex:none}
+.ext{height:14px;background:var(--bfill);border-radius:0 7px 7px 0}
+.lt{margin-left:6px;font-size:11px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums}
+.help{margin:0 0 10px;font-size:12.5px;color:var(--mute)}
+.help summary{cursor:pointer;font-weight:600;padding:6px 0}
+.help ul{margin:2px 0 8px;padding-left:18px}.help li{margin:4px 0}
+input::placeholder{color:var(--mute);opacity:1}
+.net.z{background:transparent;box-shadow:inset 0 0 0 1px var(--line);color:var(--mute)}
 .src{color:var(--mute);font-size:11px;margin-top:4px}
 /* scoreboard game cards */
 .head{display:grid;grid-template-columns:auto 1fr auto;column-gap:12px;row-gap:6px;align-items:center;padding:10px 12px}
@@ -80,10 +87,16 @@ border-radius:10px;padding:10px 12px;-webkit-appearance:none}
  <div class="top"><h1>Root for / against</h1>
   <div class="wk"><button id="pw">&lsaquo;</button><span id="wk">Wk –</span><button id="nw">&rsaquo;</button></div>
   <button id="rf" title="Refresh">&#8635;</button></div>
- <input id="q" type="search" placeholder="Search a player (+ / −)" autocomplete="off" autocapitalize="off" spellcheck="false">
+ <input id="q" type="search" placeholder="Search a player or team" autocomplete="off" autocapitalize="off" spellcheck="false">
  <div class="tabs" id="tabs"></div>
 </header>
 <div class="meta" id="meta">Loading…</div>
+<details class="help"><summary>How to read this</summary><ul>
+<li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
+<li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
+<li>Game totals (+21 / −16) add up the nets of every player in that game.</li>
+<li>Stat bars: the filled part is what he has so far and the tick is the sportsbook line. A stub past the tick means he's over the line, and the label says whether that helps or hurts you.</li>
+</ul></details>
 <div id="out"></div>
 </div>
 <script>
@@ -200,7 +213,7 @@ async function loadGame(gk,force){
     const [away,home]=gk.split("@"), w=S.week, norm=a=>a==="WSH"?"WAS":a;
     await loadScores(force);
     const ev=(S.sb.data.events||[]).find(e=>{const t=e.competitions[0].competitors.map(c=>norm(c.team.abbreviation));return t.includes(away)&&t.includes(home)});
-    if(!ev)throw new Error("game not on ESPN yet");
+    if(!ev)throw new Error("ESPN hasn't listed this game yet.");
     const eid=ev.id, state=ev.status.type.state;
     const [sum,pb,proj,r1,r2]=await Promise.all([state==="pre"?null:get(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=${eid}`),
       get(`https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/${eid}/competitions/${eid}/odds/100/propBets?limit=1000`).catch(()=>null),projFor(w,force),
@@ -219,7 +232,7 @@ async function loadGame(gk,force){
         else if(grp.name==="rushing"){s.rushYd=g("rushingYards");s.rushTD=g("rushingTouchdowns")}
         else if(grp.name==="receiving"){s.rec=g("receptions");s.recYd=g("receivingYards");s.recTD=g("receivingTouchdowns")}}}
     S.gs[gk]={ok:true,state,lines,stats,proj,byName:Object.assign({},r1,r2),at:Date.now(),hasLines:Object.keys(lines).length>0};
-  }catch(e){S.gs[gk]={err:e.message,at:Date.now()}}
+  }catch(e){S.gs[gk]={err:/^ESPN/.test(e.message)?e.message:"Couldn't load stats for this game.",at:Date.now()}}
   render();
 }
 const fmtN=n=>Number.isInteger(n)?String(n):n.toFixed(1);
@@ -229,28 +242,37 @@ function lineFor(key,r,gs,eid){
   const pr=(gs.proj[r.pid]||{})[SPK[key]]; if(pr>0)return{v:Math.round(pr*10)/10,src:" · proj"};
   return null;
 }
-function barHtml(label,actual,line){
+function barHtml(label,actual,line,net){
   if(!line)return `<div class="bar"><div class="bh"><span>${label}</span><span><b>${fmtN(actual)}</b> · no line</span></div></div>`;
-  const L=line.v,ratio=L>0?actual/L:0,over=ratio>1,fill=Math.min(ratio,1)*100,ext=over?Math.round(8+Math.min(ratio-1,1)*14):0;
-  return `<div class="bar"><div class="bh"><span>${label}</span><span><b class="${over?"ov":""}">${fmtN(actual)}</b> / ${fmtN(L)}${line.src}</span></div>
-   <div class="bw"><div class="trk"><div class="fl" style="width:${fill}%"></div><span class="lt">${fmtN(L)}</span></div>
-   <div class="gut">${over?`<span class="brk"></span><span class="ext" style="width:${ext}px"></span>`:""}</div></div></div>`;
+  const L=line.v,over=actual>L,at=L>0&&actual===L,ratio=L>0?actual/L:0,fill=Math.min(ratio,1)*100,ext=over?Math.round(8+Math.min(ratio-1,1)*14):0;
+  const eff=net>0?`<span class="eff g">helps you</span>`:net<0?`<span class="eff b">hurts you</span>`:"";
+  const tag=over?`<span class="ovr">OVER +${fmtN(Math.round((actual-L)*10)/10)}${eff?" · ":""}</span>${eff}`:at?`<span class="ovr">AT LINE</span>`:"";
+  return `<div class="bar"><div class="bh"><span>${label}${tag?" "+tag:""}</span><span><b>${fmtN(actual)}</b> / ${fmtN(L)}${line.src}</span></div>
+   <div class="bw"><div class="trk"><div class="fl" style="width:${fill}%"></div></div><span class="tick"></span>
+   <div class="gut">${over?`<span class="ext" style="width:${ext}px"></span>`:`<span class="lt">${fmtN(L)}</span>`}</div></div></div>`;
 }
 function barsHtml(r){
   if(!r.game)return"";
   const specs=SPECS[r.pos];
-  if(!specs)return`<div class="src">Stat bars cover QB / RB / WR / TE.</div>`;
+  if(!specs)return`<div class="src">Stat bars cover QB, RB, WR and TE.</div>`;
   const gs=S.gs[r.game];
   if(!gs||(gs.busy&&!gs.ok))return`<div class="src">Loading lines and stats…</div>`;
-  if(gs.err)return`<div class="src">Stats unavailable (${esc(gs.err)}).</div>`;
+  if(gs.err)return`<div class="src">${esc(gs.err)} Tap ↻ to try again.</div>`;
   const eid=r.espn||gs.byName[nm(r.name)]||"", a=gs.stats[eid]||{};
   const act={passYd:a.passYd||0,passTD:a.passTD||0,rushYd:a.rushYd||0,rec:a.rec||0,recYd:a.recYd||0,td:(a.rushTD||0)+(a.recTD||0)};
+  const lines=specs.map(([l,k])=>[l,act[k],lineFor(k,r,gs,eid)]);
   const t=new Date(gs.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
   const st={pre:"not started",in:"live",post:"final"}[gs.state]||"";
-  return `<div class="bars">${specs.map(([l,k])=>barHtml(l,act[k],lineFor(k,r,gs,eid))).join("")}
-   <div class="src">Lines: DraftKings via ESPN${gs.state!=="pre"?" (pregame)":""}; "proj" = Sleeper projection where no line is posted. Stats: ESPN, ${st}, as of ${t}.${eid?"":" (couldn't match this player on ESPN)"}</div></div>`;
+  const note=lines.some(x=>x[2]&&x[2].src.includes("proj"))?" “proj” is a Sleeper projection, used where no line is posted.":"";
+  const td=lines.some(x=>x[2]&&x[2].src.includes("anytime"))?" The TD bar uses an anytime-TD line of 0.5.":"";
+  return `<div class="bars">${lines.map(([l,v,ln])=>barHtml(l,v,ln,r.net)).join("")}
+   <div class="src">Line: DraftKings${gs.state!=="pre"?", pregame":""}. Stats: ESPN, ${st}, ${t}.${note}${td}${eid?"":" Couldn't match this player on ESPN."}</div></div>`;
 }
 
+const shortName=n=>{
+  const p=String(n).replace(/\b(Jr|Sr|II|III|IV|V)\.?$/i,"").trim().split(/\s+/);
+  return p.length<2||p[1]==="DEF"?String(n):p[0][0]+". "+p[p.length-1];
+};
 const dayName=d=>{if(!d)return"";const[y,m,x]=d.split("-").map(Number);return new Date(y,m-1,x).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})};
 const sgn=n=>n>0?"+"+n:n<0?"−"+(-n):"0";
 const netCls=n=>n>0?"p":n<0?"n":"z";
@@ -265,13 +287,13 @@ function detail(r){
 function rowHtml(r,showGame){
   const g=showGame&&r.game?` · ${r.game.replace("@"," @ ")}`:"";
   return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row"><div class="nm"><b>${esc(r.name)}</b> <span class="sub">${esc(r.pos)} ${esc(r.team)}${g}</span></div>
-   <span class="cnt">you ${r.f} · opp ${r.a}</span>${netBadge(r)}</div>${detail(r)}</div>`;
+   <span class="cnt">for ${r.f} · against ${r.a}</span>${netBadge(r)}</div>${detail(r)}</div>`;
 }
 function gameCard(g){
   const key=g.away+"@"+g.home, sc=S.sc[key], st=effState(g), isOpen=S.open[key]??(st==="in");
   const up=g.rows.filter(r=>r.net>0),dn=g.rows.filter(r=>r.net<0),ev=g.rows.filter(r=>r.net===0);
   const sum=l=>l.reduce((t,r)=>t+Math.abs(r.net),0);
-  const top=(l,n)=>l.slice(0,n).map(r=>esc(r.name.split(" ").slice(-1)[0])+" "+sgn(r.net)).join(", ");
+  const top=(l,n)=>l.slice(0,n).map(r=>esc(shortName(r.name))+" "+sgn(r.net)).join(", ");
   up.sort((a,b)=>b.net-a.net||b.f-a.f);dn.sort((a,b)=>a.net-b.net||b.a-a.a);
   const prev=[up.length?"For: "+top(up,3):"",dn.length?"Against: "+top(dn,3):""].filter(Boolean).join(" · ")||"Even";
   const sec=(cls,label,l)=>l.length?`<div class="sec ${cls}">${label}</div>`+l.map(r=>rowHtml(r,false)).join(""):"";
@@ -282,9 +304,9 @@ function gameCard(g){
     :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head">
    <div class="sb">${tm(A,lead==="a")}${tm(H,lead==="h")}</div><div class="stc">${stc}</div>
-   <div class="nets"><span class="net p">+${sum(up)}</span><span class="net n">−${sum(dn)}</span></div>
+   <div class="nets" title="Totals for this game: players to root for / root against"><span class="net p">+${sum(up)}</span><span class="net n">−${sum(dn)}</span></div>
    <div class="prev">${prev}</div></div>
-   <div class="body">${sec("f","Root for",up)}${sec("a","Root against",dn)}${sec("e","Even / hedged",ev)}</div></div>`;
+   <div class="body">${sec("f","Root for",up)}${sec("a","Root against",dn)}${sec("e","Even · cancels out",ev)}</div></div>`;
 }
 
 function render(){
@@ -309,7 +331,7 @@ function render(){
     let html=rows.slice(0,200).map(r=>rowHtml(r,true)).join("");
     if(q&&rows.length===0){
       const hits=Object.entries(PLAYERS).filter(([id,p])=>p[0].toLowerCase().includes(q)).slice(0,8);
-      html=hits.length?`<div class="meta">Not in any of your lineups or your opponents' this week (0 / 0):</div>`+hits.map(([id,p])=>
+      html=hits.length?`<div class="meta">Not started by you or any opponent this week (0 / 0):</div>`+hits.map(([id,p])=>
         `<div class="card"><div class="row"><div class="nm"><b>${esc(p[0])}</b> <span class="sub">${esc(p[1])} ${esc(p[2])}</span></div><span class="net z">0</span></div></div>`).join("")
         :`<div class="empty">No player matches “${esc(q)}”.</div>`;
     }else html=`<div class="card">${html||'<div class="empty">Nothing here.</div>'}</div>`;
@@ -348,7 +370,7 @@ $("#q").addEventListener("input",render);
 async function refresh(week){
   if(S.busy)return;S.busy=true;$("#rf").style.opacity=.4;
   try{S.data=await load(week);await loadScores(true);store.set("rfa-"+S.data.week,S.data);render();await Promise.all(Object.keys(S.gs).map(gk=>loadGame(gk,true)))}
-  catch(e){if(!S.data)$("#out").innerHTML=`<div class="err">Couldn't reach Sleeper (${esc(e.message)}). Pull to retry.</div>`;$("#meta").textContent="Refresh failed: "+e.message}
+  catch(e){if(!S.data)$("#out").innerHTML=`<div class="err">Couldn't load your leagues from Sleeper. Check your connection, then tap ↻.</div>`;$("#meta").textContent="Couldn't refresh"+(S.data?", showing the last saved view.":".")}
   S.busy=false;$("#rf").style.opacity=1;
 }
 $("#rf").onclick=()=>refresh(S.week);

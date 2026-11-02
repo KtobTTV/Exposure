@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6fdb'/%3E%3Cpath d='M9 16h14M16 9v14' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-<title>Root For or Against</title>
+<title>Root for / against</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--mute:#5d6877;--line:#e1e5eb;--good:#0d7a3f;--goodbg:#e2f5e9;
 --bad:#b3261e;--badbg:#fbe7e5;--warn:#8a5a00;--warnbg:#fff1d6;--info:#1f5fbf;--infobg:#e4eefc;--btrk:#dbe3f1;--btrkb:#8795ad;--bfill:#2f6fdb;--ctl:#7f8a99}
@@ -123,6 +123,12 @@ h1 .short{display:none}
 .gt{font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}.gt b{font-weight:700}
 .gdiv{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding:10px 12px 4px;border-top:1px solid var(--line)}.card>.gdiv:first-child{border-top:0}
 .bi[aria-invalid="true"]{border-color:var(--bad)}.bierr{display:block;color:var(--bad);font-size:12px}
+.vd{display:grid;justify-items:end;gap:2px;text-align:right}.vw{font-size:15px}.vw b{font-weight:800}.vl{font-size:12px;color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.gtl{font-size:13px;color:var(--mute);padding:8px 12px 0}.gtl b{font-weight:700}.gtl .p{color:var(--good)}.gtl .n{color:var(--bad)}
+.mtally{margin:4px 0 2px;font-size:15px}.mtally .g{color:var(--good)}.mtally .b{color:var(--bad)}
+.warn{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--warnbg);color:var(--warn);font-size:14px;font-weight:600}.warn button{flex:none;background:var(--card)}
+.sh3{font-size:15px;margin:14px 0 2px}
+#rf{margin-left:8px}
 .fint .g{color:var(--good)}.fint .b{color:var(--bad)}
 .lv{color:var(--warn);font-weight:700}
 /* player detail v3: bars first, leagues behind a toggle */
@@ -199,6 +205,9 @@ h1 .short{display:none}
 input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .empty button{display:block;margin:10px auto 0}
 .chev.side{transform:rotate(-90deg)}
+/* last: overrides */
+@media (prefers-color-scheme:dark){.chip.on,.bnav button.on,#fb[aria-expanded="true"],#fb.on{background:var(--infobg);color:var(--ink);border-color:var(--info)}}
+@media (max-width:359px){.vd{grid-column:1/-1;justify-items:start;text-align:left;display:flex;gap:8px;align-items:baseline}#rf{margin-left:0}}
 </style></head><body><div class="wrap">
 <header>
  <div class="top"><h1><span class="full">Root for / against</span><span class="short">For / Against</span></h1>
@@ -206,7 +215,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
   <button id="rf" class="ic" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
   <button id="st" class="ic" data-settings="1" title="Settings" aria-label="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
 </header>
-<div class="meta" id="meta"></div><div class="sr" id="an" aria-live="polite"></div>
+<div class="meta" id="meta"></div><div id="warn" class="warn" role="status" hidden></div><div class="sr" id="an" aria-live="polite"></div>
 <div class="stickyhd" id="sh"><div class="searchbar"><input id="q" type="search" aria-label="Search players or teams" placeholder="Player or team" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false"><button id="fb" aria-expanded="false" aria-controls="ctl" hidden>Filter</button></div>
 <div id="fa"></div><div id="ctl"></div></div>
 <div id="upd" hidden></div><main id="out" aria-busy="true"></main>
@@ -216,9 +225,9 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  <ul>
  <li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
  <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
- <li>"lean +5" beside a team's score adds up the nets of that team's players. "Game total +7 / −6" adds up everyone in the game you root for, and everyone you root against.</li>
+ <li>"Root KC" on a game is the team whose players you need more: under it, "KC +4 · BUF −3" adds up the nets of each team's players. Open the game for "Game total": everyone in it you root for, and everyone you root against.</li>
  <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
- <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring, so defensive players add 0. Players Sleeper has no stats for count as 0, and the card says who.</li>
+ <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line, and "proj" means a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
  <li>The Matchups tab shows your score in every league this week, the closest first. "Down 3.2 · Proj win by 10.8" is where you stand now and where you should finish: live players count what they have plus their projection for the time left. Scoring is each league's own. "Up 3.5" is good. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Down 1.4 · good".</li>
  <li>On the Players tab, Filter opens the filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
@@ -234,7 +243,7 @@ const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){retu
 let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,lgOpen:{},projs:{},pts:{},status:"all",fopen:false,more:{},pfin:null,pbye:null,peven:null,mopen:{},mfin:null,mAt:0,mBusy:false,tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
 
 {const U=store.get("rfa-ui")||{};const ok=(v,l,d)=>l.includes(v)?v:d;
- S.money=!!U.money||U.tab==="value";S.tab=U.tab==="value"?"players":ok(U.tab,["games","players","matchups"],"games");S.msort=ok(U.msort,["close","proj","left","alpha"],"close");S.vmin=[0,10,25,50,100,250].includes(+U.vmin)?+U.vmin:0;S.view=ok(U.view,["all","for","against"],"all");
+ S.money=!!U.money||U.tab==="value";S.tab=U.tab==="value"?"players":ok(U.tab,["games","players","matchups"],"games");S.msort=ok(U.msort,["close","proj","stake","left","alpha"],"close");S.vmin=[0,10,25,50,100,250].includes(+U.vmin)?+U.vmin:0;S.view=ok(U.view,["all","for","against"],"all");
  S.sort=ok(U.sort,["impact","alpha","game"],"impact");S.status=ok(U.status,["all","active","done"],"all")}
 const saveUI=()=>store.set("rfa-ui",{tab:S.tab,view:S.view,sort:S.sort,status:S.status,money:S.money,vmin:S.vmin,msort:S.msort});
 S.buy=store.get("rfa-buy")||{};
@@ -479,7 +488,7 @@ function liveLine(r){
   const td=(a.rushTD||0)+(a.recTD||0),bits=[],raw=gs.pts?gs.pts[r.pid]:undefined;
   if(noBox){if(!gs.pts||raw!==undefined)bits.push('<span class="nostat">no ESPN stats</span>')}
   else if(r.pos==="QB"){bits.push(`${a.passYd||0} pass yds`,`${a.passTD||0} TD`,`${a.passInt||0} INT`);if(a.rushYd)bits.push(`${a.rushYd} rush`)}
-  else if(r.pos==="RB"){bits.push(`${a.rushAtt||0} car`,`${a.rushYd||0} yds`);if(a.rec)bits.push(`${a.rec} rec ${a.recYd||0} yds`);bits.push(`${td} TD`)}
+  else if(r.pos==="RB"){bits.push(`${a.rushAtt||0} car`,`${a.rushYd||0} yds`);if(a.rec)bits.push(`${a.rec} rec`,`${a.recYd||0} rec yds`);bits.push(`${td} TD`)}
   else if(r.pos==="WR"||r.pos==="TE"){bits.push(`${a.rec||0} rec`,`${a.recYd||0} yds`,`${td} TD`);if(a.rushYd)bits.push(`${a.rushYd} rush`)}
   let pt="";
   if(gs.pts){
@@ -525,7 +534,7 @@ function valueHtml(d){
   rows.sort((a,b)=>RANK[rStateOf(a.r)]-RANK[rStateOf(b.r)]||Math.abs(b.net)-Math.abs(a.net)||(b.f+b.a)-(a.f+a.a)||a.r.name.localeCompare(b.r.name));
   const unset=lgs.length-withBuy.length;
   const note=`<div class="vnote">Counting ${counted.length} of ${lgs.length} leagues${S.vmin?` with a buy-in of ${money(S.vmin)} or more`:""}${unset&&!S.vmin?` (${unset} count as $0)`:""}. Tap a player to see which leagues.${unset&&!S.vmin?`<button class="fclear" data-settings="1"><span>Set ${unset} missing buy-in${unset===1?"":"s"}</span>${CHEV.replace('class="chev"','class="chev side"')}</button>`:""}</div>`;
-  const list=rows.length?`<div class="card">${rows.slice(0,100).map(valRow).join("")}</div>`:`<div class="card"><div class="empty">${S.status==="active"?"No live or upcoming players match.":S.status==="done"?"No finished players match.":"No players match this filter."}${S.status==="all"?"":'<button data-showall="1">Show all players</button>'}</div></div>`;
+  const list=rows.length?`<div class="card">${rows.slice(0,100).map(valRow).join("")}</div>${rows.length>100?`<div class="vnote">Showing 100 of ${rows.length}. Search to find the rest.</div>`:""}`:`<div class="card"><div class="empty">${S.status==="active"?"No live or upcoming players match.":S.status==="done"?"No finished players match.":"No players match this filter."}${S.status==="all"?"":'<button data-showall="1">Show all players</button>'}</div></div>`;
   return note+list;
 }
 function settingsHtml(){
@@ -533,7 +542,7 @@ function settingsHtml(){
   const rows=lgs.map(l=>{const own=S.buy[l.id],g=guessBuy(l.name);
     return `<label class="birow"><span class="bn">${esc(baseName(l.name))}${/ \(tank\)$/.test(l.name)?" (tank)":""}${own==null&&g?`<small>$${g} read from the league name</small>`:""}</span><span class="bin">$<input class="bi" inputmode="decimal" data-lid="${esc(l.id)}" aria-label="Buy-in for ${esc(baseName(l.name))}" value="${own!=null?esc(own):""}" placeholder="${g||0}"></span></label>`}).join("");
   return `<div class="sheeth"><h2 id="setT">Settings</h2><button data-close="1">Close</button></div>
-   <h3 style="margin:14px 0 2px">League buy-ins</h3>
+   <h3 class="sh3">League buy-ins</h3>
    <p class="sub">Used when Players ranks by buy-in dollars. They're saved on this device only and are never sent anywhere.</p>
    <div class="bsum" id="bsum"></div>
    <div class="bilist">${rows||'<div class="empty">Leagues load first. Close this and try again in a moment.</div>'}</div>
@@ -590,7 +599,7 @@ function muCard(c){
   const mg=Math.abs(c.margin).toFixed(1);
   const txt=(!m.them?"No opponent":c.margin===0?"Tied":c.over?(c.margin>0?"Won by ":"Lost by ")+mg:(c.margin>0?"Up ":"Down ")+mg)+(m.tank&&m.them&&c.margin?(good?" · good":" · bad"):"");
   const cls=!m.them||c.margin===0?"z":good?"p":bad?"n":"z";
-  const verdict=!m.them||c.over?"":Math.abs(c.pm)<.05?"Proj tie":(c.pm>0?"Proj win by ":"Proj loss by ")+Math.abs(c.pm).toFixed(1);
+  const verdict=!m.them||c.over?"":Math.abs(c.pm)<.05?"Proj tie":(c.pm>0?"Proj win by ":"Proj loss by ")+Math.abs(c.pm).toFixed(1)+(m.tank?(c.pm<0?" · good":" · bad"):"");
   const leftTxt=c.over?"Final":m.them?`You ${c.a.left.length} left · them ${c.b.left.length}`:`${c.a.left.length} left`;
   const nE=c.a.empty.length,emp=nE&&!c.over?` · <span class="warn">${nE} empty slot${nE===1?"":"s"}</span>`:"";
   const body=m.them?`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left · proj ${f1(c.a.final)}</span></div>${muRows(c,"me",c.a)}</div>
@@ -598,7 +607,7 @@ function muCard(c){
     :`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left</span></div>${muRows(c,"me",c.a)}</div>`;
   const aria=[m.name+(m.tank?" (tank)":""),m.them?"vs "+m.opp:"",txt,verdict].filter(Boolean).join(". ");
   return `<div class="card mu${open?" open":""}"><div class="head mh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${open}" data-mu="${esc(m.id)}" data-fk="mu:${esc(m.id)}">${CHEV}
-   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk">(tank)</span>':""}${m.them?`<div class="sub">vs ${esc(m.opp)}</div>`:""}</div><span class="pill ${cls}"><span class="sr">${good?"good for you":bad?"bad for you":""} </span>${txt}</span>
+   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk nw">(tank)</span>':""}</div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
    <div class="ms">You <b>${f1(c.a.pts)}</b>${m.them?` – <b>${f1(c.b.pts)}</b> ${esc(m.opp)}`:""}</div>
    <div class="mx">${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
    <div class="body">${body}</div></div>`;
@@ -609,14 +618,16 @@ function matchupsHtml(d){
   const all=ms.map(muCalc);
   const key={close:(a,b)=>(a.m.them?0:1)-(b.m.them?0:1)||Math.abs(a.margin)-Math.abs(b.margin)||Math.abs(a.pm)-Math.abs(b.pm),
     proj:(a,b)=>(a.m.them?0:1)-(b.m.them?0:1)||Math.abs(a.pm)-Math.abs(b.pm),
+    stake:(a,b)=>effBuy(b.m.id,b.m.name)-effBuy(a.m.id,a.m.name)||Math.abs(a.margin)-Math.abs(b.margin),
     left:(a,b)=>(b.a.left.length+(b.b?b.b.left.length:0))-(a.a.left.length+(a.b?a.b.left.length:0)),
     alpha:(a,b)=>a.m.name.localeCompare(b.m.name)}[S.msort]||(()=>0);
   const act=all.filter(c=>!c.over).sort((a,b)=>key(a,b)||a.m.name.localeCompare(b.m.name));
   const done=all.filter(c=>c.over).sort((a,b)=>Math.abs(a.margin)-Math.abs(b.margin));
   const live=all.filter(c=>c.a.left.some(o=>o.st==="in")||(c.b&&c.b.left.some(o=>o.st==="in"))).length;
-  const ctl=`<div class="vctl"><div class="vhead"><h2>Matchups</h2></div><div class="ctl"><label class="sortl"><span class="sub">Sort</span><select id="msortsel" data-fk="ms" aria-label="Sort matchups">${[["close","Closest score"],["proj","Closest projected"],["left","Most players left"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.msort===k?" selected":""}>${l}</option>`).join("")}</select></label></div></div>`;
+  const ctl=`<div class="vctl"><div class="vhead"><h2>Matchups</h2></div><div class="ctl"><label class="sortl"><span class="sub">Sort</span><select id="msortsel" data-fk="ms" aria-label="Sort matchups">${[["close","Closest score"],["proj","Closest projected"],["stake","Biggest buy-in"],["left","Most players left"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.msort===k?" selected":""}>${l}</option>`).join("")}</select></label></div></div>`;
   const asOf=new Date(Math.max(S.mAt,d.at)).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
-  const note=`<div class="mnote">${all.length} leagues · ${act.length} in play${live?` · ${live} with a player live`:""} · scores as of ${asOf}. Proj uses each league's scoring and scales live players by time left.</div>`;
+  const way=c=>c.m.them&&c.margin?(c.m.tank?c.margin<0:c.margin>0):null,yes=all.filter(c=>way(c)===true).length,no=all.filter(c=>way(c)===false).length,nt=all.filter(c=>c.m.tank).length;
+  const note=`<p class="mtally"><b class="g">${yes} going your way</b> · <b class="b">${no} not</b>${all.length-yes-no?` · ${all.length-yes-no} tied or no opponent`:""}</p><div class="mnote">${act.length} in play${live?` · ${live} with a player live`:""} · scores as of ${asOf}${nt?` · ${nt} tank league${nt===1?" counts":"s count"} losing as your way`:""}. Proj uses each league's scoring and scales live players by time left.</div>`;
   const o=S.mfin??(!act.length);
   return ctl+note+(act.length?act.map(muCard).join(""):"")+(done.length?`<button class="fint" data-fk="mf" data-mfin="1" data-open="${o?1:0}" aria-expanded="${o}"><span>Finished · ${done.length}</span>${CHEV}</button>${o?done.map(muCard).join(""):""}`:"");
 }
@@ -685,17 +696,18 @@ function gameCard(g,compact){
      <div class="cline"><b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span></div><span class="pill ${o.c}">${o.v==null?"":`<span class="sr">${o.c==="p"?"helped you":o.c==="n"?"hurt you":"even"} </span>`}${o.t}</span></div>
      <div class="body"><div class="fbody">${total}${lns}${miss}</div>${secs}</div></div>`;
   }
-  const tm=(t,l)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span>${chipN(teamLean(g,t.abbr),t.abbr)}</div>`;
-  const diff=show?Math.abs(+A.score-+H.score):0, leadTxt=!show?"":diff===0?"Tied":`${lead==="a"?A.abbr:H.abbr} leads by ${diff}`;
-  const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span><span class="clk">${esc(leadTxt)}</span>`
+  const tm=(t,l)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span></div>`;
+  const la=teamLean(g,A.abbr),lh=teamLean(g,H.abbr),pick=la>lh?A.abbr:lh>la?H.abbr:"";
+  const vd=`<div class="vd">${pick?`<span class="vw">Root <b>${esc(pick)}</b></span>`:`<span class="vw"><b>Even</b></span>`}<span class="vl">${esc(A.abbr)} ${sgn(la)} · ${esc(H.abbr)} ${sgn(lh)}</span></div>`;
+  const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
     :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
   const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+sgn(r.net)).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
-  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
+  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),pick?`Root ${pick}: ${A.abbr} ${sgn(la)}, ${H.abbr} ${sgn(lh)}`:"Teams even",up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
    <div class="sb">${tm(A,lead==="a")}${tm(H,lead==="h")}</div><div class="stc">${stc}</div>
-   <div class="tot"><span>Game total</span><span class="gt"><b class="p"><span class="sr">Root for </span>+${sum(up)}</b> / <b class="n"><span class="sr">Root against </span>−${sum(dn)}</b></span></div>
+   ${vd}
    <div class="lines">${linesHtml(up,dn)}</div></div>
-   <div class="body">${secs}</div></div>`;
+   <div class="body"><div class="gtl">Game total: <b class="p">+${sum(up)}</b> root for · <b class="n">−${sum(dn)}</b> root against</div>${secs}</div></div>`;
 }
 
 function render(){
@@ -712,6 +724,8 @@ const rStateOf=r=>{
   const gst=((S.data&&S.data.gstat)||{})[r.game];return gst==="in_game"?"in":gst==="complete"?"post":"pre";
 };
 const RANK={in:0,pre:1,none:2,post:3};
+let warnHtml=null;
+function setWarn(h){if(h===warnHtml)return;warnHtml=h;const w=$("#warn");w.innerHTML=h;w.hidden=!h}
 let faHtml=null;
 function setFa(h){if(h===faHtml)return;faHtml=h;$("#fa").innerHTML=h}
 function renderInner(){
@@ -723,13 +737,17 @@ function renderInner(){
   setText($("#wk"),"Wk "+(wk||"–"));
   $("#pw").disabled=!wk||wk<=1;$("#nw").disabled=!wk||wk>=18;
   if(!d){
-    setCtl("");setFa("");$("#fb").hidden=true;
+    setCtl("");setFa("");setWarn("");$("#fb").hidden=true;
     setText($("#meta"),S.err?"":wk?`Loading Week ${wk}…`:"Loading your leagues…");
     out.innerHTML=S.err?`<div class="err">${esc(S.err)}<button data-retry="1">Try again</button></div>`:'<div class="empty">Loading…</div>';
     return;
   }
   const ago=Math.round((Date.now()-d.at)/60000);
-  setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · didn't load: ${(d.failedNames||[]).slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${(d.failedNames||[]).length>2?` +${d.failedNames.length-2} more`:""}`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`);
+  setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · didn't load: ${(d.failedNames||[]).slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${(d.failedNames||[]).length>2?` +${d.failedNames.length-2} more`:""}`:""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`);
+  const liveOld=S.sb&&Object.values(S.sc).some(x=>x.state==="in")&&Date.now()-S.sb.at>5*60000;
+  setWarn(S.err?`<span>${esc(S.err)}.</span><button data-retry="1">Try again</button>`
+    :S.curWeek&&S.week!==S.curWeek?`<span>Showing Week ${S.week}, not this week.</span><button data-gowk="1">Back to Week ${S.curWeek}</button>`
+    :liveOld?`<span>Live scores are ${Math.round((Date.now()-S.sb.at)/60000)} min old.</span><button data-retry="1">Refresh</button>`:"");
   const onTab=S.tab;
   for(const [id,k] of [["#tg","games"],["#tp","players"],["#tm","matchups"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-current",onTab===k?"page":"false")}
   $("#sh").classList.toggle("stick",onTab==="players"&&!S.fopen);
@@ -754,14 +772,15 @@ function renderInner(){
     if(view==="for")rows=rows.filter(r=>r.net>0);if(view==="against")rows=rows.filter(r=>r.net<0);
     if(q)rows=rows.filter(r=>r.name.toLowerCase().includes(q)||r.team.toLowerCase()===q||(r.pos+" "+r.team).toLowerCase().includes(q));
     else{if(S.status==="active")rows=rows.filter(r=>{const x=rStateOf(r);return x==="in"||x==="pre"});if(S.status==="done")rows=rows.filter(r=>rStateOf(r)==="post")}
-    const kick=r=>{if(!r.game)return"z";const sc=S.sc[r.game];return (sc?sc.date:((d.gstat&&d.gstat[r.game])?"":"y"))+r.game};
+    const kick=r=>{if(!r.game)return"z";const sc=S.sc[r.game];return RANK[rStateOf(r)]+(sc?sc.date:((d.gstat&&d.gstat[r.game])?"":"y"))+r.game};
     const strength=(a,b)=>Math.abs(b.net)-Math.abs(a.net)||(b.f+b.a)-(a.f+a.a);
     const metric=S.sort==="alpha"?()=>0:S.sort==="game"?(a,b)=>kick(a).localeCompare(kick(b)):strength;
     const ranked=S.sort==="impact";
     const rk=r=>RANK[rStateOf(r)];
     const isTeam=r=>q&&r.team.toLowerCase()===q?0:1;
     rows.sort((a,b)=>isTeam(a)-isTeam(b)||(ranked?rk(a)-rk(b):0)||metric(a,b)||a.name.localeCompare(b.name));
-    const card=l=>`<div class="card">${l.slice(0,200).map(r=>rowHtml(r,true)).join("")}</div>`;
+    const more=n=>n>200?`<div class="vnote">Showing 200 of ${n}. Search to find the rest.</div>`:"";
+    const card=l=>`<div class="card">${l.slice(0,200).map(r=>rowHtml(r,true)).join("")}</div>${more(l.length)}`;
     const grp=(key,label,l,o)=>`<button class="fint" data-fk="${key}" data-${{pf:"pfin",pb:"pbye",pe:"peven"}[key]}="1" data-open="${o?1:0}" aria-expanded="${o}"><span>${label} · ${l.length} player${l.length===1?"":"s"}</span>${CHEV}</button>${o?card(l):""}`;
     let html;
     if(q&&rows.length===0){
@@ -779,7 +798,7 @@ function renderInner(){
       let h="",last=null;
       for(const r of rows.slice(0,200)){if(r.game!==last){last=r.game;const sc=r.game&&S.sc[r.game];
         h+=`<div class="gdiv">${r.game?esc(r.game.replace("@"," @ "))+(sc?" · "+esc(stText(sc)):""):"Bye / no game"}</div>`}h+=rowHtml(r,true)}
-      html=`<div class="card">${h}</div>`;
+      html=`<div class="card">${h}</div>${more(rows.length)}`;
     }else html=card(rows);
     out.innerHTML=html;
   }else if(S.tab==="matchups"){
@@ -818,7 +837,7 @@ function openSheet(el,from){SHEET=el;S.helpFrom=from||document.activeElement;el.
 function closeSheet(){if(!SHEET)return;SHEET.hidden=true;SHEET=null;$(".wrap").inert=false;$(".bnav").inert=false;document.body.style.overflow="";const tgt=S.helpFrom&&S.helpFrom.isConnected?S.helpFrom:($("[data-settings]")||$("#th"));if(tgt&&tgt.focus)tgt.focus()}
 function openSettings(from){const from2=SHEET?S.helpFrom:from;if(SHEET)closeSheet();$("#setin").innerHTML=settingsHtml();updateBsum();openSheet($("#setsheet"),from2)}
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-reload],[data-tab],[data-view],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],#fb,.head,.row");if(!t)return;
+  const t=e.target.closest("[data-reload],[data-gowk],[data-tab],[data-view],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],#fb,.head,.row");if(!t)return;
   if(t.dataset.reload){location.replace(location.pathname+"?v="+t.dataset.reload);return}
   if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
   else if(t.dataset.close!==undefined)closeSheet();
@@ -827,7 +846,8 @@ document.addEventListener("click",e=>{
   else if(t.dataset.showall!==undefined){S.status="all";saveUI();render()}
   else if(t.id==="fb"){S.fopen=!S.fopen;render()}
   else if(t.dataset.retry){refresh(S.week)}
-  else if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";saveUI();render();window.scrollTo(0,0);if(S.tab==="matchups")refreshMatchups()}
+  else if(t.dataset.gowk){go(S.curWeek)}
+  else if(t.dataset.tab){S.tab=t.dataset.tab;S.pdet={};$("#q").value="";saveUI();render();window.scrollTo(0,0);if(S.tab==="matchups")refreshMatchups()}
   else if(t.dataset.mu){S.mopen[t.dataset.mu]=!S.mopen[t.dataset.mu];render()}
   else if(t.dataset.mfin!==undefined){S.mfin=t.dataset.open!=="1";render()}
   else if(t.dataset.view){S.view=t.dataset.view;saveUI();render()}
@@ -885,7 +905,7 @@ async function refresh(week){
   }catch(e){
     if(tok!==S.tok)return;
     S.loading=false;
-    S.err=S.data?errMsg(e).replace(/\.$/,"")+", showing the last saved view":errMsg(e)+" Check your connection, then try again.";
+    S.err=S.data?errMsg(e).replace(/\.$/,"")+". Showing what loaded "+fmtAgo(Math.round((Date.now()-S.data.at)/60000)):errMsg(e)+" Check your connection, then try again.";
     render();
   }finally{
     if(tok===S.tok){S.busy=false;S.loading=false;$("#rf").classList.remove("busy")}

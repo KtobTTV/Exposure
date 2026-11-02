@@ -155,6 +155,18 @@ h1 .short{display:none}
 .lines b{margin-right:2px}
 .bh>span:first-child{min-width:0}.bh>span:last-child{white-space:nowrap}
 .nostat{font-style:italic}
+/* v6: $ value + settings */
+.net.big{min-width:76px}
+.vctl{margin:0 0 10px}
+.vnote{font-size:13px;color:var(--mute);margin:8px 0}
+.vhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 8px}
+.vhead h2{font-size:17px;margin:0}
+.bilist{display:grid;margin:8px 0}
+.birow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:4px 0;border-bottom:1px solid var(--line)}
+.bn{min-width:0;overflow-wrap:anywhere}.bn small{display:block;color:var(--mute);font-size:12px}
+.bin{display:flex;align-items:center;gap:4px;font-weight:600;flex:none}
+.bi{width:96px;min-height:44px;text-align:right;font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 10px;-webkit-appearance:none}
+.bsum{margin:8px 0}
 </style></head><body><div class="wrap">
 <header>
  <div class="top"><h1><span class="full">Root for / against</span><span class="short">For / Against</span></h1>
@@ -168,6 +180,7 @@ h1 .short{display:none}
 </div>
 <div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetT" hidden><div class="sheetin">
  <div class="sheeth"><h2 id="sheetT">How to read this</h2><button id="sx" data-close="1" aria-label="Close help">Close</button></div>
+ <p><button data-settings="1">Set league buy-ins</button></p>
  <ul>
  <li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
  <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
@@ -175,9 +188,11 @@ h1 .short{display:none}
  <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR.</li>
  <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you (about +1 per league across 41 leagues). Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  <li>Stat bars: the filled part is what he has so far and the tick is the DraftKings line. A stub past the tick means he's over the line, and the label says whether that helps or hurts you. "proj" means the line is a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
+ <li>The $ Value tab adds up the buy-ins of every league where a player helps you (for) or hurts you (against). "+$320" means he helps you in $320 more of buy-ins than he hurts you. Set the buy-ins in Settings; they stay on this device only. Use "Leagues" to count only your big-money leagues.</li>
  <li>On the Players tab, Filter opens the filters. Live and upcoming games come first, and finished players sit in a collapsed group at the bottom.</li>
  </ul></div></div>
-<nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-pressed="true">Games</button><button id="tp" data-tab="players" aria-pressed="false">Players</button><button id="th" data-help="1" aria-haspopup="dialog">Help</button></nav>
+<nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-pressed="true">Games</button><button id="tp" data-tab="players" aria-pressed="false">Players</button><button id="tv" data-tab="value" aria-pressed="false">$ Value</button><button id="th" data-help="1" aria-haspopup="dialog">Help</button></nav>
+<div id="setsheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="setT" hidden><div class="sheetin" id="setin"></div></div>
 <script>
 const UID="__UID__", PLAYERS=__PLAYERS__, TANK=new Set(__TANK__), API="https://api.sleeper.app/v1";
 const $=s=>document.querySelector(s);
@@ -186,9 +201,10 @@ const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){retu
 let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,lgOpen:{},projs:{},pts:{},status:"all",fopen:false,more:{},pfin:null,pbye:null,tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
 
 {const U=store.get("rfa-ui")||{};const ok=(v,l,d)=>l.includes(v)?v:d;
- S.tab=ok(U.tab,["games","players"],"games");S.view=ok(U.view,["all","for","against"],"all");
+ S.tab=ok(U.tab,["games","players","value"],"games");S.vview=ok(U.vview,["all","for","against"],"all");S.vstat=ok(U.vstat,["active","all","done"],"active");S.vmin=[0,10,25,50,100,250].includes(+U.vmin)?+U.vmin:0;S.view=ok(U.view,["all","for","against"],"all");
  S.sort=ok(U.sort,["impact","alpha","game"],"impact");S.status=ok(U.status,["all","active","done"],"all")}
-const saveUI=()=>store.set("rfa-ui",{tab:S.tab,view:S.view,sort:S.sort,status:S.status});
+const saveUI=()=>store.set("rfa-ui",{tab:S.tab,view:S.view,sort:S.sort,status:S.status,vview:S.vview,vstat:S.vstat,vmin:S.vmin});
+S.buy=store.get("rfa-buy")||{};
 const CHEV='<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const fmtAgo=m=>m<1?"just now":m<60?m+" min ago":m<1440?Math.round(m/60)+" hr ago":Math.round(m/1440)+" days ago";
 async function get(u,tries=2){
@@ -222,13 +238,14 @@ async function load(week){
   const games={};
   for(const g of sched){if(g.week!==w)continue;games[g.away+"@"+g.home]={away:g.away,home:g.home,date:g.date,status:g.status,rows:[]}}
   const teamGame={};for(const k in games){teamGame[games[k].away]=k;teamGame[games[k].home]=k}
-  const shares={}; let nLg=0, failed=0;
+  const shares={}, lgList=[]; let nLg=0, failed=0;
   await pool(lgs,async lg=>{
     try{
       const [rosters,mus,users]=await Promise.all([get(`${API}/league/${lg.league_id}/rosters`),
         get(`${API}/league/${lg.league_id}/matchups/${w}`),get(`${API}/league/${lg.league_id}/users`)]);
       const mine=rosters.find(r=>String(r.owner_id)===UID||(r.co_owners||[]).includes(UID)); if(!mine)return;
       const my=mus.find(m=>m.roster_id===mine.roster_id); if(!my)return; nLg++;
+      lgList.push({id:String(lg.league_id),name:(lg.name||"").trim()+(TANK.has(String(lg.league_id))?" (tank)":"")});
       const opp=my.matchup_id==null?null:mus.find(m=>m.matchup_id===my.matchup_id&&m.roster_id!==mine.roster_id);
       const oroster=opp&&rosters.find(r=>r.roster_id===opp.roster_id);
       const ou=oroster&&users.find(u=>u.user_id===oroster.owner_id);
@@ -238,7 +255,7 @@ async function load(week){
         const side=(own!==tank)?"f":"a";
         for(const pid of new Set((list||[]).map(String))){
           if(!pid||pid==="0"||pid==="None")continue;
-          (shares[pid]=shares[pid]||{f:[],a:[]})[side].push({lg:lname,opp:oname,t:tank});
+          (shares[pid]=shares[pid]||{f:[],a:[]})[side].push({lg:lname,id:String(lg.league_id),opp:oname,t:tank});
         }}
     }catch(e){failed++;console.warn(lg.name,e)}
   });
@@ -252,7 +269,7 @@ async function load(week){
   for(const g of gl)g.rows.sort((a,b)=>(b.f+b.a)-(a.f+a.a)||Math.abs(b.net)-Math.abs(a.net)||a.name.localeCompare(b.name));
   gl.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||(b.rows.reduce((t,r)=>t+r.f+r.a,0)-a.rows.reduce((t,r)=>t+r.f+r.a,0)));
   const gstat={};for(const k in games)gstat[k]=games[k].status;
-  return {week:w,season:S.season,leagues:nLg,failed,gstat,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
+  return {week:w,season:S.season,leagues:nLg,failed,gstat,lgList,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
 }
 
 /* ---------- per-game stat bars: DraftKings lines (ESPN) vs live ESPN box score ---------- */
@@ -428,6 +445,60 @@ function rowHtml(r,showGame){
   return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${!!S.pdet[r.pid]}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm"><b>${esc(r.name)}</b> ${meta}${liveLine(r)}</div>
    ${netBadge(r)}</div>${detail(r)}</div>`;
 }
+const guessBuy=name=>{const m=/\$\s?(\d{1,5})(?!\d)/.exec(name||"");return m?+m[1]:0};
+const effBuy=(id,name)=>{const v=id!=null?S.buy[id]:undefined;return v!=null?+v:guessBuy(name)};
+const baseName=n=>String(n).replace(/ \(tank\)$/,"");
+const money=n=>"$"+Math.abs(Math.round(n)).toLocaleString();
+const smoney=n=>(n>0?"+":n<0?"−":"")+money(n);
+function leaguesOf(d){
+  if(d&&d.lgList&&d.lgList.length)return d.lgList;
+  const m={};for(const r of (d?d.rows:[]))for(const x of r.fl.concat(r.al))m[x.lg]=m[x.lg]||{id:x.id||x.lg,name:x.lg};
+  return Object.values(m);
+}
+function dollars(r,min){
+  const pick=l=>l.map(x=>({x,b:effBuy(x.id,x.lg)})).filter(o=>o.b>0&&o.b>=min).sort((a,b)=>b.b-a.b);
+  const F=pick(r.fl),A=pick(r.al),f=F.reduce((t,o)=>t+o.b,0),a=A.reduce((t,o)=>t+o.b,0);
+  return {r,F,A,f,a,net:f-a};
+}
+function valRow(o){
+  const r=o.r,gp=gameParts(r),cls=o.net>0?"p":o.net<0?"n":"z",open=!!S.pdet[r.pid];
+  const li=(l,side)=>l.length?`<div class="lgh ${side==="f"?"f":"a"}">${side==="f"?"With you":"Against"} · ${money(l.reduce((t,x)=>t+x.b,0))}</div><ul class="lgl">${l.map(x=>`<li>${money(x.b)} · ${esc(baseName(x.x.lg))}${x.x.t?' <span class="tk">tank</span>':""} <span class="sub">${side==="f"?(x.x.t?esc(x.x.opp)+" starts him":"vs "+esc(x.x.opp)):(x.x.t?"you start him":esc(x.x.opp)+" starts him")}</span></li>`).join("")}</ul>`:"";
+  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${open}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm"><b>${esc(r.name)}</b> <span class="sub nw">${esc(r.pos)} ${esc(r.team)}${gp.opp?" · "+esc(gp.opp):""}</span><div class="sub nw">${gp.when?gp.when+" · ":""}for ${money(o.f)} · against ${money(o.a)}</div>${liveLine(r)}</div><span class="net ${cls} big"><span class="sr">dollar net </span>${smoney(o.net)}</span></div>
+   <div class="det${open?" show":""}">${barsHtml(r)}${li(o.F,"f")}${li(o.A,"a")}</div></div>`;
+}
+function valueHtml(d){
+  const lgs=leaguesOf(d),withBuy=lgs.filter(l=>effBuy(l.id,l.name)>0),counted=lgs.filter(l=>effBuy(l.id,l.name)>0&&effBuy(l.id,l.name)>=S.vmin);
+  const ctl=`<div class="vctl"><div class="vhead"><h2>Player $ Value</h2><button data-settings="1">Settings</button></div>
+   <div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.vview===v?" on":""}" data-vview="${v}" data-fk="vc:${v}" aria-pressed="${S.vview===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
+   <div class="ctl"><label class="sortl"><span class="sub">Leagues</span><select id="vminsel" data-fk="vm" aria-label="Count leagues with a buy-in of at least">${[[0,"Any buy-in"],[10,"$10 and up"],[25,"$25 and up"],[50,"$50 and up"],[100,"$100 and up"],[250,"$250 and up"]].map(([k,l])=>`<option value="${k}"${S.vmin===k?" selected":""}>${l}</option>`).join("")}</select></label>
+   <label class="sortl"><span class="sub">Show</span><select id="vstsel" data-fk="vs" aria-label="Which games">${[["active","Live & upcoming"],["all","All players"],["done","Finished"]].map(([k,l])=>`<option value="${k}"${S.vstat===k?" selected":""}>${l}</option>`).join("")}</select></label></div></div>`;
+  if(!withBuy.length)return ctl+`<div class="card"><div class="empty">No buy-ins set yet.<br>Add what each league costs in Settings and this tab ranks players by the dollars riding on them.<br><button data-settings="1">Set league buy-ins</button></div></div>`;
+  let rows=d.rows.map(r=>dollars(r,S.vmin)).filter(o=>o.F.length||o.A.length);
+  if(S.vstat==="active")rows=rows.filter(o=>{const x=rStateOf(o.r);return x==="in"||x==="pre"});
+  if(S.vstat==="done")rows=rows.filter(o=>rStateOf(o.r)==="post");
+  if(S.vview==="for")rows=rows.filter(o=>o.net>0);if(S.vview==="against")rows=rows.filter(o=>o.net<0);
+  rows.sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)||(b.f+b.a)-(a.f+a.a)||a.r.name.localeCompare(b.r.name));
+  const unset=lgs.length-withBuy.length;
+  const note=`<div class="vnote">Counting ${counted.length} of ${lgs.length} leagues${S.vmin?` with a buy-in of ${money(S.vmin)} or more`:""}${unset&&!S.vmin?` (${unset} have no buy-in and count as $0)`:""}. Tap a player to see which leagues.</div>`;
+  const list=rows.length?`<div class="card">${rows.slice(0,100).map(valRow).join("")}</div>`:`<div class="card"><div class="empty">${S.vstat==="active"?"No live or upcoming players match.":S.vstat==="done"?"No finished players match.":"No players match."}</div></div>`;
+  return ctl+note+list;
+}
+function settingsHtml(){
+  const d=S.data,lgs=leaguesOf(d).slice().sort((a,b)=>baseName(a.name).localeCompare(baseName(b.name)));
+  const rows=lgs.map(l=>{const own=S.buy[l.id],g=guessBuy(l.name);
+    return `<label class="birow"><span class="bn">${esc(baseName(l.name))}${/ \(tank\)$/.test(l.name)?" (tank)":""}${own==null&&g?`<small>$${g} read from the league name</small>`:""}</span><span class="bin">$<input class="bi" inputmode="decimal" data-lid="${esc(l.id)}" aria-label="Buy-in for ${esc(baseName(l.name))}" value="${own!=null?esc(own):""}" placeholder="${g||0}"></span></label>`}).join("");
+  return `<div class="sheeth"><h2 id="setT">Settings</h2><button data-close="1">Close</button></div>
+   <h3 style="margin:14px 0 2px">League buy-ins</h3>
+   <p class="sub">Used by the $ Value tab. They're saved on this device only and are never sent anywhere.</p>
+   <div class="bsum" id="bsum"></div>
+   <div class="bilist">${rows||'<div class="empty">Leagues load first. Close this and try again in a moment.</div>'}</div>
+   <p><button data-resetbuy="1">Reset all buy-ins</button></p>`;
+}
+function updateBsum(){
+  const el=$("#bsum");if(!el)return;
+  const lgs=leaguesOf(S.data),tot=lgs.reduce((t,l)=>t+effBuy(l.id,l.name),0),set=lgs.filter(l=>effBuy(l.id,l.name)>0).length;
+  el.textContent=`${set} of ${lgs.length} leagues have a buy-in · ${money(tot)} total`;
+}
 const teamLean=(g,ab)=>g.rows.filter(r=>r.team===ab).reduce((t,r)=>t+r.net,0);
 const chipN=(n,ab)=>`<span class="chipn ${netCls(n)}"><span class="sr">${esc(ab)} lean </span>${sgn(n)}</span>`;
 const ptsMap=()=>((S.pts[S.week]||{}).map)||null;
@@ -520,7 +591,7 @@ function renderInner(){
   const ago=Math.round((Date.now()-d.at)/60000);
   setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · ${d.failed} ${d.failed===1?"league":"leagues"} didn't load`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`);
   const onTab=q?"players":S.tab;
-  for(const [id,k] of [["#tg","games"],["#tp","players"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-pressed",onTab===k)}
+  for(const [id,k] of [["#tg","games"],["#tp","players"],["#tv","value"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-pressed",onTab===k)}
   $("#sh").classList.toggle("stick",onTab==="players");
   const nf=(S.view!=="all"?1:0)+(S.status!=="all"?1:0)+(S.sort!=="impact"?1:0);
   const fb=$("#fb");fb.hidden=onTab!=="players";fb.setAttribute("aria-expanded",S.fopen);fb.classList.toggle("on",nf>0&&!S.fopen);setText(fb,"Filter"+(nf?" · "+nf:""));
@@ -564,6 +635,8 @@ function renderInner(){
       html=(live.length?card(live):"")+(byes.length?grp("pb","Bye / no game",byes,S.pbye??false):"")+(done.length?grp("pf","Finished",done,S.pfin??(!live.length&&!byes.length)):"");
     }else html=card(rows);
     out.innerHTML=html;
+  }else if(S.tab==="value"){
+    out.innerHTML=valueHtml(d);
   }else{
     const live=[],upc=[],fin=[],expo=g=>g.rows.reduce((t,r)=>t+r.f+r.a,0);
     for(const g of d.games){const st=effState(g);(st==="in"?live:st==="post"?fin:upc).push(g)}
@@ -594,12 +667,17 @@ function renderInner(){
   }
 }
 
-const openHelp=from=>{S.helpFrom=from||document.activeElement;$("#sheet").hidden=false;$(".wrap").inert=true;$(".bnav").inert=true;document.body.style.overflow="hidden";$("#sx").focus()};
-const closeHelp=()=>{$("#sheet").hidden=true;$(".wrap").inert=false;$(".bnav").inert=false;document.body.style.overflow="";if(S.helpFrom&&S.helpFrom.focus)S.helpFrom.focus()};
+let SHEET=null;
+function openSheet(el,from){SHEET=el;S.helpFrom=from||document.activeElement;el.hidden=false;$(".wrap").inert=true;$(".bnav").inert=true;document.body.style.overflow="hidden";const c=el.querySelector("[data-close]");if(c)c.focus()}
+function closeSheet(){if(!SHEET)return;SHEET.hidden=true;SHEET=null;$(".wrap").inert=false;$(".bnav").inert=false;document.body.style.overflow="";const tgt=S.helpFrom&&S.helpFrom.isConnected?S.helpFrom:($("[data-settings]")||$("#th"));if(tgt&&tgt.focus)tgt.focus()}
+function openSettings(from){const from2=SHEET?S.helpFrom:from;if(SHEET)closeSheet();$("#setin").innerHTML=settingsHtml();updateBsum();openSheet($("#setsheet"),from2)}
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-view],[data-final],[data-pfin],[data-pbye],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],#fb,.head,.row");if(!t)return;
-  if(t.dataset.help!==undefined)openHelp(t);
-  else if(t.dataset.close!==undefined)closeHelp();
+  const t=e.target.closest("[data-tab],[data-view],[data-final],[data-pfin],[data-pbye],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-settings],[data-resetbuy],[data-vview],#fb,.head,.row");if(!t)return;
+  if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
+  else if(t.dataset.close!==undefined)closeSheet();
+  else if(t.dataset.settings!==undefined)openSettings(t);
+  else if(t.dataset.resetbuy!==undefined){if(confirm("Reset all league buy-ins on this device?")){S.buy={};store.set("rfa-buy",S.buy);$("#setin").innerHTML=settingsHtml();updateBsum();render()}}
+  else if(t.dataset.vview){S.vview=t.dataset.vview;saveUI();render()}
   else if(t.id==="fb"){S.fopen=!S.fopen;render()}
   else if(t.dataset.retry){refresh(S.week)}
   else if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";saveUI();render();window.scrollTo(0,0)}
@@ -617,14 +695,25 @@ document.addEventListener("click",e=>{
   else if(t.classList.contains("row")){const pr=t.parentElement;S.pdet[pr.dataset.pid]=!S.pdet[pr.dataset.pid];render();if(S.pdet[pr.dataset.pid]&&pr.dataset.gk)loadGame(pr.dataset.gk)}
 });
 $("#q").addEventListener("input",render);
+document.addEventListener("input",e=>{
+  const t=e.target;if(!t.classList||!t.classList.contains("bi"))return;
+  const id=t.dataset.lid,v=t.value.trim();
+  if(v==="")delete S.buy[id];else{const n=parseFloat(v.replace(/[$,]/g,""));if(isFinite(n)&&n>=0)S.buy[id]=n}
+  store.set("rfa-buy",S.buy);updateBsum();render();
+});
 document.addEventListener("keydown",e=>{
-  if(!$("#sheet").hidden){if(e.key==="Escape"){e.preventDefault();closeHelp()}else if(e.key==="Tab"){e.preventDefault();$("#sx").focus()}return}
+  if(SHEET){
+    if(e.key==="Escape"){e.preventDefault();closeSheet()}
+    else if(e.key==="Tab"){const f=[...SHEET.querySelectorAll("button,input,select")].filter(x=>!x.disabled&&x.offsetParent!==null);if(f.length){e.preventDefault();const i=f.indexOf(document.activeElement);f[e.shiftKey?(i<=0?f.length-1:i-1):(i===f.length-1?0:i+1)].focus()}}
+    return}
   if(e.key!=="Enter"&&e.key!==" ")return;
   const t=e.target;if(t&&t.getAttribute&&t.getAttribute("role")==="button"){e.preventDefault();t.click()}
 });
 document.addEventListener("change",e=>{
   if(e.target.id==="sortsel"){S.sort=e.target.value;saveUI();render()}
   else if(e.target.id==="stsel"){S.status=e.target.value;saveUI();render()}
+  else if(e.target.id==="vminsel"){S.vmin=+e.target.value;saveUI();render()}
+  else if(e.target.id==="vstsel"){S.vstat=e.target.value;saveUI();render()}
 });
 const errMsg=e=>navigator.onLine===false?"You're offline.":e&&e.name==="AbortError"?"Sleeper took too long to respond.":"Couldn't load from Sleeper.";
 async function refresh(week){

@@ -167,6 +167,21 @@ h1 .short{display:none}
 .bin{display:flex;align-items:center;gap:4px;font-weight:600;flex:none}
 .bi{width:96px;min-height:44px;text-align:right;font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 10px;-webkit-appearance:none}
 .bsum{margin:8px 0}
+/* v7: matchups */
+.bnav button{padding:0 4px}
+#th{flex:none;width:44px}
+@media (max-width:359px){.bnav{gap:4px}.bnav button{font-size:12px}}
+.head.mh{grid-template-columns:1fr auto}
+.head.mh>.mt{min-width:0}.head.mh>.ms,.head.mh>.mx{grid-column:1/-1}
+.ms{font-size:15px;font-variant-numeric:tabular-nums}.ms b{font-weight:800}
+.mx{font-size:13px;color:var(--mute)}
+.msd{padding:8px 12px 4px}
+.msh{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:4px 0 2px;color:var(--mute)}.msh b{color:var(--ink);font-size:14px}
+.mrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.mrow .mn{min-width:0}.mrow .sl{display:inline-block;min-width:34px;font-size:12px;font-weight:700;color:var(--mute)}
+.mrow .mv{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}.mrow .mv small{display:block;font-weight:400;color:var(--mute);font-size:12px}
+.mrow.dn{opacity:.85}
+.mnote{font-size:13px;color:var(--mute);margin:8px 0}
 </style></head><body><div class="wrap">
 <header>
  <div class="top"><h1><span class="full">Root for / against</span><span class="short">For / Against</span></h1>
@@ -188,22 +203,23 @@ h1 .short{display:none}
  <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR.</li>
  <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you (about +1 per league across 41 leagues). Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  <li>Stat bars: the filled part is what he has so far and the tick is the DraftKings line. A stub past the tick means he's over the line, and the label says whether that helps or hurts you. "proj" means the line is a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
+ <li>The Matchups tab shows your score in every league this week, the closest first. Tap one to see who is left to play on both sides, with their projected points in that league's own scoring. "Up 3.5" is good, except in tank leagues, where it shows red.</li>
  <li>The $ Value tab adds up the buy-ins of every league where a player helps you (for) or hurts you (against). "+$320" means he helps you in $320 more of buy-ins than he hurts you. Set the buy-ins in Settings; they stay on this device only. Use "Leagues" to count only your big-money leagues.</li>
  <li>On the Players tab, Filter opens the filters. Live and upcoming games come first, and finished players sit in a collapsed group at the bottom.</li>
  </ul></div></div>
-<nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-pressed="true">Games</button><button id="tp" data-tab="players" aria-pressed="false">Players</button><button id="tv" data-tab="value" aria-pressed="false">$ Value</button><button id="th" data-help="1" aria-haspopup="dialog">Help</button></nav>
+<nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-pressed="true">Games</button><button id="tp" data-tab="players" aria-pressed="false">Players</button><button id="tm" data-tab="matchups" aria-pressed="false">Matchups</button><button id="tv" data-tab="value" aria-pressed="false">$ Value</button><button id="th" data-help="1" aria-haspopup="dialog" aria-label="Help">?</button></nav>
 <div id="setsheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="setT" hidden><div class="sheetin" id="setin"></div></div>
 <script>
 const UID="__UID__", PLAYERS=__PLAYERS__, TANK=new Set(__TANK__), API="https://api.sleeper.app/v1";
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,lgOpen:{},projs:{},pts:{},status:"all",fopen:false,more:{},pfin:null,pbye:null,tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
+let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,lgOpen:{},projs:{},pts:{},status:"all",fopen:false,more:{},pfin:null,pbye:null,mopen:{},mfin:null,mAt:0,mBusy:false,tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
 
 {const U=store.get("rfa-ui")||{};const ok=(v,l,d)=>l.includes(v)?v:d;
- S.tab=ok(U.tab,["games","players","value"],"games");S.vview=ok(U.vview,["all","for","against"],"all");S.vstat=ok(U.vstat,["active","all","done"],"active");S.vmin=[0,10,25,50,100,250].includes(+U.vmin)?+U.vmin:0;S.view=ok(U.view,["all","for","against"],"all");
+ S.tab=ok(U.tab,["games","players","value","matchups"],"games");S.msort=ok(U.msort,["close","proj","left","alpha"],"close");S.vview=ok(U.vview,["all","for","against"],"all");S.vstat=ok(U.vstat,["active","all","done"],"active");S.vmin=[0,10,25,50,100,250].includes(+U.vmin)?+U.vmin:0;S.view=ok(U.view,["all","for","against"],"all");
  S.sort=ok(U.sort,["impact","alpha","game"],"impact");S.status=ok(U.status,["all","active","done"],"all")}
-const saveUI=()=>store.set("rfa-ui",{tab:S.tab,view:S.view,sort:S.sort,status:S.status,vview:S.vview,vstat:S.vstat,vmin:S.vmin});
+const saveUI=()=>store.set("rfa-ui",{tab:S.tab,view:S.view,sort:S.sort,status:S.status,vview:S.vview,vstat:S.vstat,vmin:S.vmin,msort:S.msort});
 S.buy=store.get("rfa-buy")||{};
 const CHEV='<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const fmtAgo=m=>m<1?"just now":m<60?m+" min ago":m<1440?Math.round(m/60)+" hr ago":Math.round(m/1440)+" days ago";
@@ -238,7 +254,8 @@ async function load(week){
   const games={};
   for(const g of sched){if(g.week!==w)continue;games[g.away+"@"+g.home]={away:g.away,home:g.home,date:g.date,status:g.status,rows:[]}}
   const teamGame={};for(const k in games){teamGame[games[k].away]=k;teamGame[games[k].home]=k}
-  const shares={}, lgList=[]; let nLg=0, failed=0;
+  const shares={}, lgList=[], muOut=[]; let nLg=0, failed=0;
+  const projs=await projFor(w,true).catch(()=>({}));
   await pool(lgs,async lg=>{
     try{
       const [rosters,mus,users]=await Promise.all([get(`${API}/league/${lg.league_id}/rosters`),
@@ -251,6 +268,10 @@ async function load(week){
       const ou=oroster&&users.find(u=>u.user_id===oroster.owner_id);
       const oname=String(ou?((ou.metadata||{}).team_name||ou.display_name):"?").trim();
       const tank=TANK.has(String(lg.league_id)), lname=(lg.name||"").trim()+(tank?" (tank)":"");
+      {const labels=(lg.roster_positions||[]).filter(p=>!["BN","IR","TAXI"].includes(p)),sc=lg.scoring_settings||{};
+       const sp=(stats)=>{let t=0;for(const k in stats){if(sc[k])t+=stats[k]*sc[k]}return Math.round(t*100)/100};
+       const side=m=>m?{pts:Number(m.points)||0,st:(m.starters||[]).map((pid,i)=>({pid:String(pid),slot:labels[i]||"",pts:Number((m.starters_points||[])[i])||0,proj:sp(projs[String(pid)]||{})})).filter(x=>x.pid&&x.pid!=="0")}:null;
+       muOut.push({id:String(lg.league_id),name:(lg.name||"").trim(),tank,opp:oname,rid:mine.roster_id,orid:opp?opp.roster_id:null,me:side(my),them:side(opp)});}
       for(const [list,own] of [[my.starters,true],[opp?opp.starters:[],false]]){
         const side=(own!==tank)?"f":"a";
         for(const pid of new Set((list||[]).map(String))){
@@ -268,8 +289,9 @@ async function load(week){
   const gl=Object.values(games).filter(g=>g.rows.length);
   for(const g of gl)g.rows.sort((a,b)=>(b.f+b.a)-(a.f+a.a)||Math.abs(b.net)-Math.abs(a.net)||a.name.localeCompare(b.name));
   gl.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||(b.rows.reduce((t,r)=>t+r.f+r.a,0)-a.rows.reduce((t,r)=>t+r.f+r.a,0)));
+  for(const m of muOut)for(const sd of [m.me,m.them]){if(!sd)continue;for(const x of sd.st){const [nme,pos,team]=await pinfo(x.pid);x.name=nme;x.pos=pos;x.team=team;x.game=teamGame[team]||null}}
   const gstat={};for(const k in games)gstat[k]=games[k].status;
-  return {week:w,season:S.season,leagues:nLg,failed,gstat,lgList,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
+  return {week:w,season:S.season,leagues:nLg,failed,gstat,lgList,matchups:muOut,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
 }
 
 /* ---------- per-game stat bars: DraftKings lines (ESPN) vs live ESPN box score ---------- */
@@ -499,6 +521,82 @@ function updateBsum(){
   const lgs=leaguesOf(S.data),tot=lgs.reduce((t,l)=>t+effBuy(l.id,l.name),0),set=lgs.filter(l=>effBuy(l.id,l.name)>0).length;
   el.textContent=`${set} of ${lgs.length} leagues have a buy-in · ${money(tot)} total`;
 }
+const f1=n=>(Math.round(n*10)/10).toFixed(1);
+function xState(x){
+  if(!x.game)return"none";
+  const sc=S.sc[x.game];if(sc)return sc.state;
+  const g=((S.data&&S.data.gstat)||{})[x.game];return g==="in_game"?"in":g==="complete"?"post":"pre";
+}
+function whenOf(x){
+  const sc=S.sc[x.game];if(!sc)return"upcoming";
+  if(sc.state==="in")return "LIVE "+stText(sc);
+  if(sc.state==="pre")return sc.tv?new Date(sc.date).toLocaleDateString(undefined,{weekday:"short"})+" "+new Date(sc.date).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"time TBD";
+  return"Final";
+}
+function sideCalc(side){
+  const left=[],done=[];let more=0;
+  for(const x of side.st){const st=xState(x);
+    if(st==="in"||st==="pre"){left.push({x,st});more+=Math.max(x.proj-(st==="in"?x.pts:0),0)}else done.push(x)}
+  left.sort((a,b)=>(a.st==="in"?0:1)-(b.st==="in"?0:1)||(S.sc[a.x.game]?S.sc[a.x.game].date:"z").localeCompare(S.sc[b.x.game]?S.sc[b.x.game].date:"z"));
+  return{pts:side.pts,left,done,more,final:side.pts+more};
+}
+function muCalc(m){
+  const a=sideCalc(m.me),b=m.them?sideCalc(m.them):null;
+  const margin=b?a.pts-b.pts:0,pm=b?a.final-b.final:0,over=!a.left.length&&(!b||!b.left.length);
+  return{m,a,b,margin,pm,over};
+}
+function muRows(c,side,calc){
+  const rows=[...calc.left.map(o=>{const x=o.x,live=o.st==="in";
+    return `<div class="mrow"><div class="mn"><span class="sl">${esc(x.slot)}</span><b>${esc(x.name)}</b> <span class="sub nw">${esc(x.pos)} ${esc(x.team)}</span><div class="sub">${esc(whenOf(x))}${live?` · scored ${f1(x.pts)}`:""}</div></div><div class="mv">${f1(live?Math.max(x.proj,x.pts):x.proj)}<small>proj</small></div></div>`}),
+   ...calc.done.map(x=>`<div class="mrow dn"><div class="mn"><span class="sl">${esc(x.slot)}</span><b>${esc(x.name)}</b> <span class="sub nw">${esc(x.pos)} ${esc(x.team)}</span><div class="sub">${x.game?"Final":"no game"}</div></div><div class="mv">${f1(x.pts)}<small>pts</small></div></div>`)];
+  return rows.join("");
+}
+function muCard(c){
+  const m=c.m,open=!!S.mopen[m.id];
+  const good=m.tank?c.margin<0:c.margin>0,bad=m.tank?c.margin>0:c.margin<0;
+  const mg=Math.abs(c.margin).toFixed(1);
+  const txt=!m.them?"No opponent":c.margin===0?"Tied":c.over?(c.margin>0?"Won by ":"Lost by ")+mg:(c.margin>0?"Up ":"Down ")+mg;
+  const cls=!m.them||c.margin===0?"z":good?"p":bad?"n":"z";
+  const leftTxt=m.them?`${c.a.left.length} left · ${c.b.left.length} left`:`${c.a.left.length} left`;
+  const body=m.them?`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left · proj ${f1(c.a.final)}</span></div>${muRows(c,"me",c.a)}</div>
+    <div class="msd"><div class="msh"><b>${esc(m.opp)} · ${f1(c.b.pts)}</b><span>${c.b.left.length} left · proj ${f1(c.b.final)}</span></div>${muRows(c,"them",c.b)}</div>`
+    :`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left</span></div>${muRows(c,"me",c.a)}</div>`;
+  return `<div class="card mu${open?" open":""}"><div class="head mh" role="button" tabindex="0" aria-expanded="${open}" data-mu="${esc(m.id)}" data-fk="mu:${esc(m.id)}">${CHEV}
+   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk">(tank)</span>':""}${m.them?`<div class="sub">vs ${esc(m.opp)}</div>`:""}</div><span class="pill ${cls}"><span class="sr">${good?"good for you":bad?"bad for you":""} </span>${txt}</span>
+   <div class="ms">You <b>${f1(c.a.pts)}</b>${m.them?` – <b>${f1(c.b.pts)}</b> ${esc(m.opp)}`:""}</div>
+   <div class="mx">${leftTxt}${m.them?` · proj ${f1(c.a.final)} – ${f1(c.b.final)}`:""}</div></div>
+   <div class="body">${body}</div></div>`;
+}
+function matchupsHtml(d){
+  const ms=d.matchups;
+  if(!ms||!ms.length)return `<div class="card"><div class="empty">${S.loading?"Loading matchups…":"No matchups to show yet. Pull ↻ to load them."}</div></div>`;
+  const all=ms.map(muCalc);
+  const key={close:(a,b)=>(a.m.them?0:1)-(b.m.them?0:1)||Math.abs(a.margin)-Math.abs(b.margin)||Math.abs(a.pm)-Math.abs(b.pm),
+    proj:(a,b)=>(a.m.them?0:1)-(b.m.them?0:1)||Math.abs(a.pm)-Math.abs(b.pm),
+    left:(a,b)=>(b.a.left.length+(b.b?b.b.left.length:0))-(a.a.left.length+(a.b?a.b.left.length:0)),
+    alpha:(a,b)=>a.m.name.localeCompare(b.m.name)}[S.msort]||(()=>0);
+  const act=all.filter(c=>!c.over).sort((a,b)=>key(a,b)||a.m.name.localeCompare(b.m.name));
+  const done=all.filter(c=>c.over).sort((a,b)=>Math.abs(a.margin)-Math.abs(b.margin));
+  const live=all.filter(c=>c.a.left.some(o=>o.st==="in")||(c.b&&c.b.left.some(o=>o.st==="in"))).length;
+  const ctl=`<div class="vctl"><div class="vhead"><h2>Matchups</h2></div><div class="ctl"><label class="sortl"><span class="sub">Sort</span><select id="msortsel" data-fk="ms" aria-label="Sort matchups">${[["close","Closest score"],["proj","Closest projected"],["left","Most players left"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.msort===k?" selected":""}>${l}</option>`).join("")}</select></label></div></div>`;
+  const note=`<div class="mnote">${all.length} leagues · ${act.length} in play${live?` · ${live} with a player live`:""}. "Left" counts starters whose game isn't final. Points use each league's own scoring; "proj" is Sleeper's projection in that scoring.</div>`;
+  const o=S.mfin??(!act.length);
+  return ctl+note+(act.length?act.map(muCard).join(""):"")+(done.length?`<button class="fint" data-fk="mf" data-mfin="1" data-open="${o?1:0}" aria-expanded="${o}"><span>Finished · ${done.length}</span>${CHEV}</button>${o?done.map(muCard).join(""):""}`:"");
+}
+async function refreshMatchups(force){
+  const d=S.data;if(!d||!d.matchups||S.mBusy||(!force&&Date.now()-S.mAt<20000))return;
+  S.mBusy=true;const w=S.week,ep=S.epoch;
+  try{
+    await pool(d.matchups,async m=>{
+      try{const mus=await get(`${API}/league/${m.id}/matchups/${w}`);
+        const upd=(side,rid)=>{const r=mus.find(x=>x.roster_id===rid);if(!r||!side)return;side.pts=Number(r.points)||0;
+          const mp={};(r.starters||[]).forEach((pid,i)=>mp[String(pid)]=Number((r.starters_points||[])[i])||0);
+          for(const x of side.st)if(mp[x.pid]!==undefined)x.pts=mp[x.pid]};
+        upd(m.me,m.rid);if(m.them)upd(m.them,m.orid)}catch(e){}
+    });
+    if(ep===S.epoch){S.mAt=Date.now();render()}
+  }finally{S.mBusy=false}
+}
 const teamLean=(g,ab)=>g.rows.filter(r=>r.team===ab).reduce((t,r)=>t+r.net,0);
 const chipN=(n,ab)=>`<span class="chipn ${netCls(n)}"><span class="sr">${esc(ab)} lean </span>${sgn(n)}</span>`;
 const ptsMap=()=>((S.pts[S.week]||{}).map)||null;
@@ -591,7 +689,7 @@ function renderInner(){
   const ago=Math.round((Date.now()-d.at)/60000);
   setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · ${d.failed} ${d.failed===1?"league":"leagues"} didn't load`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`);
   const onTab=q?"players":S.tab;
-  for(const [id,k] of [["#tg","games"],["#tp","players"],["#tv","value"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-pressed",onTab===k)}
+  for(const [id,k] of [["#tg","games"],["#tp","players"],["#tm","matchups"],["#tv","value"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-pressed",onTab===k)}
   $("#sh").classList.toggle("stick",onTab==="players");
   const nf=(S.view!=="all"?1:0)+(S.status!=="all"?1:0)+(S.sort!=="impact"?1:0);
   const fb=$("#fb");fb.hidden=onTab!=="players";fb.setAttribute("aria-expanded",S.fopen);fb.classList.toggle("on",nf>0&&!S.fopen);setText(fb,"Filter"+(nf?" · "+nf:""));
@@ -635,6 +733,8 @@ function renderInner(){
       html=(live.length?card(live):"")+(byes.length?grp("pb","Bye / no game",byes,S.pbye??false):"")+(done.length?grp("pf","Finished",done,S.pfin??(!live.length&&!byes.length)):"");
     }else html=card(rows);
     out.innerHTML=html;
+  }else if(S.tab==="matchups"){
+    out.innerHTML=matchupsHtml(d);
   }else if(S.tab==="value"){
     out.innerHTML=valueHtml(d);
   }else{
@@ -672,7 +772,7 @@ function openSheet(el,from){SHEET=el;S.helpFrom=from||document.activeElement;el.
 function closeSheet(){if(!SHEET)return;SHEET.hidden=true;SHEET=null;$(".wrap").inert=false;$(".bnav").inert=false;document.body.style.overflow="";const tgt=S.helpFrom&&S.helpFrom.isConnected?S.helpFrom:($("[data-settings]")||$("#th"));if(tgt&&tgt.focus)tgt.focus()}
 function openSettings(from){const from2=SHEET?S.helpFrom:from;if(SHEET)closeSheet();$("#setin").innerHTML=settingsHtml();updateBsum();openSheet($("#setsheet"),from2)}
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-view],[data-final],[data-pfin],[data-pbye],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-settings],[data-resetbuy],[data-vview],#fb,.head,.row");if(!t)return;
+  const t=e.target.closest("[data-tab],[data-view],[data-final],[data-pfin],[data-pbye],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-vview],#fb,.head,.row");if(!t)return;
   if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
   else if(t.dataset.close!==undefined)closeSheet();
   else if(t.dataset.settings!==undefined)openSettings(t);
@@ -680,7 +780,9 @@ document.addEventListener("click",e=>{
   else if(t.dataset.vview){S.vview=t.dataset.vview;saveUI();render()}
   else if(t.id==="fb"){S.fopen=!S.fopen;render()}
   else if(t.dataset.retry){refresh(S.week)}
-  else if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";saveUI();render();window.scrollTo(0,0)}
+  else if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";saveUI();render();window.scrollTo(0,0);if(S.tab==="matchups")refreshMatchups()}
+  else if(t.dataset.mu){S.mopen[t.dataset.mu]=!S.mopen[t.dataset.mu];render()}
+  else if(t.dataset.mfin!==undefined){S.mfin=t.dataset.open!=="1";render()}
   else if(t.dataset.view){S.view=t.dataset.view;saveUI();render()}
   else if(t.dataset.lg){S.lgOpen[t.dataset.lg]=!S.lgOpen[t.dataset.lg];render()}
   else if(t.dataset.more){S.more[t.dataset.more]=!S.more[t.dataset.more];render()}
@@ -712,6 +814,7 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("change",e=>{
   if(e.target.id==="sortsel"){S.sort=e.target.value;saveUI();render()}
   else if(e.target.id==="stsel"){S.status=e.target.value;saveUI();render()}
+  else if(e.target.id==="msortsel"){S.msort=e.target.value;saveUI();render()}
   else if(e.target.id==="vminsel"){S.vmin=+e.target.value;saveUI();render()}
   else if(e.target.id==="vstsel"){S.vstat=e.target.value;saveUI();render()}
 });
@@ -755,6 +858,7 @@ setInterval(async()=>{
   const soon=x=>x.state==="in"||(x.state==="pre"&&new Date(x.date)-Date.now()<10*60000);
   if(!Object.values(S.sc).some(soon))return;
   await Promise.all([loadScores(true),loadPts(S.week,true)]);render();
+  if(S.tab==="matchups")await refreshMatchups(true);
   ensureLive(true);
   await Promise.all(Object.keys(S.gs).filter(k=>S.sc[k]&&S.sc[k].state==="in"&&(S.open[k]??true)===false).map(k=>loadGame(k,true)));
 },45000);

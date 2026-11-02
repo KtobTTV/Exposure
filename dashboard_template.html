@@ -126,7 +126,7 @@ h1 .short{display:none}
 .vd{display:grid;justify-items:end;gap:2px;text-align:right}.vw{font-size:15px}.vw b{font-weight:800}.vl{font-size:12px;color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
 .gtl{font-size:13px;color:var(--mute);padding:8px 12px 0}.gtl b{font-weight:700}.gtl .p{color:var(--good)}.gtl .n{color:var(--bad)}
 .mtally{margin:4px 0 2px;font-size:15px}.mtally .g{color:var(--good)}.mtally .b{color:var(--bad)}
-.warn{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--warnbg);color:var(--warn);font-size:14px;font-weight:600}.warn button{flex:none;background:var(--card)}
+.wbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--warnbg);color:var(--warn);font-size:14px;font-weight:600}.wbar button{flex:none;background:var(--card)}
 .sh3{font-size:15px;margin:14px 0 2px}
 #rf{margin-left:8px}
 .fint .g{color:var(--good)}.fint .b{color:var(--bad)}
@@ -206,6 +206,9 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .empty button{display:block;margin:10px auto 0}
 .chev.side{transform:rotate(-90deg)}
 /* last: overrides */
+.evt{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+.vd .vl:first-child{font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+@media (max-width:359px){.bnav button{font-size:14px}}
 .hc{display:none;grid-column:1/-1;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hc .w{font-weight:800}
 .card.open>.head .sb,.card.open>.head .stc,.card.open>.head .vd{display:none}.card.open>.head .hc{display:block}
 .card.open>.head:not(.mh):not(.fh){grid-template-columns:1fr;min-height:44px;padding-top:0;padding-bottom:0;align-content:center}.card.open>.head:not(.mh):not(.fh)>.chev{top:14px}
@@ -226,7 +229,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
   <button id="rf" class="ic" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
   <button id="st" class="ic" data-settings="1" title="Settings" aria-label="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
 </header>
-<div class="meta" id="meta"></div><div id="warn" class="warn" role="status" hidden></div><div class="sr" id="an" aria-live="polite"></div>
+<div class="meta" id="meta"></div><div id="warn" class="wbar" role="status" hidden></div><div class="sr" id="an" aria-live="polite"></div>
 <div class="stickyhd" id="sh"><div class="searchbar"><input id="q" type="search" aria-label="Search players or teams" placeholder="Player or team" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false"><button id="fb" aria-expanded="false" aria-controls="ctl" hidden>Filter</button></div>
 <div id="fa"></div><div id="ctl"></div></div>
 <div id="upd" hidden></div><main id="out" aria-busy="true"></main>
@@ -236,13 +239,13 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  <ul>
  <li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
  <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
- <li>"Lean KC" on a game is the team your players lean toward, counted in leagues: under it, "KC +4 · BUF −3" adds up the nets of each team's players. Open the game for "Game total": everyone in it you root for, and everyone you root against.</li>
+ <li>"Team lean KC +4 · BUF −3" adds up the nets of each team's players, counted in leagues. Open the game for "Game total": everyone in it you root for, and everyone you root against.</li>
  <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
  <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line, and "proj" means a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
  <li>The Matchups tab shows your score in every league this week, the closest first. "Down 3.2 · Proj win by 10.8" is where you stand now and where you should finish: live players count what they have plus their projection for the time left. Scoring is each league's own. "Up 3.5" is good. The count at the top says how many are going your way. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Down 1.4 · good".</li>
- <li>On the Players tab, Filter opens the filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
- <li>In Filter, Rank "Buy-in $" adds up the buy-ins of every league where a player is for or against you. "+$320" means he's for you in $320 more of buy-ins than against you. Set the buy-ins in Settings, the gear at the top; they stay on this device only.</li>
+ <li>On the Players tab, "Sort & filter" opens the ranking and filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
+ <li>In "Sort & filter", Rank "Buy-in $" adds up the buy-ins of every league where a player is for or against you. "+$320" means he's for you in $320 more of buy-ins than against you. Set the buy-ins in Settings, the gear at the top; they stay on this device only.</li>
  </ul></div></div>
 <nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-current="page">Games</button><button id="tp" data-tab="players">Players</button><button id="tm" data-tab="matchups">Matchups</button><button id="th" data-help="1" aria-haspopup="dialog" aria-label="Help">?</button></nav>
 <div id="setsheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="setT" hidden><div class="sheetin" id="setin"></div></div>
@@ -254,7 +257,7 @@ const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){retu
 let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,lgOpen:{},projs:{},pts:{},status:"all",fopen:false,more:{},pfin:null,pbye:null,peven:null,mopen:{},mfin:null,mAt:0,mBusy:false,tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
 
 {const U=store.get("rfa-ui")||{};const ok=(v,l,d)=>l.includes(v)?v:d;
- S.money=!!U.money||U.tab==="value";S.tab=U.tab==="value"?"players":ok(U.tab,["games","players","matchups"],"games");S.msort=ok(U.msort,["close","proj","stake","left","alpha"],"close");S.vmin=[0,10,25,50,100,250].includes(+U.vmin)?+U.vmin:0;S.view=ok(U.view,["all","for","against"],"all");
+ S.money=!!U.money||U.tab==="value";S.tab=U.tab==="value"?"players":ok(U.tab,["games","players","matchups"],"games");S.msort=ok(U.msort,["close","proj","stake","left","alpha"],"proj");S.vmin=[0,10,25,50,100,250].includes(+U.vmin)?+U.vmin:0;S.view=ok(U.view,["all","for","against"],"all");
  S.sort=ok(U.sort,["impact","alpha","game"],"impact");S.status=ok(U.status,["all","active","done"],"all")}
 const saveUI=()=>store.set("rfa-ui",{tab:S.tab,view:S.view,sort:S.sort,status:S.status,money:S.money,vmin:S.vmin,msort:S.msort});
 S.buy=store.get("rfa-buy")||{};
@@ -450,7 +453,7 @@ function barsHtml(r){
   if(gs.err)return`<div class="src">${esc(gs.err)} Tap ↻ to try again.</div>`;
   const eid=r.espn||gs.byName[nm(r.name)]||"", a=gs.stats[eid];
   const act=a?{passYd:a.passYd||0,passTD:a.passTD||0,rushYd:a.rushYd||0,rec:a.rec||0,recYd:a.recYd||0,td:(a.rushTD||0)+(a.recTD||0)}:{};   // no box-score entry is unknown, never 0
-  const pr=(gs.proj[r.pid]||{}).pts_ppr, ptsLine=pr>0?{v:Math.round(pr*10)/10,src:" · proj"}:null;
+  const pr=(gs.proj[r.pid]||{}).pts_ppr, ptsLine=pr>0?{v:Math.round(pr*10)/10,src:" · game proj"}:null;
   if(gs.state==="pre")return `<div class="bars">${specs.map(([l,k])=>barText(l,lineFor(k,r,gs,eid))).join("")}${barText("Fantasy pts (PPR)",ptsLine)}</div>`;
   const fin=gs.state==="post",bars=specs.map(([l,k])=>barHtml(l,act[k],lineFor(k,r,gs,eid),fin));
   const raw=gs.pts?gs.pts[r.pid]:undefined, got=raw===undefined?null:Math.round(raw*10)/10;
@@ -551,7 +554,7 @@ function valueHtml(d){
 function settingsHtml(){
   const d=S.data,lgs=leaguesOf(d).slice().sort((a,b)=>baseName(a.name).localeCompare(baseName(b.name)));
   const rows=lgs.map(l=>{const own=S.buy[l.id],g=guessBuy(l.name);
-    return `<label class="birow"><span class="bn">${esc(baseName(l.name))}${/ \(tank\)$/.test(l.name)?" (tank)":""}${own==null&&g?`<small>$${g} read from the league name</small>`:""}</span><span class="bin">$<input class="bi" inputmode="decimal" data-lid="${esc(l.id)}" aria-label="Buy-in for ${esc(baseName(l.name))}" value="${own!=null?esc(own):""}" placeholder="${g||0}"></span></label>`}).join("");
+    return `<label class="birow"><span class="bn">${esc(baseName(l.name))}${/ \(tank\)$/.test(l.name)?" (tank)":""}${own==null?`<small>${g?`Using $${g} from the league name`:"Not set · counts as $0"}</small>`:""}</span><span class="bin">$<input class="bi" inputmode="decimal" data-lid="${esc(l.id)}" aria-label="Buy-in for ${esc(baseName(l.name))}" value="${own!=null?esc(own):""}" placeholder=""></span></label>`}).join("");
   return `<div class="sheeth"><h2 id="setT">Settings</h2><button data-close="1">Close</button></div>
    <h3 class="sh3">League buy-ins</h3>
    <p class="sub">Used when Players ranks by buy-in dollars. They're saved on this device only and are never sent anywhere.</p>
@@ -620,7 +623,7 @@ function muCard(c){
   return `<div class="card mu${open?" open":""}"><div class="head mh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${open}" data-mu="${esc(m.id)}" data-fk="mu:${esc(m.id)}">${CHEV}
    <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk nw">(tank)</span>':""}</div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
    <div class="ms">You <b>${f1(c.a.pts)}</b>${m.them?` – <b>${f1(c.b.pts)}</b> ${esc(m.opp)}`:""}</div>
-   <div class="mx">${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
+   <div class="mx">${!c.over&&m.them&&Math.abs(c.pm)<5?'<span class="warn">Toss-up</span> · ':""}${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
    <div class="body">${body}</div></div>`;
 }
 function matchupsHtml(d){
@@ -690,6 +693,7 @@ function gameCard(g,compact){
   const CAP=4;
   const sec=(cls,label,l)=>{
     if(!l.length)return"";
+    if(cls==="e"){const ek=key+"|e",eo=!!S.more[ek];return `<button class="evt" data-more="${esc(ek)}" data-fk="m:${esc(ek)}" aria-expanded="${eo}"><span>${label} · ${l.length}</span>${CHEV}</button>`+(eo?l.map(r=>rowHtml(r,false)).join(""):"")}
     const mk=key+"|"+cls,long=!compact&&l.length>CAP+1,all=!long||!!S.more[mk];
     return `<div class="sec ${cls}">${label}</div>`+(all?l:l.slice(0,CAP)).map(r=>rowHtml(r,false)).join("")
       +(long?`<button class="morebtn" data-more="${esc(mk)}" data-fk="m:${esc(mk)}">${all?"Show fewer":`Show ${l.length-CAP} more`}</button>`:"");
@@ -708,13 +712,13 @@ function gameCard(g,compact){
      <div class="body"><div class="fbody">${total}${lns}${miss}</div>${secs}</div></div>`;
   }
   const tm=(t,l)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span></div>`;
-  const la=teamLean(g,A.abbr),lh=teamLean(g,H.abbr),pick=la>lh?A.abbr:lh>la?H.abbr:"";
-  const vd=`<div class="vd">${pick?`<span class="vw">Lean <b>${esc(pick)}</b></span>`:`<span class="vw"><b>Even</b></span>`}<span class="vl">${esc(A.abbr)} ${sgn(la)} · ${esc(H.abbr)} ${sgn(lh)}</span></div>`;
-  const hc=`<div class="hc"><b>${esc(A.abbr)}</b> ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b><span class="sub"> · ${esc(stText(sc)||(st==="post"?"Final":""))}${pick?` · Lean ${esc(pick)}`:""}</span></div>`;
+  const la=teamLean(g,A.abbr),lh=teamLean(g,H.abbr);
+  const vd=`<div class="vd"><span class="vl">Team lean</span><span class="vl">${esc(A.abbr)} ${sgn(la)} · ${esc(H.abbr)} ${sgn(lh)}</span></div>`;
+  const hc=`<div class="hc"><b>${esc(A.abbr)}</b> ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b><span class="sub"> · ${esc(stText(sc)||(st==="post"?"Final":""))}</span></div>`;
   const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
     :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
   const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+sgn(r.net)).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
-  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),pick?`Lean ${pick}: ${A.abbr} ${sgn(la)}, ${H.abbr} ${sgn(lh)}`:"Teams even",up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
+  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),`Team lean ${A.abbr} ${sgn(la)}, ${H.abbr} ${sgn(lh)}`,up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
    <div class="sb">${tm(A,lead==="a")}${tm(H,lead==="h")}</div><div class="stc">${stc}</div>
    ${vd}${hc}
@@ -755,7 +759,7 @@ function renderInner(){
     return;
   }
   const ago=Math.round((Date.now()-d.at)/60000);
-  setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · didn't load: ${(d.failedNames||[]).slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${(d.failedNames||[]).length>2?` +${d.failedNames.length-2} more`:""}`:""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`);
+  setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · didn't load: ${(d.failedNames||[]).slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${(d.failedNames||[]).length>2?` +${d.failedNames.length-2} more`:""}`:""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · scores "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}).replace(/\s/g,"\u00a0"):""}`);
   const liveOld=S.sb&&Object.values(S.sc).some(x=>x.state==="in")&&Date.now()-S.sb.at>5*60000;
   setWarn(S.err?`<span>${esc(S.err)}.</span><button data-retry="1">Try again</button>`
     :S.curWeek&&S.week!==S.curWeek?`<span>Showing Week ${S.week}, not this week.</span><button data-gowk="1">Back to Week ${S.curWeek}</button>`
@@ -763,14 +767,14 @@ function renderInner(){
   const onTab=S.tab;
   for(const [id,k] of [["#tg","games"],["#tp","players"],["#tm","matchups"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-current",onTab===k?"page":"false")}
   $("#sh").classList.toggle("stick",onTab==="players"&&!S.fopen);
-  const nf=(S.view!=="all"?1:0)+(S.status!=="all"?1:0)+(S.sort!=="impact"&&!S.money?1:0)+(S.money?1:0);
-  const fb=$("#fb");fb.hidden=onTab!=="players";fb.setAttribute("aria-expanded",S.fopen);fb.classList.toggle("on",nf>0&&!S.fopen);setText(fb,"Filter"+(nf?" · "+nf:""));
+  const nf=(S.view!=="all"?1:0)+(S.status!=="all"?1:0)+(S.money&&S.vmin?1:0);
+  const fb=$("#fb");fb.hidden=onTab!=="players";fb.setAttribute("aria-expanded",S.fopen);fb.classList.toggle("on",nf>0&&!S.fopen);setText(fb,"Sort & filter"+(nf?" · "+nf:""));
   const act=[];
   if(S.view!=="all")act.push({for:"Root for",against:"Root against"}[S.view]);
   if(S.status!=="all")act.push({active:"Live & upcoming",done:"Finished"}[S.status]);
-  if(S.money)act.push("Buy-in $"+(S.vmin?` · ${money(S.vmin)} and up`:""));
+  if(S.money&&S.vmin)act.push(`Buy-ins ${money(S.vmin)} and up`);
   const searchSkips=q&&act.length;
-  if(S.sort!=="impact"&&!S.money&&!searchSkips)act.push("Rank: "+{alpha:"A–Z",game:"By game"}[S.sort]);
+  
   setFa(onTab==="players"&&act.length&&!S.fopen?(q?`<div class="fnote">Search ignores your filters (${esc(act.join(" · "))}).</div>`:`<div class="fsum"><span>${esc(act.join(" · "))}</span><button class="fx ic" data-clearf="1" aria-label="Clear filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`):"");
   setCtl(onTab==="players"&&S.fopen?`<div class="ctl"><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
     <label class="sortl"><span class="sub">Rank</span><select id="ranksel" data-fk="sel0" aria-label="Rank players by">${[["impact","Strongest net"],["usd","Buy-in $"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${(S.money?"usd":S.sort)===k?" selected":""}>${l}</option>`).join("")}</select></label>
@@ -868,7 +872,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.pfin!==undefined){S.pfin=t.dataset.open!=="1";render();if(S.pfin)loadFinished()}
   else if(t.dataset.pbye!==undefined){S.pbye=t.dataset.open!=="1";render()}
   else if(t.dataset.peven!==undefined){S.peven=t.dataset.open!=="1";render()}
-  else if(t.dataset.clearf!==undefined){S.view="all";S.status="all";S.sort="impact";S.money=false;S.vmin=0;saveUI();render()}
+  else if(t.dataset.clearf!==undefined){S.view="all";S.status="all";S.vmin=0;saveUI();render()}
   else if(t.dataset.final!==undefined){S.finalOpen=t.dataset.open!=="1";render()}
   else if(t.classList.contains("head")){
     const c=t.parentElement,nowOpen=!c.classList.contains("open");S.open[c.dataset.gk]=nowOpen;render();

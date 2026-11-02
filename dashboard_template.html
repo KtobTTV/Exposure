@@ -204,6 +204,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .empty button{display:block;margin:10px auto 0}
 .chev.side{transform:rotate(-90deg)}
 /* last: overrides */
+.sheet li,.vnote,.empty{text-wrap:pretty}
 @media (prefers-color-scheme:dark){:root{--btrkb:#7f93b8}.tick{background:var(--bg);box-shadow:0 0 0 1.5px var(--ink)}}
 .hh{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:18px 0 -4px}
 .mtally .tu{color:var(--warn)}
@@ -551,7 +552,7 @@ function dollars(r,min){
 function valRow(o){
   const r=o.r,gp=gameParts(r),cls=o.net>0?"p":o.net<0?"n":"z",open=!!S.pdet[r.pid];
   const li=(l,side)=>l.length?`<div class="lgh ${side==="f"?"f":"a"}">${side==="f"?"Root for":"Root against"} · ${money(l.reduce((t,x)=>t+x.b,0))}</div><ul class="lgl">${l.map(x=>`<li>${money(x.b)} · ${esc(baseName(x.x.lg))}${x.x.t?' <span class="tk">tank</span>':""} <span class="sub">${side==="f"?(x.x.t?esc(x.x.opp)+" starts him":"vs "+esc(x.x.opp)):(x.x.t?"you start him":esc(x.x.opp)+" starts him")}</span></li>`).join("")}</ul>`:"";
-  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${open}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm"><b>${esc(r.name)}</b> <span class="sub nw">${esc(r.pos)} ${esc(r.team)}${gp.opp?" · "+esc(gp.opp):""}</span><div class="sub nw">${gp.when?gp.when+" · ":""}for ${money(o.f)} · against ${money(o.a)}</div>${liveLine(r)}</div><span class="net ${cls} big"><span class="sr">dollar net </span>${smoney(o.net)}</span></div>
+  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${open}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm"><b>${esc(r.name)}</b> <span class="sub nw">${esc(r.pos)} ${esc(r.team)}${gp.opp?" · "+esc(gp.opp):""}</span><div class="sub">${gp.when?`<span class="nw">${gp.when}</span> · `:""}<span class="nw">for ${money(o.f)}</span> · <span class="nw">against ${money(o.a)}</span></div>${liveLine(r)}</div><span class="net ${cls} big"><span class="sr">dollar net </span>${smoney(o.net)}</span></div>
    <div class="det${open?" show":""}">${barsHtml(r)}${li(o.F,"f")}${li(o.A,"a")}</div></div>`;
 }
 function valueHtml(d,q){

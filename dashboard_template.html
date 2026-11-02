@@ -144,7 +144,7 @@ h1 .short{display:none}
 <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
 <li>The chip beside each team's score (+5, −1) adds up the nets of that team's players. "Game total" adds up everyone in the game.</li>
 <li>Finished games say "Went your way", "Went against you" or "Even": did the winning team's players net out in your favor? A rough guide, not your fantasy score.</li>
-<li>Stat bars: the filled part is what he has so far and the tick is the sportsbook line. A stub past the tick means he's over the line, and the label says whether that helps or hurts you.</li>
+<li>Stat bars: the filled part is what he has so far and the tick is the DraftKings line. A stub past the tick means he's over the line, and the label says whether that helps or hurts you. "proj" means the line is a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts, which use Sleeper's PPR scoring).</li>
 </ul></details>
 </div>
 <nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-pressed="true">Games</button><button id="tp" data-tab="players" aria-pressed="false">Players</button></nav>
@@ -153,7 +153,7 @@ const UID="__UID__", PLAYERS=__PLAYERS__, TANK=new Set(__TANK__), API="https://a
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,lgOpen:{},projs:{},tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
+let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,lgOpen:{},projs:{},pts:{},tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
 
 async function get(u,tries=2){
   const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),15000);
@@ -228,8 +228,18 @@ const SPECS={QB:[["Passing yards","passYd"],["Rushing yards","rushYd"],["Passing
   TE:[["Receptions","rec"],["Receiving yards","recYd"],["Touchdowns","td"]]};
 async function projFor(w,force){
   if(S.projs[w]&&!force)return S.projs[w];
-  try{const rows=await get(`https://api.sleeper.com/projections/nfl/${S.season}/${w}?season_type=regular&order_by=ppr&position[]=QB&position[]=RB&position[]=WR&position[]=TE`);
+  try{const rows=await get(`https://api.sleeper.com/projections/nfl/${S.season}/${w}?season_type=regular&order_by=ppr&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF`);
     const m={};for(const r of rows)m[String(r.player_id)]=r.stats||{};return S.projs[w]=m}catch(e){return S.projs[w]||{}}
+}
+let ptsP=null;
+function loadPts(w,force){
+  const c=S.pts[w];
+  if(c&&Date.now()-c.at<(force?5000:600000))return Promise.resolve(c.map);
+  if(ptsP&&ptsP.w===w)return ptsP.p;
+  const p=get(`https://api.sleeper.com/stats/nfl/${S.season}/${w}?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF`)
+    .then(rows=>{const m={};for(const r of rows)m[String(r.player_id)]=(r.stats&&r.stats.pts_ppr)||0;S.pts[w]={at:Date.now(),map:m};return m})
+    .catch(()=>c?c.map:null).finally(()=>{ptsP=null});
+  ptsP={w,p};return p;
 }
 const normTeam=a=>a==="WSH"?"WAS":a;
 const SBURL=w=>`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${S.season}&seasontype=2&week=${w}`;
@@ -274,8 +284,8 @@ async function loadGame(gk,force){
     const ev=(S.sb.data.events||[]).find(e=>{const t=e.competitions[0].competitors.map(c=>norm(c.team.abbreviation));return t.includes(away)&&t.includes(home)});
     if(!ev)throw new Error("ESPN hasn't listed this game yet.");
     const eid=ev.id, state=ev.status.type.state;
-    const [sum,pb,proj,r1,r2]=await Promise.all([state==="pre"?null:get(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=${eid}`),
-      get(`https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/${eid}/competitions/${eid}/odds/100/propBets?limit=1000`).catch(()=>null),projFor(w,force),
+    const [sum,pb,proj,pts,r1,r2]=await Promise.all([state==="pre"?null:get(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=${eid}`),
+      get(`https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/${eid}/competitions/${eid}/odds/100/propBets?limit=1000`).catch(()=>null),projFor(w,force),loadPts(w,force),
       ...ev.competitions[0].competitors.map(c=>rosterIds(c.team.id))]);
     const lines={};
     for(const it of (pb&&pb.items)||[]){const k=TY[it.type.id],v=it.current&&it.current.target&&it.current.target.value;if(!k||v==null)continue;
@@ -291,7 +301,7 @@ async function loadGame(gk,force){
         else if(grp.name==="rushing"){s.rushYd=g("rushingYards");s.rushTD=g("rushingTouchdowns")}
         else if(grp.name==="receiving"){s.rec=g("receptions");s.recYd=g("receivingYards");s.recTD=g("receivingTouchdowns")}}}
     if(ep!==S.epoch)return;
-    S.gs[gk]={ok:true,state,lines,stats,proj,byName:Object.assign({},r1,r2),at:Date.now(),hasLines:Object.keys(lines).length>0};
+    S.gs[gk]={ok:true,state,lines,stats,proj,pts,byName:Object.assign({},r1,r2),at:Date.now(),hasLines:Object.keys(lines).length>0};
   }catch(e){if(ep!==S.epoch)return;S.gs[gk]={err:/^ESPN/.test(e.message)?e.message:navigator.onLine===false?"You're offline.":"Couldn't load stats for this game.",at:Date.now()}}
   render();
 }
@@ -303,6 +313,7 @@ function lineFor(key,r,gs,eid){
   return null;
 }
 function barHtml(label,actual,line,net){
+  if(actual==null)return `<div class="bar"><div class="bh"><span>${label}</span><span>stats unavailable</span></div></div>`;
   if(!line)return `<div class="bar"><div class="bh"><span>${label}</span><span><b>${fmtN(actual)}</b> · no line</span></div></div>`;
   const L=line.v,over=actual>L,at=L>0&&actual===L,ratio=L>0?actual/L:0,fill=Math.min(ratio,1)*100,ext=over?Math.round(8+Math.min(ratio-1,1)*14):0;
   const eff=net>0?`<span class="eff g">helps you</span>`:net<0?`<span class="eff b">hurts you</span>`:"";
@@ -314,20 +325,19 @@ function barHtml(label,actual,line,net){
 }
 function barsHtml(r){
   if(!r.game)return"";
-  const specs=SPECS[r.pos];
-  if(!specs)return`<div class="src">Stat bars cover QB, RB, WR and TE.</div>`;
+  const specs=SPECS[r.pos]||(r.pos==="K"||r.pos==="DEF"?[]:null);
+  if(!specs)return`<div class="src">Stat bars cover QB, RB, WR, TE, K and DEF.</div>`;
   const gs=S.gs[r.game];
   if(!gs||(gs.busy&&!gs.ok))return`<div class="src">Loading lines and stats…</div>`;
   if(gs.err)return`<div class="src">${esc(gs.err)} Tap ↻ to try again.</div>`;
   const eid=r.espn||gs.byName[nm(r.name)]||"", a=gs.stats[eid]||{};
   const act={passYd:a.passYd||0,passTD:a.passTD||0,rushYd:a.rushYd||0,rec:a.rec||0,recYd:a.recYd||0,td:(a.rushTD||0)+(a.recTD||0)};
-  const lines=specs.map(([l,k])=>[l,act[k],lineFor(k,r,gs,eid)]);
-  const t=new Date(gs.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
-  const st={pre:"not started",in:"live",post:"final"}[gs.state]||"";
-  const note=lines.some(x=>x[2]&&x[2].src.includes("proj"))?" “proj” is a Sleeper projection, used where no line is posted.":"";
-  const td=lines.some(x=>x[2]&&x[2].src.includes("anytime"))?" The TD bar uses an anytime-TD line of 0.5.":"";
-  return `<div class="bars">${lines.map(([l,v,ln])=>barHtml(l,v,ln,r.net)).join("")}
-   <div class="src">Lines: DraftKings${gs.state!=="pre"?" (pregame)":""}. Stats: ESPN, ${st}, as of ${t}.${note}${td}${eid?"":" Couldn't match this player on ESPN."}</div></div>`;
+  const bars=specs.map(([l,k])=>barHtml(l,act[k],lineFor(k,r,gs,eid),r.net));
+  const pr=(gs.proj[r.pid]||{}).pts_ppr, ptsLine=pr>0?{v:Math.round(pr*10)/10,src:" · proj"}:null;
+  const got=gs.pts?Math.round(((gs.pts[r.pid]||0))*10)/10:null;
+  bars.push(barHtml("Fantasy pts (PPR)",got,ptsLine,r.net));
+  const miss=specs.length&&!eid?`<div class="src">Couldn't match this player on ESPN, so the yardage bars may read 0.</div>`:"";
+  return `<div class="bars">${bars.join("")}${miss}</div>`;
 }
 
 const shortName=n=>{
@@ -346,7 +356,7 @@ function lgItem(x,side){
 function detail(r){
   const nf=r.fl.length,na=r.al.length,open=!!S.lgOpen[r.pid];
   const list=open?`${nf?`<div class="lgh f">With you · ${nf}</div><ul class="lgl">${r.fl.map(x=>lgItem(x,"f")).join("")}</ul>`:""}${na?`<div class="lgh a">Against · ${na}</div><ul class="lgl">${r.al.map(x=>lgItem(x,"a")).join("")}</ul>`:""}`:"";
-  const tog=`<button class="lgtog" data-lg="${esc(r.pid)}" data-fk="l:${esc(r.pid)}" aria-expanded="${open}"><span>With you ${nf} · Against ${na}</span><span>${open?"Hide leagues ▴":`Show ${nf+na} leagues ▾`}</span></button>`;
+  const tog=`<button class="lgtog" data-lg="${esc(r.pid)}" data-fk="l:${esc(r.pid)}" aria-expanded="${open}"><span>With you ${nf} · Against ${na}</span><span>${open?"Hide leagues ▴":`Show ${nf+na} league${nf+na===1?"":"s"} ▾`}</span></button>`;
   return `<div class="det${S.pdet[r.pid]?" show":""}">${barsHtml(r)}${tog}${list}</div>`;
 }
 function gameLabel(r){

@@ -206,7 +206,11 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .empty button{display:block;margin:10px auto 0}
 .chev.side{transform:rotate(-90deg)}
 /* last: overrides */
-.card.open>.head.mh .mt,.card.open>.head.mh .pill,.card.open>.head.mh .ms,.card.open>.head.mh .mx{display:none}.card.open>.head.mh .hc{display:block}
+.tm .tl{margin-left:2px}
+.card.open>.head.mh .hc{display:flex;align-items:center;gap:8px}.hc .hn{min-width:0;overflow:hidden;text-overflow:ellipsis}.hc .hs{flex:none;font-variant-numeric:tabular-nums}
+.msr{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:2px 0 0}.msr.f{color:var(--good)}.msr.a{color:var(--bad)}
+.ovr{white-space:nowrap}.ext{min-width:4px}
+.card.open>.head.mh>.mt,.card.open>.head.mh>.pill,.card.open>.head.mh>.ms,.card.open>.head.mh>.mx{display:none}.card.open>.head.mh .hc{display:flex;align-items:center;gap:8px;min-width:0}
 .card.open>.head.mh{grid-template-columns:1fr;min-height:44px;padding-top:0;padding-bottom:0;align-content:center}.card.open>.head.mh>.chev{top:14px}
 .evt{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
 .vd .vl:first-child{font-size:11px;text-transform:uppercase;letter-spacing:.05em}
@@ -241,7 +245,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  <ul>
  <li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
  <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
- <li>"Team lean KC +4 · BUF −3" adds up the nets of each team's players, counted in leagues. Open the game for "Game total": everyone in it you root for, and everyone you root against.</li>
+ <li>"lean +4" beside a team adds up the nets of that team's players, counted in leagues: the team you want scoring.</li>
  <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
  <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line, and "proj" means a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
@@ -443,8 +447,7 @@ function barHtml(label,actual,line,final){
   const txt=over?(isTD?"Scored":"Over by "+fmtN(Math.round((actual-L)*10)/10)):at?"At line":under?(isTD?"No TD":"Under by "+fmtN(Math.round((L-actual)*10)/10)):"";
   const tag=txt?`<span class="ovr">${txt}</span>`:"";
   return `<div class="bar"><div class="bh"><span>${label}${tag?" "+tag:""}</span><span><b>${fmtN(actual)}</b> / ${fmtN(L)}${line.src}</span></div>
-   <div class="bw" aria-hidden="true"><div class="trk"><div class="fl" style="width:${fill}%"></div></div><span class="tick"></span>
-   <div class="gut">${over?`<span class="ext" style="width:${ext}px"></span>`:""}</div></div></div>`;
+   <div class="bw" aria-hidden="true"><div class="trk" style="flex:${over?L/Math.min(actual,3*L):1}"><div class="fl" style="width:${fill}%"></div></div><span class="tick"></span>${over?`<span class="ext" style="flex:${1-L/Math.min(actual,3*L)}"></span>`:""}</div></div>`;
 }
 function barsHtml(r){
   if(!r.game)return"";
@@ -549,7 +552,7 @@ function valueHtml(d){
   if(S.view==="for")rows=rows.filter(o=>o.net>0);if(S.view==="against")rows=rows.filter(o=>o.net<0);
   rows.sort((a,b)=>RANK[rStateOf(a.r)]-RANK[rStateOf(b.r)]||Math.abs(b.net)-Math.abs(a.net)||(b.f+b.a)-(a.f+a.a)||a.r.name.localeCompare(b.r.name));
   const unset=lgs.length-withBuy.length;
-  const note=`<div class="vnote">Counting ${counted.length} of ${lgs.length} leagues${S.vmin?` with a buy-in of ${money(S.vmin)} or more`:""}${unset&&!S.vmin?` (${unset} count as $0)`:""}. Tap a player to see which leagues.${unset&&!S.vmin?`<button class="fclear" data-settings="1"><span>Set ${unset} missing buy-in${unset===1?"":"s"}</span>${CHEV.replace('class="chev"','class="chev side"')}</button>`:""}</div>`;
+  const note=`<div class="vnote">Live first, then biggest $ net. Counting ${counted.length} of ${lgs.length} leagues${S.vmin?` with a buy-in of ${money(S.vmin)} or more`:""}${unset&&!S.vmin?` (${unset} count as $0)`:""}. Tap a player to see which leagues.${unset&&!S.vmin?`<button class="fclear" data-settings="1"><span>Set ${unset} missing buy-in${unset===1?"":"s"}</span>${CHEV.replace('class="chev"','class="chev side"')}</button>`:""}</div>`;
   const list=rows.length?`<div class="card">${rows.slice(0,100).map(valRow).join("")}</div>${rows.length>100?`<div class="vnote">Showing 100 of ${rows.length}. Search to find the rest.</div>`:""}`:`<div class="card"><div class="empty">${S.status==="active"?"No live or upcoming players match.":S.status==="done"?"No finished players match.":"No players match this filter."}${S.status==="all"?"":'<button data-showall="1">Show all players</button>'}</div></div>`;
   return note+list;
 }
@@ -620,12 +623,12 @@ function muCard(c){
   const verdict=live?"Now: "+now.toLowerCase():"";
   const leftTxt=c.over?"Final":m.them?`You ${c.a.left.length} left · them ${c.b.left.length}`:`${c.a.left.length} left`;
   const nE=c.a.empty.length,emp=nE&&!c.over?` · <span class="warn">${nE} empty slot${nE===1?"":"s"}</span>`:"";
-  const body=m.them?`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left · proj ${f1(c.a.final)}</span></div>${muRows(c,"me",c.a)}</div>
-    <div class="msd"><div class="msh"><b>${esc(m.opp)} · ${f1(c.b.pts)}</b><span>${c.b.left.length} left · proj ${f1(c.b.final)}</span></div>${muRows(c,"them",c.b)}</div>`
+  const body=m.them?`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left · proj ${f1(c.a.final)}</span></div><div class="msr ${m.tank?"a":"f"}">${m.tank?"Root against these (tank)":"Root for these"}</div>${muRows(c,"me",c.a)}</div>
+    <div class="msd"><div class="msh"><b>${esc(m.opp)} · ${f1(c.b.pts)}</b><span>${c.b.left.length} left · proj ${f1(c.b.final)}</span></div><div class="msr ${m.tank?"f":"a"}">${m.tank?"Root for these (tank)":"Root against these"}</div>${muRows(c,"them",c.b)}</div>`
     :`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left</span></div>${muRows(c,"me",c.a)}</div>`;
   const aria=[m.name+(m.tank?" (tank)":""),m.them?"vs "+m.opp:"",txt+(!m.tank&&(good||bad)?(good?", good for you":", bad for you"):""),verdict].filter(Boolean).join(". ");
   return `<div class="card mu${open?" open":""}"><div class="head mh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${open}" data-mu="${esc(m.id)}" data-fk="mu:${esc(m.id)}">${CHEV}
-   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk nw">(tank)</span>':""}</div><div class="hc"><b>${esc(m.name)}</b><span class="sub"> · ${f1(c.a.pts)}${m.them?"–"+f1(c.b.pts):""} · ${esc(txt)}</span></div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
+   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk nw">(tank)</span>':""}</div><div class="hc"><b class="hn">${esc(m.name)}</b><span class="hs">${f1(c.a.pts)}${m.them?"–"+f1(c.b.pts):""} <span class="pill ${cls}">${esc(txt)}</span></span></div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
    <div class="ms">You <b>${f1(c.a.pts)}</b>${m.them?` – <b>${f1(c.b.pts)}</b> ${esc(m.opp)}`:""}</div>
    <div class="mx">${!c.over&&m.them&&Math.abs(c.pm)<5?'<span class="warn">Toss-up</span> · ':""}${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
    <div class="body">${body}</div></div>`;
@@ -716,19 +719,19 @@ function gameCard(g,compact){
      <div class="cline"><b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span></div><span class="pill ${o.c}">${o.t}</span></div>
      <div class="body"><div class="fbody">${total}${lns}${miss}</div>${secs}</div></div>`;
   }
-  const tm=(t,l)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span></div>`;
+  const tm=(t,l,n)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span><span class="tl"><span class="sr">${esc(t.abbr)} </span>lean <b class="${netCls(n)}">${sgn(n)}</b></span></div>`;
   const la=teamLean(g,A.abbr),lh=teamLean(g,H.abbr);
-  const vd=`<div class="vd"><span class="vl">Team lean</span><span class="vl">${esc(A.abbr)} ${sgn(la)} · ${esc(H.abbr)} ${sgn(lh)}</span></div>`;
+  const vd="";
   const hc=`<div class="hc"><b>${esc(A.abbr)}</b> ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b><span class="sub"> · ${esc(stText(sc)||(st==="post"?"Final":""))}</span></div>`;
   const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
     :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
   const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+sgn(r.net)).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
   const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),`Team lean ${A.abbr} ${sgn(la)}, ${H.abbr} ${sgn(lh)}`,up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
-   <div class="sb">${tm(A,lead==="a")}${tm(H,lead==="h")}</div><div class="stc">${stc}</div>
+   <div class="sb">${tm(A,lead==="a",la)}${tm(H,lead==="h",lh)}</div><div class="stc">${stc}</div>
    ${vd}${hc}
    <div class="lines">${linesHtml(up,dn)}</div></div>
-   <div class="body"><div class="gtl">Game total: <b class="p">+${sum(up)}</b> root for · <b class="n">−${sum(dn)}</b> root against</div>${secs}</div></div>`;
+   <div class="body">${secs}</div></div>`;
 }
 
 function render(){
@@ -782,7 +785,7 @@ function renderInner(){
   
   setFa(onTab==="players"&&act.length&&!S.fopen?(q?`<div class="fnote">Search ignores your filters (${esc(act.join(" · "))}).</div>`:`<div class="fsum"><span>${esc(act.join(" · "))}</span><button class="fx ic" data-clearf="1" aria-label="Clear filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`):"");
   setCtl(onTab==="players"&&S.fopen?`<div class="ctl"><div class="seg" role="group" aria-label="Count by">${[["lg","Count leagues"],["usd","Count buy-in $"]].map(([k,l])=>`<button class="chip${S.money===(k==="usd")?" on":""}" data-unit="${k}" data-fk="u:${k}" aria-pressed="${S.money===(k==="usd")}">${l}</button>`).join("")}</div><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
-    ${S.money?"":`<label class="sortl"><span class="sub">Rank</span><select id="ranksel" data-fk="sel0" aria-label="Rank players by">${[["impact","Strongest net"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.sort===k?" selected":""}>${l}</option>`).join("")}</select></label>`}
+    ${S.money?"":`<label class="sortl"><span class="sub">Rank</span><select id="ranksel" data-fk="sel0" aria-label="Rank players by">${[["impact","Live first, strongest net"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.sort===k?" selected":""}>${l}</option>`).join("")}</select></label>`}
     ${S.money?`<label class="sortl"><span class="sub">Buy-in</span><select id="vminsel" data-fk="vm" aria-label="Count leagues with a buy-in of at least">${[[0,"Any"],[10,"$10 and up"],[25,"$25 and up"],[50,"$50 and up"],[100,"$100 and up"],[250,"$250 and up"]].map(([k,l])=>`<option value="${k}"${S.vmin===k?" selected":""}>${l}</option>`).join("")}</select></label>`:""}
     <label class="sortl"><span class="sub">Show</span><select id="stsel" data-fk="sel2" aria-label="Which games">${[["all","All players"],["active","Live & upcoming"],["done","Finished"]].map(([k,l])=>`<option value="${k}"${S.status===k?" selected":""}>${l}</option>`).join("")}</select></label>
     ${nf?`<button class="fclear" data-clearf="1"><span>Clear filters</span><span aria-hidden="true">✕</span></button>`:""}</div>`:"");
@@ -895,7 +898,7 @@ document.addEventListener("input",e=>{
   t.setAttribute("aria-invalid",bad?"true":"false");
   const row=t.closest(".birow"),old=row&&row.querySelector(".bierr");if(old)old.remove();
   const cap=row&&row.querySelector(".bn small:not(.bierr)");if(cap)cap.hidden=bad;
-  if(bad&&row){const m=document.createElement("small");m.className="bierr";m.id="e-"+id;m.textContent="Not a number. Enter a dollar amount, like 25.";row.querySelector(".bn").appendChild(m);t.setAttribute("aria-describedby",m.id)}else t.removeAttribute("aria-describedby");
+  if(bad&&row){const m=document.createElement("small");m.className="bierr";m.id="e-"+id;m.textContent=`Not a number, so this league still counts as ${money(effBuy(id,(leaguesOf(S.data).find(l=>l.id===id)||{}).name||""))}. Enter a dollar amount, like 25.`;row.querySelector(".bn").appendChild(m);t.setAttribute("aria-describedby",m.id)}else t.removeAttribute("aria-describedby");
   store.set("rfa-buy",S.buy);updateBsum();render();
 });
 document.addEventListener("keydown",e=>{

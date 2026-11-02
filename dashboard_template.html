@@ -245,7 +245,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
  <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line, and "proj" means a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
- <li>The Matchups tab shows your score in every league this week, the closest first. "Down 3.2 · Proj win by 10.8" is where you stand now and where you should finish: live players count what they have plus their projection for the time left. Scoring is each league's own. "Up 3.5" is good. The count at the top says how many are going your way. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Down 1.4 · good".</li>
+ <li>The Matchups tab shows your score in every league this week, the closest first. While players are left, the pill shows where you should finish ("Proj win by 10.8") and the line under it shows where you stand now ("Now: down 3.2"). Live players count what they have plus their projection for the time left. "Toss-up" means the projected finish is within 5 points. Scoring is each league's own. The count at the top says how many are headed your way. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Proj loss by 6.9 · good".</li>
  <li>On the Players tab, "Sort & filter" opens the ranking and filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
  <li>In "Sort & filter", "Count buy-in $" adds up the buy-ins of every league where a player is for or against you. "+$320" means he's for you in $320 more of buy-ins than against you. Set the buy-ins in Settings, the gear at the top; they stay on this device only.</li>
  </ul></div></div>
@@ -611,11 +611,13 @@ function muRows(c,side,calc){
 }
 function muCard(c){
   const m=c.m,open=!!S.mopen[m.id];
-  const good=m.tank?c.margin<0:c.margin>0,bad=m.tank?c.margin>0:c.margin<0;
+  const live=!!m.them&&!c.over,v=live?c.pm:c.margin,even=Math.abs(v)<.05;   // while players are left, the pill is the projected finish
+  const good=!even&&(m.tank?v<0:v>0),bad=!even&&(m.tank?v>0:v<0);
   const mg=Math.abs(c.margin).toFixed(1);
-  const txt=(!m.them?"No opponent":c.margin===0?"Tied":c.over?(c.margin>0?"Won by ":"Lost by ")+mg:(c.margin>0?"Up ":"Down ")+mg)+(m.tank&&m.them&&c.margin?(good?" · good":" · bad"):"");
-  const cls=!m.them||c.margin===0?"z":good?"p":bad?"n":"z";
-  const verdict=!m.them||c.over?"":Math.abs(c.pm)<.05?"Proj tie":(c.pm>0?"Proj win by ":"Proj loss by ")+Math.abs(c.pm).toFixed(1)+(m.tank?(c.pm<0?" · good":" · bad"):"");
+  const now=!m.them?"No opponent":c.margin===0?"Tied":c.over?(c.margin>0?"Won by ":"Lost by ")+mg:(c.margin>0?"Up ":"Down ")+mg;
+  const txt=(live?(even?"Proj tie":(c.pm>0?"Proj win by ":"Proj loss by ")+Math.abs(c.pm).toFixed(1)):now)+(m.tank&&m.them&&!even?(good?" · good":" · bad"):"");
+  const cls=!m.them||even?"z":good?"p":bad?"n":"z";
+  const verdict=live?"Now: "+now.toLowerCase():"";
   const leftTxt=c.over?"Final":m.them?`You ${c.a.left.length} left · them ${c.b.left.length}`:`${c.a.left.length} left`;
   const nE=c.a.empty.length,emp=nE&&!c.over?` · <span class="warn">${nE} empty slot${nE===1?"":"s"}</span>`:"";
   const body=m.them?`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left · proj ${f1(c.a.final)}</span></div>${muRows(c,"me",c.a)}</div>
@@ -642,8 +644,8 @@ function matchupsHtml(d){
   const live=all.filter(c=>c.a.left.some(o=>o.st==="in")||(c.b&&c.b.left.some(o=>o.st==="in"))).length;
   const ctl=`<div class="vctl"><div class="ctl"><label class="sortl"><span class="sub">Sort</span><select id="msortsel" data-fk="ms" aria-label="Sort matchups">${[["close","Closest score"],["proj","Closest projected"],["stake","Biggest buy-in"],["left","Most players left"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.msort===k?" selected":""}>${l}</option>`).join("")}</select></label></div></div>`;
   const asOf=new Date(Math.max(S.mAt,d.at)).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
-  const way=c=>c.m.them&&c.margin?(c.m.tank?c.margin<0:c.margin>0):null,yes=full.filter(c=>way(c)===true).length,no=full.filter(c=>way(c)===false).length,nt=full.filter(c=>c.m.tank).length;
-  const tally=`<p class="mtally"><b class="g">${yes} going your way</b> · <b class="b">${no} not</b>${full.length-yes-no?` · ${full.length-yes-no} tied or no opponent`:""}</p>`;
+  const way=c=>{const v=c.over?c.margin:c.pm;return c.m.them&&Math.abs(v)>=.05?(c.m.tank?v<0:v>0):null},yes=full.filter(c=>way(c)===true).length,no=full.filter(c=>way(c)===false).length,nt=full.filter(c=>c.m.tank).length;
+  const tally=`<p class="mtally"><b class="g">${yes} going your way</b> · <b class="b">${no} not</b>${full.length-yes-no?` · ${full.length-yes-no} tied or no opponent`:""}${full.some(c=>!c.over)?'<span class="sub"> · by projected finish</span>':""}</p>`;
   const note=`<div class="mnote">${act.length} in play${live?` · ${live} with a player live`:""} · as of ${asOf}${nt?` · tank: losing counts as your way`:""}</div>`;
   const o=S.mfin??(!act.length);
   if(qq&&!all.length)return tally+ctl+`<div class="card"><div class="empty">No league or opponent matches “${esc(qq)}”.</div></div>`;

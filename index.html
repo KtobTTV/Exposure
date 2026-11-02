@@ -82,15 +82,18 @@ input::placeholder{color:var(--mute);opacity:1}
 @media (prefers-reduced-motion:reduce){.pill.live::before{animation:none}}
 .day.livehd{color:var(--warn)}
 .fint{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:44px;margin:18px 0 6px;padding:0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+button:disabled{opacity:.4;cursor:default}
+.nm,.det,.prev{overflow-wrap:anywhere}
+.err button{margin-top:10px;display:block;margin-inline:auto}
 </style></head><body><div class="wrap">
 <header>
  <div class="top"><h1>Root for / against</h1>
-  <div class="wk"><button id="pw">&lsaquo;</button><span id="wk">Wk –</span><button id="nw">&rsaquo;</button></div>
-  <button id="rf" title="Refresh">&#8635;</button></div>
+  <div class="wk"><button id="pw" aria-label="Previous week">&lsaquo;</button><span id="wk">Wk –</span><button id="nw" aria-label="Next week">&rsaquo;</button></div>
+  <button id="rf" title="Refresh" aria-label="Refresh">&#8635;</button></div>
  <input id="q" type="search" placeholder="Search a player or team" autocomplete="off" autocapitalize="off" spellcheck="false">
  <div class="tabs" id="tabs"></div>
 </header>
-<div class="meta" id="meta">Loading…</div>
+<div class="meta" id="meta" aria-live="polite">Loading…</div>
 <details class="help"><summary>How to read this</summary><ul>
 <li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
 <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
@@ -104,9 +107,17 @@ const UID="677404197456531456", PLAYERS={"6462":["Ellis Richardson","TE","FA","3
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let S={week:null,season:null,curWeek:null,data:null,tab:"games",hideFinal:false,view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,projs:{}};
+let S={week:null,season:null,curWeek:null,data:null,tab:"games",hideFinal:false,view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,projs:{},tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
 
-async function get(u){const r=await fetch(u);if(!r.ok)throw new Error(u.split("/").slice(-2).join("/")+" "+r.status);return r.json()}
+async function get(u,tries=2){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),15000);
+  try{
+    const r=await fetch(u,{signal:ctl.signal});
+    if((r.status===429||r.status>=500)&&tries>1){await new Promise(x=>setTimeout(x,700));return get(u,tries-1)}
+    if(!r.ok)throw new Error(u.split("/").slice(-2).join("/")+" "+r.status);
+    return await r.json();
+  }finally{clearTimeout(t)}
+}
 async function pool(items,fn,n=8){const out=new Array(items.length);let i=0;
   await Promise.all(Array.from({length:Math.min(n,items.length)},async()=>{while(i<items.length){const k=i++;out[k]=await fn(items[k])}}));return out}
 
@@ -121,15 +132,15 @@ async function pinfo(pid){
 
 async function load(week){
   const state=await get(API+"/state/nfl");
-  S.season=state.league_season; S.curWeek=state.week; S.week=week||S.week||state.week;
-  const w=S.week;
+  S.season=state.league_season; S.curWeek=state.week;
+  const w=week||state.week;
   const [leagues,sched]=await Promise.all([get(`${API}/user/${UID}/leagues/nfl/${S.season}`),
     get(`https://api.sleeper.app/schedule/nfl/regular/${S.season}`)]);
   const lgs=leagues.filter(l=>l.status==="in_season"&&Number((l.settings||{}).best_ball||0)!==1);
   const games={};
   for(const g of sched){if(g.week!==w)continue;games[g.away+"@"+g.home]={away:g.away,home:g.home,date:g.date,status:g.status,rows:[]}}
   const teamGame={};for(const k in games){teamGame[games[k].away]=k;teamGame[games[k].home]=k}
-  const shares={}; let nLg=0;
+  const shares={}; let nLg=0, failed=0;
   await pool(lgs,async lg=>{
     try{
       const [rosters,mus,users]=await Promise.all([get(`${API}/league/${lg.league_id}/rosters`),
@@ -147,7 +158,7 @@ async function load(week){
           if(!pid||pid==="0"||pid==="None")continue;
           (shares[pid]=shares[pid]||{f:[],a:[]})[side].push({lg:lname,opp:oname,t:tank});
         }}
-    }catch(e){console.warn(lg.name,e)}
+    }catch(e){failed++;console.warn(lg.name,e)}
   });
   const rows=[];
   for(const pid in shares){
@@ -158,7 +169,7 @@ async function load(week){
   const gl=Object.values(games).filter(g=>g.rows.length);
   for(const g of gl)g.rows.sort((a,b)=>(b.f+b.a)-(a.f+a.a)||Math.abs(b.net)-Math.abs(a.net)||a.name.localeCompare(b.name));
   gl.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||(b.rows.reduce((t,r)=>t+r.f+r.a,0)-a.rows.reduce((t,r)=>t+r.f+r.a,0)));
-  return {week:w,season:S.season,leagues:nLg,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
+  return {week:w,season:S.season,leagues:nLg,failed,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
 }
 
 /* ---------- per-game stat bars: DraftKings lines (ESPN) vs live ESPN box score ---------- */
@@ -180,7 +191,7 @@ function parseScores(d){
   for(const e of d.events||[]){
     const c=e.competitions[0],t=e.status.type,cm={};
     for(const x of c.competitors)cm[x.homeAway]={abbr:normTeam(x.team.abbreviation),score:x.score,color:/^[0-9a-f]{6}$/i.test(x.team.color||"")?x.team.color:""};
-    if(cm.home&&cm.away)m[cm.away.abbr+"@"+cm.home.abbr]={away:cm.away,home:cm.home,state:t.state,name:t.name,period:e.status.period,clock:e.status.displayClock,date:e.date};
+    if(cm.home&&cm.away)m[cm.away.abbr+"@"+cm.home.abbr]={away:cm.away,home:cm.home,tv:c.timeValid!==false,state:t.state,name:t.name,period:e.status.period,clock:e.status.displayClock,date:e.date};
   }
   return m;
 }
@@ -189,13 +200,13 @@ function loadScores(force){
   const w=S.week;
   if(S.sb&&S.sb.week===w&&Date.now()-S.sb.at<(force?5000:600000))return Promise.resolve();
   if(sbP&&sbP.w===w)return sbP.p;
-  const p=get(SBURL(w)).then(d=>{S.sb={week:w,at:Date.now(),data:d};S.sc=parseScores(d)}).catch(()=>{}).finally(()=>{sbP=null});
+  const p=get(SBURL(w)).then(d=>{if(w!==S.week)return;S.sb={week:w,at:Date.now(),data:d};S.sc=parseScores(d)}).catch(()=>{}).finally(()=>{sbP=null});
   sbP={w,p};return p;
 }
 const effState=g=>{const sc=S.sc[g.away+"@"+g.home];return sc?sc.state:g.status==="in_game"?"in":g.status==="complete"?"post":"pre"};
 const stText=sc=>{
   if(!sc)return"";
-  if(sc.state==="pre")return new Date(sc.date).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+  if(sc.state==="pre")return sc.tv?new Date(sc.date).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"Time TBD";
   if(sc.state==="in")return sc.name==="STATUS_HALFTIME"?"Half":(sc.period>4?"OT":"Q"+sc.period)+" "+sc.clock;
   return sc.period>4?"Final/OT":"Final";
 };
@@ -208,6 +219,7 @@ async function rosterIds(teamId){
 }
 async function loadGame(gk,force){
   const cur=S.gs[gk]; if(cur&&(cur.busy||(cur.ok&&!force)))return;
+  const ep=S.epoch;
   S.gs[gk]=Object.assign(cur||{},{busy:true}); render();
   try{
     const [away,home]=gk.split("@"), w=S.week, norm=a=>a==="WSH"?"WAS":a;
@@ -231,8 +243,9 @@ async function loadGame(gk,force){
         if(grp.name==="passing"){s.passYd=g("passingYards");s.passTD=g("passingTouchdowns")}
         else if(grp.name==="rushing"){s.rushYd=g("rushingYards");s.rushTD=g("rushingTouchdowns")}
         else if(grp.name==="receiving"){s.rec=g("receptions");s.recYd=g("receivingYards");s.recTD=g("receivingTouchdowns")}}}
+    if(ep!==S.epoch)return;
     S.gs[gk]={ok:true,state,lines,stats,proj,byName:Object.assign({},r1,r2),at:Date.now(),hasLines:Object.keys(lines).length>0};
-  }catch(e){S.gs[gk]={err:/^ESPN/.test(e.message)?e.message:"Couldn't load stats for this game.",at:Date.now()}}
+  }catch(e){if(ep!==S.epoch)return;S.gs[gk]={err:/^ESPN/.test(e.message)?e.message:navigator.onLine===false?"You're offline.":"Couldn't load stats for this game.",at:Date.now()}}
   render();
 }
 const fmtN=n=>Number.isInteger(n)?String(n):n.toFixed(1);
@@ -311,10 +324,17 @@ function gameCard(g){
 
 function render(){
   const d=S.data, q=$("#q").value.trim().toLowerCase(), out=$("#out");
-  if(!d){return}
-  $("#wk").textContent="Wk "+d.week;
+  const wk=S.week||(d&&d.week)||null;
+  $("#wk").textContent="Wk "+(wk||"–");
+  $("#pw").disabled=!!wk&&wk<=1;$("#nw").disabled=!!wk&&wk>=18;
+  if(!d){
+    $("#tabs").innerHTML="";
+    $("#meta").textContent=S.err?"":wk?`Loading Week ${wk}…`:"Loading your leagues…";
+    out.innerHTML=S.err?`<div class="err">${esc(S.err)}<button data-retry="1">Try again</button></div>`:'<div class="empty">Loading…</div>';
+    return;
+  }
   const ago=Math.round((Date.now()-d.at)/60000);
-  $("#meta").textContent=`${d.leagues} leagues · ${d.rows.length} players · updated ${ago<1?"just now":ago+" min ago"}${S.week!==S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit",second:"2-digit"})+", refreshing every 45s":""}`;
+  $("#meta").textContent=`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+(ago<1?"just now":ago+" min ago")}${d.failed?` · ${d.failed} ${d.failed===1?"league":"leagues"} didn't load`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit",second:"2-digit"})+", refreshing every 45s":""}`;
   const tabs=[["games","Games"],["players","Players"]];
   $("#tabs").innerHTML=tabs.map(([k,l])=>`<button class="chip${(q?"players":S.tab)===k?" on":""}" data-tab="${k}">${l}</button>`).join("")+
     
@@ -334,7 +354,7 @@ function render(){
       html=hits.length?`<div class="meta">Not started by you or any opponent this week (0 / 0):</div>`+hits.map(([id,p])=>
         `<div class="card"><div class="row"><div class="nm"><b>${esc(p[0])}</b> <span class="sub">${esc(p[1])} ${esc(p[2])}</span></div><span class="net z">0</span></div></div>`).join("")
         :`<div class="empty">No player matches “${esc(q)}”.</div>`;
-    }else html=`<div class="card">${html||'<div class="empty">Nothing here.</div>'}</div>`;
+    }else html=`<div class="card">${html||`<div class="empty">${S.view==="all"?"No players to show.":"No players match this filter."}</div>`}</div>`;
     out.innerHTML=html;
   }else{
     const live=[],upc=[],fin=[],expo=g=>g.rows.reduce((t,r)=>t+r.f+r.a,0);
@@ -353,13 +373,14 @@ function render(){
       const o=S.finalOpen??(!live.length&&!upc.length);
       html+=`<button class="fint" data-final="1" data-open="${o?1:0}" aria-expanded="${o}"><span>Final · ${fin.length}</span><span>${o?"▴":"▾"}</span></button>`+(o?fin.map(gameCard).join(""):"");
     }
-    out.innerHTML=html||'<div class="empty">No games with players in your lineups.</div>';
+    out.innerHTML=html||`<div class="empty">${!d.leagues?`No active leagues have matchups for Week ${d.week} yet.`:!d.schedGames?`No NFL games are scheduled for Week ${d.week}.`:"None of your starters or your opponents' starters play this week."}</div>`;
   }
 }
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-view],[data-sort],[data-final],.head,.row");if(!t)return;
-  if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";render()}
+  const t=e.target.closest("[data-tab],[data-view],[data-sort],[data-final],[data-retry],.head,.row");if(!t)return;
+  if(t.dataset.retry){refresh(S.week)}
+  else if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";render()}
   else if(t.dataset.view){S.view=t.dataset.view;if(S.view==="for")S.sort="plus";else if(S.view==="against")S.sort="minus";else S.sort="impact";render()}
   else if(t.dataset.sort){S.sort=t.dataset.sort;render()}
   else if(t.dataset.final!==undefined){S.finalOpen=t.dataset.open!=="1";render()}
@@ -367,15 +388,36 @@ document.addEventListener("click",e=>{
   else if(t.classList.contains("row")){const pr=t.parentElement;S.pdet[pr.dataset.pid]=!S.pdet[pr.dataset.pid];render();if(S.pdet[pr.dataset.pid]&&pr.dataset.gk)loadGame(pr.dataset.gk)}
 });
 $("#q").addEventListener("input",render);
+const errMsg=e=>navigator.onLine===false?"You're offline.":e&&e.name==="AbortError"?"Sleeper took too long to respond.":"Couldn't load from Sleeper.";
 async function refresh(week){
-  if(S.busy)return;S.busy=true;$("#rf").style.opacity=.4;
-  try{S.data=await load(week);await loadScores(true);store.set("rfa-"+S.data.week,S.data);render();await Promise.all(Object.keys(S.gs).map(gk=>loadGame(gk,true)))}
-  catch(e){if(!S.data)$("#out").innerHTML=`<div class="err">Couldn't load your leagues from Sleeper. Check your connection, then tap ↻.</div>`;$("#meta").textContent="Couldn't refresh"+(S.data?", showing the last saved view.":".")}
-  S.busy=false;$("#rf").style.opacity=1;
+  const w=week||undefined;
+  if(S.busy&&S.busyWeek===w)return;
+  const tok=++S.tok;S.busy=true;S.busyWeek=w;S.loading=true;$("#rf").style.opacity=.4;render();
+  try{
+    const data=await load(w); if(tok!==S.tok)return;
+    S.week=data.week;S.data=data;S.err=null;store.set("rfa-"+data.week,data);
+    await loadScores(true); if(tok!==S.tok)return;
+    S.loading=false;render();
+    await Promise.all(Object.keys(S.gs).map(gk=>loadGame(gk,true)));
+  }catch(e){
+    if(tok!==S.tok)return;
+    S.loading=false;
+    S.err=S.data?errMsg(e).replace(/\.$/,"")+", showing the last saved view":errMsg(e)+" Check your connection, then try again.";
+    render();
+  }finally{
+    if(tok===S.tok){S.busy=false;S.loading=false;$("#rf").style.opacity=1}
+  }
 }
+function go(n){
+  if(n===S.week)return;
+  S.week=n;S.epoch++;S.gs={};S.sc={};S.sb=null;S.data=store.get("rfa-"+n);S.err=null;S.loading=true;
+  render();
+  clearTimeout(S.stepT);S.stepT=setTimeout(()=>refresh(n),250);
+}
+const step=d=>go(Math.min(18,Math.max(1,(S.week||(S.data&&S.data.week)||S.curWeek||1)+d)));
 $("#rf").onclick=()=>refresh(S.week);
-$("#pw").onclick=()=>{S.gs={};S.week=(S.week||S.curWeek||S.data.week)-1;S.data=store.get("rfa-"+S.week);render();refresh(S.week)};
-$("#nw").onclick=()=>{S.gs={};S.week=(S.week||S.curWeek||S.data.week)+1;S.data=store.get("rfa-"+S.week);render();refresh(S.week)};
+$("#pw").onclick=()=>step(-1);
+$("#nw").onclick=()=>step(1);
 setInterval(async()=>{
   if(document.hidden||!S.data||S.busy)return;
   const soon=x=>x.state==="in"||(x.state==="pre"&&new Date(x.date)-Date.now()<10*60000);

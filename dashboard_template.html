@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6fdb'/%3E%3Cpath d='M9 16h14M16 9v14' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Root For or Against</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--mute:#5d6877;--line:#e1e5eb;--good:#0d7a3f;--goodbg:#e2f5e9;
+--bad:#b3261e;--badbg:#fbe7e5;--warn:#8a5a00;--warnbg:#fff1d6;--info:#1f5fbf;--infobg:#e4eefc;--btrk:#dbe3f1;--bfill:#2f6fdb}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--card:#171c22;--ink:#e7ecf2;--mute:#8b98a5;--line:#262d36;
+--good:#6ee7a0;--goodbg:#123d1e;--bad:#ff9ca3;--badbg:#47161a;--warn:#f0c36a;--warnbg:#3d2f0e;--info:#7fb3ff;--infobg:#14284a;--btrk:#2a3a55;--bfill:#6aa5ff}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:720px;margin:0 auto}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:8px}
+h1{font-size:17px;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+button{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 11px;min-height:44px;min-width:44px;cursor:pointer}
+button:active{opacity:.6}
+.wk{display:flex;align-items:center;gap:6px;font-weight:600}
+input[type=search]{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);
+border-radius:10px;padding:0 12px;min-height:44px;-webkit-appearance:none}
+.chip{border-radius:99px;padding:0 16px;min-height:44px;font-size:14px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.meta{color:var(--mute);font-size:12.5px;margin:8px 0}
+.day{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:18px 0 6px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 8px;overflow:hidden}
+.prev{color:var(--mute);font-size:12.5px;margin-top:2px}
+.body{border-top:1px solid var(--line);display:none}
+.card.open .body{display:block}
+.sec{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px 2px}
+.sec.f{color:var(--good)}.sec.a{color:var(--bad)}.sec.e{color:var(--mute)}
+.row{padding:8px 12px;min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .nm{flex:1;min-width:0}.row b{font-weight:600}
+.sub{color:var(--mute);font-size:12.5px}
+.net{min-width:44px;text-align:center;font-weight:700;border-radius:99px;padding:2px 8px;font-variant-numeric:tabular-nums}
+.net.p{background:var(--goodbg);color:var(--good)}.net.n{background:var(--badbg);color:var(--bad)}.cnt{color:var(--mute);font-size:12px;white-space:nowrap}
+.det{padding:2px 12px 10px 12px;font-size:13px;display:none}
+.det.show{display:block}
+.det div{margin:2px 0}.det .w{color:var(--good);font-weight:600}.det .x{color:var(--bad);font-weight:600}
+.pill{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.pill.live{background:var(--warnbg);color:var(--warn)}.pill.fin{background:var(--infobg);color:var(--info)}
+.empty,.err{color:var(--mute);text-align:center;padding:30px 10px}
+.err{color:var(--bad)}
+.bars{padding:2px 0 8px}
+.bar{margin:8px 0}.bh{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:3px}
+.bh b{font-weight:700}
+.ovr{font-size:12px;font-weight:700;letter-spacing:.03em;margin-left:4px}
+.eff{font-weight:700}.eff.g{color:var(--good)}.eff.b{color:var(--bad)}
+.bw{display:flex;align-items:center}
+.trk{flex:1;height:14px;background:var(--btrk);border-radius:7px 0 0 7px;overflow:hidden}
+.fl{height:100%;background:var(--bfill)}
+.tick{width:2px;height:22px;background:var(--ink);flex:none;border-radius:1px}
+.gut{width:44px;display:flex;align-items:center;flex:none}
+.ext{height:14px;background:var(--bfill);border-radius:0 7px 7px 0}
+.lt{margin-left:6px;font-size:12px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums}
+.help{margin:0 0 10px;font-size:12.5px;color:var(--mute)}
+.help summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+.help ul{margin:2px 0 8px;padding-left:18px}.help li{margin:4px 0}
+input::placeholder{color:var(--mute);opacity:1}
+.net.z{background:transparent;box-shadow:inset 0 0 0 1px var(--line);color:var(--mute)}
+.src{color:var(--mute);font-size:12px;margin-top:4px}
+/* scoreboard game cards */
+.head{display:grid;grid-template-columns:auto 1fr auto;column-gap:12px;row-gap:6px;align-items:center;padding:10px 12px;cursor:pointer}
+.sb{display:grid;gap:3px;min-width:96px}
+.tm{display:flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+.tm i{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 0 1px var(--line)}
+.tm .ab{font-weight:700;width:34px}
+.tm .sc{margin-left:auto;min-width:24px;text-align:right;color:var(--mute);font-weight:500}
+.tm.lead .sc{color:var(--ink);font-weight:800}
+.stc{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.clk{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.clk.fin{color:var(--mute)}
+.nets{display:flex;gap:6px}
+.head .prev{grid-column:1/-1;margin:0}
+.pill.live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:5px;vertical-align:1px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.pill.live::before{animation:none}}
+.day.livehd{color:var(--warn)}
+.fint{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:44px;margin:18px 0 6px;padding:0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+button:disabled{opacity:.4;cursor:default}
+.nm,.det,.prev{overflow-wrap:anywhere}
+.err button{margin-top:10px;display:block;margin-inline:auto}
+/* adapt + accessibility */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{padding:0 max(16px,env(safe-area-inset-left)) calc(92px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+@media (max-width:359px){h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.top{justify-content:flex-end}}
+#pw,#nw,#rf{padding:0}
+.wk{gap:2px}.wk #wk{min-width:44px;text-align:center}
+.searchbar{margin:4px 0 10px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
+.seg{display:flex;gap:6px;flex:1 1 100%}.seg .chip{flex:1;padding:0 8px}
+.sortl{display:flex;align-items:center;gap:8px;flex:1 1 100%}
+.sortl select{flex:1;min-height:44px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:0 14px}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;gap:8px;max-width:720px;margin:0 auto;padding:8px max(16px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
+.bnav button{flex:1;border-radius:12px;font-weight:600}
+.bnav button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.head:focus-visible,.row:focus-visible{outline-offset:-2px}
+/* browser surfaces, touch feedback, numerals */
+:root{color-scheme:light dark;accent-color:var(--bfill)}
+::selection{background:var(--infobg);color:var(--ink)}
+input{caret-color:var(--bfill)}
+.head,.row{scroll-margin-top:72px;scroll-margin-bottom:84px}
+.head:active,.row:active{background:var(--bg)}
+@media (hover:hover){.head:hover,.row:hover{background:var(--bg)}button:not(:disabled):not(.on):hover{border-color:var(--mute)}}
+.net,.cnt,.bh,.meta,.sc,.clk{font-variant-numeric:tabular-nums}
+</style></head><body><div class="wrap">
+<header>
+ <div class="top"><h1>Root for / against</h1>
+  <div class="wk"><button id="pw" aria-label="Previous week">&lsaquo;</button><span id="wk">Wk –</span><button id="nw" aria-label="Next week">&rsaquo;</button></div>
+  <button id="rf" title="Refresh" aria-label="Refresh">&#8635;</button></div>
+</header>
+<div class="meta" id="meta" aria-live="polite">Loading…</div>
+<div class="searchbar"><input id="q" type="search" aria-label="Search players or teams" placeholder="Search a player or team" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+<div id="ctl"></div>
+<main id="out" aria-busy="true"></main>
+<details class="help"><summary>How to read this</summary><ul>
+<li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
+<li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
+<li>Game totals (+21 / −16) add up the nets of every player in that game.</li>
+<li>Stat bars: the filled part is what he has so far and the tick is the sportsbook line. A stub past the tick means he's over the line, and the label says whether that helps or hurts you.</li>
+</ul></details>
+</div>
+<nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-pressed="true">Games</button><button id="tp" data-tab="players" aria-pressed="false">Players</button></nav>
+<script>
+const UID="__UID__", PLAYERS=__PLAYERS__, TANK=new Set(__TANK__), API="https://api.sleeper.app/v1";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,projs:{},tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
+
+async function get(u,tries=2){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),15000);
+  try{
+    const r=await fetch(u,{signal:ctl.signal});
+    if((r.status===429||r.status>=500)&&tries>1){await new Promise(x=>setTimeout(x,700));return get(u,tries-1)}
+    if(!r.ok)throw new Error(u.split("/").slice(-2).join("/")+" "+r.status);
+    return await r.json();
+  }finally{clearTimeout(t)}
+}
+async function pool(items,fn,n=8){const out=new Array(items.length);let i=0;
+  await Promise.all(Array.from({length:Math.min(n,items.length)},async()=>{while(i<items.length){const k=i++;out[k]=await fn(items[k])}}));return out}
+
+let FULL=null;
+async function pinfo(pid){
+  let p=PLAYERS[pid]; if(p)return p;
+  if(/^[A-Z]{2,3}$/.test(pid))return [pid+" DEF","DEF",pid];
+  if(!FULL){try{FULL=await get(API+"/players/nfl")}catch(e){FULL={}}}
+  const m=FULL[pid]; if(!m)return ["Player "+pid,"?","FA"];
+  return [((m.first_name||"")+" "+(m.last_name||"")).trim()||pid,m.position||"?",m.team||"FA",m.espn_id?String(m.espn_id):""];
+}
+
+async function load(week){
+  const state=await get(API+"/state/nfl");
+  S.season=state.league_season; S.curWeek=state.week;
+  const w=week||state.week;
+  const [leagues,sched]=await Promise.all([get(`${API}/user/${UID}/leagues/nfl/${S.season}`),
+    get(`https://api.sleeper.app/schedule/nfl/regular/${S.season}`)]);
+  const lgs=leagues.filter(l=>l.status==="in_season"&&Number((l.settings||{}).best_ball||0)!==1);
+  const games={};
+  for(const g of sched){if(g.week!==w)continue;games[g.away+"@"+g.home]={away:g.away,home:g.home,date:g.date,status:g.status,rows:[]}}
+  const teamGame={};for(const k in games){teamGame[games[k].away]=k;teamGame[games[k].home]=k}
+  const shares={}; let nLg=0, failed=0;
+  await pool(lgs,async lg=>{
+    try{
+      const [rosters,mus,users]=await Promise.all([get(`${API}/league/${lg.league_id}/rosters`),
+        get(`${API}/league/${lg.league_id}/matchups/${w}`),get(`${API}/league/${lg.league_id}/users`)]);
+      const mine=rosters.find(r=>String(r.owner_id)===UID||(r.co_owners||[]).includes(UID)); if(!mine)return;
+      const my=mus.find(m=>m.roster_id===mine.roster_id); if(!my)return; nLg++;
+      const opp=my.matchup_id==null?null:mus.find(m=>m.matchup_id===my.matchup_id&&m.roster_id!==mine.roster_id);
+      const oroster=opp&&rosters.find(r=>r.roster_id===opp.roster_id);
+      const ou=oroster&&users.find(u=>u.user_id===oroster.owner_id);
+      const oname=ou?((ou.metadata||{}).team_name||ou.display_name):"?";
+      const tank=TANK.has(String(lg.league_id)), lname=(lg.name||"").trim()+(tank?" (tank)":"");
+      for(const [list,own] of [[my.starters,true],[opp?opp.starters:[],false]]){
+        const side=(own!==tank)?"f":"a";
+        for(const pid of new Set((list||[]).map(String))){
+          if(!pid||pid==="0"||pid==="None")continue;
+          (shares[pid]=shares[pid]||{f:[],a:[]})[side].push({lg:lname,opp:oname,t:tank});
+        }}
+    }catch(e){failed++;console.warn(lg.name,e)}
+  });
+  const rows=[];
+  for(const pid in shares){
+    const [name,pos,team,espn]=await pinfo(pid), s=shares[pid], gk=teamGame[team];
+    rows.push({pid,name,pos,team,espn:espn||"",f:s.f.length,a:s.a.length,net:s.f.length-s.a.length,fl:s.f,al:s.a,game:gk||null});
+  }
+  for(const r of rows)if(r.game)games[r.game].rows.push(r);
+  const gl=Object.values(games).filter(g=>g.rows.length);
+  for(const g of gl)g.rows.sort((a,b)=>(b.f+b.a)-(a.f+a.a)||Math.abs(b.net)-Math.abs(a.net)||a.name.localeCompare(b.name));
+  gl.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||(b.rows.reduce((t,r)=>t+r.f+r.a,0)-a.rows.reduce((t,r)=>t+r.f+r.a,0)));
+  return {week:w,season:S.season,leagues:nLg,failed,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
+}
+
+/* ---------- per-game stat bars: DraftKings lines (ESPN) vs live ESPN box score ---------- */
+const TY={8:"passYd",10:"passTD",12:"rushYd",13:"recYd",14:"rec"};
+const SPK={passYd:"pass_yd",passTD:"pass_td",rushYd:"rush_yd",recYd:"rec_yd",rec:"rec"};
+const SPECS={QB:[["Passing yards","passYd"],["Rushing yards","rushYd"],["Passing TDs","passTD"]],
+  RB:[["Receptions","rec"],["Rushing yards","rushYd"],["Touchdowns","td"]],
+  WR:[["Receptions","rec"],["Receiving yards","recYd"],["Touchdowns","td"]],
+  TE:[["Receptions","rec"],["Receiving yards","recYd"],["Touchdowns","td"]]};
+async function projFor(w,force){
+  if(S.projs[w]&&!force)return S.projs[w];
+  try{const rows=await get(`https://api.sleeper.com/projections/nfl/${S.season}/${w}?season_type=regular&order_by=ppr&position[]=QB&position[]=RB&position[]=WR&position[]=TE`);
+    const m={};for(const r of rows)m[String(r.player_id)]=r.stats||{};return S.projs[w]=m}catch(e){return S.projs[w]||{}}
+}
+const normTeam=a=>a==="WSH"?"WAS":a;
+const SBURL=w=>`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${S.season}&seasontype=2&week=${w}`;
+function parseScores(d){
+  const m={};
+  for(const e of d.events||[]){
+    const c=e.competitions[0],t=e.status.type,cm={};
+    for(const x of c.competitors)cm[x.homeAway]={abbr:normTeam(x.team.abbreviation),score:x.score,color:/^[0-9a-f]{6}$/i.test(x.team.color||"")?x.team.color:""};
+    if(cm.home&&cm.away)m[cm.away.abbr+"@"+cm.home.abbr]={away:cm.away,home:cm.home,tv:c.timeValid!==false,state:t.state,name:t.name,period:e.status.period,clock:e.status.displayClock,date:e.date};
+  }
+  return m;
+}
+let sbP=null;
+function loadScores(force){
+  const w=S.week;
+  if(S.sb&&S.sb.week===w&&Date.now()-S.sb.at<(force?5000:600000))return Promise.resolve();
+  if(sbP&&sbP.w===w)return sbP.p;
+  const p=get(SBURL(w)).then(d=>{if(w!==S.week)return;S.sb={week:w,at:Date.now(),data:d};S.sc=parseScores(d)}).catch(()=>{}).finally(()=>{sbP=null});
+  sbP={w,p};return p;
+}
+const effState=g=>{const sc=S.sc[g.away+"@"+g.home];return sc?sc.state:g.status==="in_game"?"in":g.status==="complete"?"post":"pre"};
+const stText=sc=>{
+  if(!sc)return"";
+  if(sc.state==="pre")return sc.tv?new Date(sc.date).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"Time TBD";
+  if(sc.state==="in")return sc.name==="STATUS_HALFTIME"?"Half":(sc.period>4?"OT":"Q"+sc.period)+" "+sc.clock;
+  return sc.period>4?"Final/OT":"Final";
+};
+const nm=n=>String(n).toLowerCase().replace(/[.'’]/g,"").replace(/-/g," ").replace(/(jr|sr|ii|iii|iv|v)/g,"").replace(/\s+/g," ").trim();
+S.rost={};
+async function rosterIds(teamId){
+  if(!S.rost[teamId]){const m={};try{const d=await get(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${teamId}/roster`);
+    for(const g of d.athletes||[])for(const a of g.items||[])m[nm(a.fullName||a.displayName||"")]=String(a.id)}catch(e){}S.rost[teamId]=m}
+  return S.rost[teamId];
+}
+async function loadGame(gk,force){
+  const cur=S.gs[gk]; if(cur&&(cur.busy||(cur.ok&&!force)))return;
+  const ep=S.epoch;
+  S.gs[gk]=Object.assign(cur||{},{busy:true}); render();
+  try{
+    const [away,home]=gk.split("@"), w=S.week, norm=a=>a==="WSH"?"WAS":a;
+    await loadScores(force);
+    const ev=(S.sb.data.events||[]).find(e=>{const t=e.competitions[0].competitors.map(c=>norm(c.team.abbreviation));return t.includes(away)&&t.includes(home)});
+    if(!ev)throw new Error("ESPN hasn't listed this game yet.");
+    const eid=ev.id, state=ev.status.type.state;
+    const [sum,pb,proj,r1,r2]=await Promise.all([state==="pre"?null:get(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=${eid}`),
+      get(`https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/${eid}/competitions/${eid}/odds/100/propBets?limit=1000`).catch(()=>null),projFor(w,force),
+      ...ev.competitions[0].competitors.map(c=>rosterIds(c.team.id))]);
+    const lines={};
+    for(const it of (pb&&pb.items)||[]){const k=TY[it.type.id],v=it.current&&it.current.target&&it.current.target.value;if(!k||v==null)continue;
+      const id=(it.athlete.$ref.match(/athletes\/(\d+)/)||[])[1];if(id)(lines[id]=lines[id]||{})[k]=v}
+    const lk="rfa-lines-"+eid;   // keep the pregame line: books move/pull lines once the game starts
+    if(state==="pre"){if(Object.keys(lines).length)store.set(lk,lines)}
+    else{const st=store.get(lk);if(st)for(const id in st)lines[id]=Object.assign({},lines[id],st[id])}
+    const stats={};
+    if(sum)for(const t of sum.boxscore.players)for(const grp of t.statistics){
+      const idx={};grp.keys.forEach((k,i)=>idx[k]=i);
+      for(const a of grp.athletes){const s=stats[a.athlete.id]=stats[a.athlete.id]||{},g=k=>parseFloat(a.stats[idx[k]])||0;
+        if(grp.name==="passing"){s.passYd=g("passingYards");s.passTD=g("passingTouchdowns")}
+        else if(grp.name==="rushing"){s.rushYd=g("rushingYards");s.rushTD=g("rushingTouchdowns")}
+        else if(grp.name==="receiving"){s.rec=g("receptions");s.recYd=g("receivingYards");s.recTD=g("receivingTouchdowns")}}}
+    if(ep!==S.epoch)return;
+    S.gs[gk]={ok:true,state,lines,stats,proj,byName:Object.assign({},r1,r2),at:Date.now(),hasLines:Object.keys(lines).length>0};
+  }catch(e){if(ep!==S.epoch)return;S.gs[gk]={err:/^ESPN/.test(e.message)?e.message:navigator.onLine===false?"You're offline.":"Couldn't load stats for this game.",at:Date.now()}}
+  render();
+}
+const fmtN=n=>Number.isInteger(n)?String(n):n.toFixed(1);
+function lineFor(key,r,gs,eid){
+  const b=(gs.lines[eid]||{})[key]; if(b!=null)return{v:b,src:""};
+  if(key==="td")return{v:0.5,src:" · anytime TD"};
+  const pr=(gs.proj[r.pid]||{})[SPK[key]]; if(pr>0)return{v:Math.round(pr*10)/10,src:" · proj"};
+  return null;
+}
+function barHtml(label,actual,line,net){
+  if(!line)return `<div class="bar"><div class="bh"><span>${label}</span><span><b>${fmtN(actual)}</b> · no line</span></div></div>`;
+  const L=line.v,over=actual>L,at=L>0&&actual===L,ratio=L>0?actual/L:0,fill=Math.min(ratio,1)*100,ext=over?Math.round(8+Math.min(ratio-1,1)*14):0;
+  const eff=net>0?`<span class="eff g">helps you</span>`:net<0?`<span class="eff b">hurts you</span>`:"";
+  const tag=over?`<span class="ovr">OVER +${fmtN(Math.round((actual-L)*10)/10)}${eff?" · ":""}</span>${eff}`:at?`<span class="ovr">AT LINE</span>`:"";
+  return `<div class="bar"><div class="bh"><span>${label}${tag?" "+tag:""}</span><span><b>${fmtN(actual)}</b> / ${fmtN(L)}${line.src}</span></div>
+   <div class="bw" aria-hidden="true"><div class="trk"><div class="fl" style="width:${fill}%"></div></div><span class="tick"></span>
+   <div class="gut">${over?`<span class="ext" style="width:${ext}px"></span>`:`<span class="lt">${fmtN(L)}</span>`}</div></div></div>`;
+}
+function barsHtml(r){
+  if(!r.game)return"";
+  const specs=SPECS[r.pos];
+  if(!specs)return`<div class="src">Stat bars cover QB, RB, WR and TE.</div>`;
+  const gs=S.gs[r.game];
+  if(!gs||(gs.busy&&!gs.ok))return`<div class="src">Loading lines and stats…</div>`;
+  if(gs.err)return`<div class="src">${esc(gs.err)} Tap ↻ to try again.</div>`;
+  const eid=r.espn||gs.byName[nm(r.name)]||"", a=gs.stats[eid]||{};
+  const act={passYd:a.passYd||0,passTD:a.passTD||0,rushYd:a.rushYd||0,rec:a.rec||0,recYd:a.recYd||0,td:(a.rushTD||0)+(a.recTD||0)};
+  const lines=specs.map(([l,k])=>[l,act[k],lineFor(k,r,gs,eid)]);
+  const t=new Date(gs.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+  const st={pre:"not started",in:"live",post:"final"}[gs.state]||"";
+  const note=lines.some(x=>x[2]&&x[2].src.includes("proj"))?" “proj” is a Sleeper projection, used where no line is posted.":"";
+  const td=lines.some(x=>x[2]&&x[2].src.includes("anytime"))?" The TD bar uses an anytime-TD line of 0.5.":"";
+  return `<div class="bars">${lines.map(([l,v,ln])=>barHtml(l,v,ln,r.net)).join("")}
+   <div class="src">Line: DraftKings${gs.state!=="pre"?", pregame":""}. Stats: ESPN, ${st}, ${t}.${note}${td}${eid?"":" Couldn't match this player on ESPN."}</div></div>`;
+}
+
+const shortName=n=>{
+  const p=String(n).replace(/\b(Jr|Sr|II|III|IV|V)\.?$/i,"").trim().split(/\s+/);
+  return p.length<2||p[1]==="DEF"?String(n):p[0][0]+". "+p[p.length-1];
+};
+const dayName=d=>{if(!d)return"";const[y,m,x]=d.split("-").map(Number);return new Date(y,m-1,x).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})};
+const sgn=n=>n>0?"+"+n:n<0?"−"+(-n):"0";
+const netCls=n=>n>0?"p":n<0?"n":"z";
+function netBadge(r){return `<span class="net ${netCls(r.net)}"><span class="sr">net </span>${sgn(r.net)}</span>`}
+function detail(r){
+  const f=r.fl.map(x=>x.t?`<div><span class="w">Tank: opp starts him</span> · ${esc(x.lg)} <span class="sub">(${esc(x.opp)} - want him to boom)</span></div>`
+    :`<div><span class="w">With you</span> · ${esc(x.lg)} <span class="sub">(vs ${esc(x.opp)})</span></div>`).join("");
+  const a=r.al.map(x=>x.t?`<div><span class="x">Tank: you start him</span> · ${esc(x.lg)} <span class="sub">(want him to flop)</span></div>`
+    :`<div><span class="x">Against</span> · ${esc(x.lg)} <span class="sub">(${esc(x.opp)} starts him)</span></div>`).join("");
+  return `<div class="det${S.pdet[r.pid]?" show":""}">${barsHtml(r)}${f}${a}</div>`;
+}
+function rowHtml(r,showGame){
+  const g=showGame&&r.game?` · ${r.game.replace("@"," @ ")}`:"";
+  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${!!S.pdet[r.pid]}" data-fk="r:${esc(r.pid)}"><div class="nm"><b>${esc(r.name)}</b> <span class="sub">${esc(r.pos)} ${esc(r.team)}${g}</span></div>
+   <span class="cnt">for ${r.f} · against ${r.a}</span>${netBadge(r)}</div>${detail(r)}</div>`;
+}
+function gameCard(g){
+  const key=g.away+"@"+g.home, sc=S.sc[key], st=effState(g), isOpen=S.open[key]??(st==="in");
+  const up=g.rows.filter(r=>r.net>0),dn=g.rows.filter(r=>r.net<0),ev=g.rows.filter(r=>r.net===0);
+  const sum=l=>l.reduce((t,r)=>t+Math.abs(r.net),0);
+  const top=(l,n)=>l.slice(0,n).map(r=>esc(shortName(r.name))+" "+sgn(r.net)).join(", ");
+  up.sort((a,b)=>b.net-a.net||b.f-a.f);dn.sort((a,b)=>a.net-b.net||b.a-a.a);
+  const prev=[up.length?"For: "+top(up,3):"",dn.length?"Against: "+top(dn,3):""].filter(Boolean).join(" · ")||"Even";
+  const sec=(cls,label,l)=>l.length?`<div class="sec ${cls}">${label}</div>`+l.map(r=>rowHtml(r,false)).join(""):"";
+  const A=sc?sc.away:{abbr:g.away,score:"",color:""},H=sc?sc.home:{abbr:g.home,score:"",color:""};
+  const show=st!=="pre"&&sc, lead=!show?"":(+A.score>+H.score?"a":+H.score>+A.score?"h":"");
+  const tm=(t,l)=>`<div class="tm${l?" lead":""}"><i style="background:${t.color?"#"+t.color:"var(--line)"}"></i><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span></div>`;
+  const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
+    :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
+  return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">
+   <div class="sb">${tm(A,lead==="a")}${tm(H,lead==="h")}</div><div class="stc">${stc}</div>
+   <div class="nets" title="Totals for this game: players to root for / root against"><span class="net p"><span class="sr">Root for </span>+${sum(up)}</span><span class="net n"><span class="sr">Root against </span>−${sum(dn)}</span></div>
+   <div class="prev">${prev}</div></div>
+   <div class="body">${sec("f","Root for",up)}${sec("a","Root against",dn)}${sec("e","Even · cancels out",ev)}</div></div>`;
+}
+
+function render(){
+  const a=document.activeElement,fk=a&&a.dataset&&a.dataset.fk;
+  renderInner();
+  if(fk){const el=document.querySelector(`[data-fk="${CSS.escape(fk)}"]`);if(el&&el!==document.activeElement)el.focus({preventScroll:true})}
+}
+let ctlHtml=null;
+function setCtl(h){if(h===ctlHtml)return;ctlHtml=h;$("#ctl").innerHTML=h}
+function renderInner(){
+  const d=S.data, q=$("#q").value.trim().toLowerCase(), out=$("#out");
+  out.setAttribute("aria-busy",S.loading?"true":"false");
+  const wk=S.week||(d&&d.week)||null;
+  $("#wk").textContent="Wk "+(wk||"–");
+  $("#pw").disabled=!!wk&&wk<=1;$("#nw").disabled=!!wk&&wk>=18;
+  if(!d){
+    setCtl("");
+    $("#meta").textContent=S.err?"":wk?`Loading Week ${wk}…`:"Loading your leagues…";
+    out.innerHTML=S.err?`<div class="err">${esc(S.err)}<button data-retry="1">Try again</button></div>`:'<div class="empty">Loading…</div>';
+    return;
+  }
+  const ago=Math.round((Date.now()-d.at)/60000);
+  $("#meta").textContent=`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+(ago<1?"just now":ago+" min ago")}${d.failed?` · ${d.failed} ${d.failed===1?"league":"leagues"} didn't load`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`;
+  const onTab=q?"players":S.tab;
+  for(const [id,k] of [["#tg","games"],["#tp","players"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-pressed",onTab===k)}
+  setCtl(onTab==="players"?`<div class="ctl"><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
+    <label class="sortl"><span class="sub">Sort</span><select id="sortsel" data-fk="sel" aria-label="Sort players">${[["impact","Most started"],["plus","Most + (root for)"],["minus","Most − (root against)"]].map(([k,l])=>`<option value="${k}"${S.sort===k?" selected":""}>${l}</option>`).join("")}</select></label></div>`:"");
+  if(q||S.tab==="players"){
+    let rows=d.rows.slice();
+    if(S.view==="for")rows=rows.filter(r=>r.net>0);if(S.view==="against")rows=rows.filter(r=>r.net<0);
+    if(q)rows=rows.filter(r=>r.name.toLowerCase().includes(q)||r.team.toLowerCase()===q||(r.pos+" "+r.team).toLowerCase().includes(q));
+    const bySort={impact:(a,b)=>(b.f+b.a)-(a.f+a.a)||Math.abs(b.net)-Math.abs(a.net),
+      plus:(a,b)=>b.net-a.net||(b.f+b.a)-(a.f+a.a),minus:(a,b)=>a.net-b.net||(b.f+b.a)-(a.f+a.a)};
+    const isTeam=r=>q&&r.team.toLowerCase()===q?0:1;
+    rows.sort((a,b)=>isTeam(a)-isTeam(b)||(q&&S.sort==="impact"?0:bySort[S.sort](a,b))||a.name.localeCompare(b.name));
+    let html=rows.slice(0,200).map(r=>rowHtml(r,true)).join("");
+    if(q&&rows.length===0){
+      const hits=Object.entries(PLAYERS).filter(([id,p])=>p[0].toLowerCase().includes(q)).slice(0,8);
+      html=hits.length?`<div class="meta">Not started by you or any opponent this week (0 / 0):</div>`+hits.map(([id,p])=>
+        `<div class="card"><div class="row"><div class="nm"><b>${esc(p[0])}</b> <span class="sub">${esc(p[1])} ${esc(p[2])}</span></div><span class="net z">0</span></div></div>`).join("")
+        :`<div class="empty">No player matches “${esc(q)}”.</div>`;
+    }else html=`<div class="card">${html||`<div class="empty">${S.view==="all"?"No players to show.":"No players match this filter."}</div>`}</div>`;
+    out.innerHTML=html;
+  }else{
+    const live=[],upc=[],fin=[],expo=g=>g.rows.reduce((t,r)=>t+r.f+r.a,0);
+    for(const g of d.games){const st=effState(g);(st==="in"?live:st==="post"?fin:upc).push(g)}
+    const kick=g=>{const sc=S.sc[g.away+"@"+g.home];return sc?sc.date:(g.date||"9")};
+    live.sort((a,b)=>expo(b)-expo(a));
+    upc.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||kick(a).localeCompare(kick(b))||expo(b)-expo(a));
+    fin.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||kick(a).localeCompare(kick(b)));
+    let html="",last="";
+    if(live.length)html+=`<div class="day livehd" role="heading" aria-level="2">Live now</div>`+live.map(gameCard).join("");
+    for(const g of upc){
+      const dn=dayName(g.date); if(dn!==last){html+=`<div class="day" role="heading" aria-level="2">${esc(dn)}</div>`;last=dn}
+      html+=gameCard(g);
+    }
+    if(fin.length){
+      const o=S.finalOpen??(!live.length&&!upc.length);
+      html+=`<button class="fint" data-fk="f" data-final="1" data-open="${o?1:0}" aria-expanded="${o}"><span>Final · ${fin.length}</span><span>${o?"▴":"▾"}</span></button>`+(o?fin.map(gameCard).join(""):"");
+    }
+    out.innerHTML=html||`<div class="empty">${!d.leagues?`No active leagues have matchups for Week ${d.week} yet.`:!d.schedGames?`No NFL games are scheduled for Week ${d.week}.`:"None of your starters or your opponents' starters play this week."}</div>`;
+  }
+}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-tab],[data-view],[data-final],[data-retry],.head,.row");if(!t)return;
+  if(t.dataset.retry){refresh(S.week)}
+  else if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";render()}
+  else if(t.dataset.view){S.view=t.dataset.view;if(S.view==="for")S.sort="plus";else if(S.view==="against")S.sort="minus";else S.sort="impact";render()}
+  else if(t.dataset.final!==undefined){S.finalOpen=t.dataset.open!=="1";render()}
+  else if(t.classList.contains("head")){const c=t.parentElement;S.open[c.dataset.gk]=!c.classList.contains("open");render()}
+  else if(t.classList.contains("row")){const pr=t.parentElement;S.pdet[pr.dataset.pid]=!S.pdet[pr.dataset.pid];render();if(S.pdet[pr.dataset.pid]&&pr.dataset.gk)loadGame(pr.dataset.gk)}
+});
+$("#q").addEventListener("input",render);
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  const t=e.target;if(t&&t.getAttribute&&t.getAttribute("role")==="button"){e.preventDefault();t.click()}
+});
+document.addEventListener("change",e=>{if(e.target.id==="sortsel"){S.sort=e.target.value;render()}});
+const errMsg=e=>navigator.onLine===false?"You're offline.":e&&e.name==="AbortError"?"Sleeper took too long to respond.":"Couldn't load from Sleeper.";
+async function refresh(week){
+  const w=week||undefined;
+  if(S.busy&&S.busyWeek===w)return;
+  const tok=++S.tok;S.busy=true;S.busyWeek=w;S.loading=true;$("#rf").style.opacity=.4;render();
+  try{
+    const data=await load(w); if(tok!==S.tok)return;
+    S.week=data.week;S.data=data;S.err=null;store.set("rfa-"+data.week,data);
+    await loadScores(true); if(tok!==S.tok)return;
+    S.loading=false;render();
+    await Promise.all(Object.keys(S.gs).map(gk=>loadGame(gk,true)));
+  }catch(e){
+    if(tok!==S.tok)return;
+    S.loading=false;
+    S.err=S.data?errMsg(e).replace(/\.$/,"")+", showing the last saved view":errMsg(e)+" Check your connection, then try again.";
+    render();
+  }finally{
+    if(tok===S.tok){S.busy=false;S.loading=false;$("#rf").style.opacity=1}
+  }
+}
+function go(n){
+  if(n===S.week)return;
+  S.week=n;S.epoch++;S.gs={};S.sc={};S.sb=null;S.data=store.get("rfa-"+n);S.err=null;S.loading=true;
+  render();
+  clearTimeout(S.stepT);S.stepT=setTimeout(()=>refresh(n),250);
+}
+const step=d=>go(Math.min(18,Math.max(1,(S.week||(S.data&&S.data.week)||S.curWeek||1)+d)));
+$("#rf").onclick=()=>refresh(S.week);
+$("#pw").onclick=()=>step(-1);
+$("#nw").onclick=()=>step(1);
+setInterval(async()=>{
+  if(document.hidden||!S.data||S.busy)return;
+  const soon=x=>x.state==="in"||(x.state==="pre"&&new Date(x.date)-Date.now()<10*60000);
+  if(!Object.values(S.sc).some(soon))return;
+  await loadScores(true);render();
+  await Promise.all(Object.keys(S.gs).filter(k=>S.sc[k]&&S.sc[k].state==="in").map(k=>loadGame(k,true)));
+},45000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.data&&Date.now()-S.data.at>120000)refresh(S.week)});
+(function init(){const c=store.get("rfa-last");if(c&&c.rows){S.data=c;render()}
+  refresh().then(()=>store.set("rfa-last",S.data))})();
+</script></body></html>

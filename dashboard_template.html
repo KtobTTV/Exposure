@@ -206,6 +206,8 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .empty button{display:block;margin:10px auto 0}
 .chev.side{transform:rotate(-90deg)}
 /* last: overrides */
+.card.open>.head.mh .mt,.card.open>.head.mh .pill,.card.open>.head.mh .ms,.card.open>.head.mh .mx{display:none}.card.open>.head.mh .hc{display:block}
+.card.open>.head.mh{grid-template-columns:1fr;min-height:44px;padding-top:0;padding-bottom:0;align-content:center}.card.open>.head.mh>.chev{top:14px}
 .evt{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
 .vd .vl:first-child{font-size:11px;text-transform:uppercase;letter-spacing:.05em}
 @media (max-width:359px){.bnav button{font-size:14px}}
@@ -217,7 +219,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .err{color:var(--ink)}
 .wk #wk{min-width:52px}
 .ctl .sortl .sub{flex:none;width:48px}
-.bi::placeholder{font-style:italic}
+.bn .bierr{color:var(--bad);font-weight:600}
 .sheeth h2{font-size:24px}.sh3{font-size:19px}
 @media (prefers-color-scheme:dark){.chip.on,.bnav button.on,#fb[aria-expanded="true"]{background:var(--infobg);color:var(--ink);border-color:var(--info)}}
 #fb.on:not([aria-expanded="true"]){background:var(--card);color:var(--ink);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
@@ -245,7 +247,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line, and "proj" means a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
  <li>The Matchups tab shows your score in every league this week, the closest first. "Down 3.2 · Proj win by 10.8" is where you stand now and where you should finish: live players count what they have plus their projection for the time left. Scoring is each league's own. "Up 3.5" is good. The count at the top says how many are going your way. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Down 1.4 · good".</li>
  <li>On the Players tab, "Sort & filter" opens the ranking and filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
- <li>In "Sort & filter", Rank "Buy-in $" adds up the buy-ins of every league where a player is for or against you. "+$320" means he's for you in $320 more of buy-ins than against you. Set the buy-ins in Settings, the gear at the top; they stay on this device only.</li>
+ <li>In "Sort & filter", "Count buy-in $" adds up the buy-ins of every league where a player is for or against you. "+$320" means he's for you in $320 more of buy-ins than against you. Set the buy-ins in Settings, the gear at the top; they stay on this device only.</li>
  </ul></div></div>
 <nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-current="page">Games</button><button id="tp" data-tab="players">Players</button><button id="tm" data-tab="matchups">Matchups</button><button id="th" data-help="1" aria-haspopup="dialog" aria-label="Help">?</button></nav>
 <div id="setsheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="setT" hidden><div class="sheetin" id="setin"></div></div>
@@ -450,7 +452,7 @@ function barsHtml(r){
   if(!specs)return`<div class="src">Stat bars cover QB, RB, WR, TE, K and DEF.</div>`;
   const gs=S.gs[r.game];
   if(!gs||(gs.busy&&!gs.ok))return`<div class="src">Loading lines and stats…</div>`;
-  if(gs.err)return`<div class="src">${esc(gs.err)} Tap ↻ to try again.</div>`;
+  if(gs.err)return`<div class="src">${esc(gs.err)} Tap Refresh at the top to try again.</div>`;
   const eid=r.espn||gs.byName[nm(r.name)]||"", a=gs.stats[eid];
   const act=a?{passYd:a.passYd||0,passTD:a.passTD||0,rushYd:a.rushYd||0,rec:a.rec||0,recYd:a.recYd||0,td:(a.rushTD||0)+(a.recTD||0)}:{};   // no box-score entry is unknown, never 0
   const pr=(gs.proj[r.pid]||{}).pts_ppr, ptsLine=pr>0?{v:Math.round(pr*10)/10,src:" · game proj"}:null;
@@ -507,8 +509,8 @@ function liveLine(r){
   let pt="";
   if(gs.pts){
     if(raw===undefined)pt='<span class="nostat">no stats</span>';
-    else pt=`<b>${Math.round(raw*10)/10} pts</b>`+(gs.state==="post"&&r.net?` · swing ${sgn(Math.round(r.net*raw))}`:"");}
-  const line=[bits.join(" · "),pt].filter(Boolean).join(" · ");
+    else pt=`<b class="nw">${Math.round(raw*10)/10} pts</b>`+(gs.state==="post"&&r.net?` · <span class="nw">swing ${sgn(Math.round(r.net*raw))}</span>`:"");}
+  const line=[bits.map(b=>`<span class="nw">${b}</span>`).join(" · "),pt].filter(Boolean).join(" · ");
   return line?`<div class="sline">${line}</div>`:"";
 }
 function rowHtml(r,showGame){
@@ -554,7 +556,7 @@ function valueHtml(d){
 function settingsHtml(){
   const d=S.data,lgs=leaguesOf(d).slice().sort((a,b)=>baseName(a.name).localeCompare(baseName(b.name)));
   const rows=lgs.map(l=>{const own=S.buy[l.id],g=guessBuy(l.name);
-    return `<label class="birow"><span class="bn">${esc(baseName(l.name))}${/ \(tank\)$/.test(l.name)?" (tank)":""}${own==null?`<small>${g?`Using $${g} from the league name`:"Not set · counts as $0"}</small>`:""}</span><span class="bin">$<input class="bi" inputmode="decimal" data-lid="${esc(l.id)}" aria-label="Buy-in for ${esc(baseName(l.name))}" value="${own!=null?esc(own):""}" placeholder=""></span></label>`}).join("");
+    return `<label class="birow"><span class="bn">${esc(baseName(l.name))}${/ \(tank\)$/.test(l.name)?" (tank)":""}${own==null?`<small>${g?`Using $${g} from the league name`:"Not set · counts as $0"}</small>`:""}</span><span class="bin">$<input class="bi" inputmode="decimal" data-lid="${esc(l.id)}" aria-label="Buy-in for ${esc(baseName(l.name))}" value="${own!=null?esc(own):""}" placeholder="${g||""}"></span></label>`}).join("");
   return `<div class="sheeth"><h2 id="setT">Settings</h2><button data-close="1">Close</button></div>
    <h3 class="sh3">League buy-ins</h3>
    <p class="sub">Used when Players ranks by buy-in dollars. They're saved on this device only and are never sent anywhere.</p>
@@ -619,9 +621,9 @@ function muCard(c){
   const body=m.them?`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left · proj ${f1(c.a.final)}</span></div>${muRows(c,"me",c.a)}</div>
     <div class="msd"><div class="msh"><b>${esc(m.opp)} · ${f1(c.b.pts)}</b><span>${c.b.left.length} left · proj ${f1(c.b.final)}</span></div>${muRows(c,"them",c.b)}</div>`
     :`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left</span></div>${muRows(c,"me",c.a)}</div>`;
-  const aria=[m.name+(m.tank?" (tank)":""),m.them?"vs "+m.opp:"",txt,verdict].filter(Boolean).join(". ");
+  const aria=[m.name+(m.tank?" (tank)":""),m.them?"vs "+m.opp:"",txt+(!m.tank&&(good||bad)?(good?", good for you":", bad for you"):""),verdict].filter(Boolean).join(". ");
   return `<div class="card mu${open?" open":""}"><div class="head mh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${open}" data-mu="${esc(m.id)}" data-fk="mu:${esc(m.id)}">${CHEV}
-   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk nw">(tank)</span>':""}</div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
+   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk nw">(tank)</span>':""}</div><div class="hc"><b>${esc(m.name)}</b><span class="sub"> · ${f1(c.a.pts)}${m.them?"–"+f1(c.b.pts):""} · ${esc(txt)}</span></div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
    <div class="ms">You <b>${f1(c.a.pts)}</b>${m.them?` – <b>${f1(c.b.pts)}</b> ${esc(m.opp)}`:""}</div>
    <div class="mx">${!c.over&&m.them&&Math.abs(c.pm)<5?'<span class="warn">Toss-up</span> · ':""}${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
    <div class="body">${body}</div></div>`;
@@ -629,7 +631,7 @@ function muCard(c){
 function matchupsHtml(d){
   const ms=d.matchups;
   if(!ms||!ms.length)return `<div class="card"><div class="empty">${S.loading?"Loading matchups…":"No matchups to show yet. Tap refresh to load them."}</div></div>`;
-  const all=ms.map(muCalc);
+  const qq=$("#q").value.trim().toLowerCase(),full=ms.map(muCalc),all=qq?full.filter(c=>c.m.name.toLowerCase().includes(qq)||String(c.m.opp||"").toLowerCase().includes(qq)):full;
   const key={close:(a,b)=>(a.m.them?0:1)-(b.m.them?0:1)||Math.abs(a.margin)-Math.abs(b.margin)||Math.abs(a.pm)-Math.abs(b.pm),
     proj:(a,b)=>(a.m.them?0:1)-(b.m.them?0:1)||Math.abs(a.pm)-Math.abs(b.pm),
     stake:(a,b)=>effBuy(b.m.id,b.m.name)-effBuy(a.m.id,a.m.name)||Math.abs(a.margin)-Math.abs(b.margin),
@@ -640,10 +642,11 @@ function matchupsHtml(d){
   const live=all.filter(c=>c.a.left.some(o=>o.st==="in")||(c.b&&c.b.left.some(o=>o.st==="in"))).length;
   const ctl=`<div class="vctl"><div class="ctl"><label class="sortl"><span class="sub">Sort</span><select id="msortsel" data-fk="ms" aria-label="Sort matchups">${[["close","Closest score"],["proj","Closest projected"],["stake","Biggest buy-in"],["left","Most players left"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.msort===k?" selected":""}>${l}</option>`).join("")}</select></label></div></div>`;
   const asOf=new Date(Math.max(S.mAt,d.at)).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
-  const way=c=>c.m.them&&c.margin?(c.m.tank?c.margin<0:c.margin>0):null,yes=all.filter(c=>way(c)===true).length,no=all.filter(c=>way(c)===false).length,nt=all.filter(c=>c.m.tank).length;
-  const tally=`<p class="mtally"><b class="g">${yes} going your way</b> · <b class="b">${no} not</b>${all.length-yes-no?` · ${all.length-yes-no} tied or no opponent`:""}</p>`;
+  const way=c=>c.m.them&&c.margin?(c.m.tank?c.margin<0:c.margin>0):null,yes=full.filter(c=>way(c)===true).length,no=full.filter(c=>way(c)===false).length,nt=full.filter(c=>c.m.tank).length;
+  const tally=`<p class="mtally"><b class="g">${yes} going your way</b> · <b class="b">${no} not</b>${full.length-yes-no?` · ${full.length-yes-no} tied or no opponent`:""}</p>`;
   const note=`<div class="mnote">${act.length} in play${live?` · ${live} with a player live`:""} · as of ${asOf}${nt?` · tank: losing counts as your way`:""}</div>`;
   const o=S.mfin??(!act.length);
+  if(qq&&!all.length)return tally+ctl+`<div class="card"><div class="empty">No league or opponent matches “${esc(qq)}”.</div></div>`;
   return tally+ctl+note+(act.length?act.map(muCard).join(""):"")+(done.length?`<button class="fint" data-fk="mf" data-mfin="1" data-open="${o?1:0}" aria-expanded="${o}"><span>Finished · ${done.length}</span>${CHEV}</button>${o?done.map(muCard).join(""):""}`:"");
 }
 async function refreshMatchups(force){
@@ -747,7 +750,7 @@ function setFa(h){if(h===faHtml)return;faHtml=h;$("#fa").innerHTML=h}
 function renderInner(){
   const d=S.data, q=$("#q").value.trim().toLowerCase(), out=$("#out");
   out.setAttribute("aria-busy",S.loading?"true":"false");
-  $("#sh").hidden=S.tab!=="players";
+  $("#sh").hidden=S.tab==="games";{const qi=$("#q"),mu=S.tab==="matchups",ph=mu?"League or opponent":"Player or team";if(qi.placeholder!==ph){qi.placeholder=ph;qi.setAttribute("aria-label",mu?"Search leagues or opponents":"Search players or teams")}}
   setText($("#an"),S.err||(d?`Week ${d.week} loaded`:""));
   const wk=S.week||(d&&d.week)||null;
   setText($("#wk"),"Wk "+(wk||"–"));
@@ -776,8 +779,8 @@ function renderInner(){
   const searchSkips=q&&act.length;
   
   setFa(onTab==="players"&&act.length&&!S.fopen?(q?`<div class="fnote">Search ignores your filters (${esc(act.join(" · "))}).</div>`:`<div class="fsum"><span>${esc(act.join(" · "))}</span><button class="fx ic" data-clearf="1" aria-label="Clear filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`):"");
-  setCtl(onTab==="players"&&S.fopen?`<div class="ctl"><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
-    <label class="sortl"><span class="sub">Rank</span><select id="ranksel" data-fk="sel0" aria-label="Rank players by">${[["impact","Strongest net"],["usd","Buy-in $"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${(S.money?"usd":S.sort)===k?" selected":""}>${l}</option>`).join("")}</select></label>
+  setCtl(onTab==="players"&&S.fopen?`<div class="ctl"><div class="seg" role="group" aria-label="Count by">${[["lg","Count leagues"],["usd","Count buy-in $"]].map(([k,l])=>`<button class="chip${S.money===(k==="usd")?" on":""}" data-unit="${k}" data-fk="u:${k}" aria-pressed="${S.money===(k==="usd")}">${l}</button>`).join("")}</div><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
+    ${S.money?"":`<label class="sortl"><span class="sub">Rank</span><select id="ranksel" data-fk="sel0" aria-label="Rank players by">${[["impact","Strongest net"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.sort===k?" selected":""}>${l}</option>`).join("")}</select></label>`}
     ${S.money?`<label class="sortl"><span class="sub">Buy-in</span><select id="vminsel" data-fk="vm" aria-label="Count leagues with a buy-in of at least">${[[0,"Any"],[10,"$10 and up"],[25,"$25 and up"],[50,"$50 and up"],[100,"$100 and up"],[250,"$250 and up"]].map(([k,l])=>`<option value="${k}"${S.vmin===k?" selected":""}>${l}</option>`).join("")}</select></label>`:""}
     <label class="sortl"><span class="sub">Show</span><select id="stsel" data-fk="sel2" aria-label="Which games">${[["all","All players"],["active","Live & upcoming"],["done","Finished"]].map(([k,l])=>`<option value="${k}"${S.status===k?" selected":""}>${l}</option>`).join("")}</select></label>
     ${nf?`<button class="fclear" data-clearf="1"><span>Clear filters</span><span aria-hidden="true">✕</span></button>`:""}</div>`:"");
@@ -853,7 +856,7 @@ function openSheet(el,from){SHEET=el;S.helpFrom=from||document.activeElement;el.
 function closeSheet(){if(!SHEET)return;SHEET.hidden=true;SHEET=null;$(".wrap").inert=false;$(".bnav").inert=false;document.body.style.overflow="";const tgt=S.helpFrom&&S.helpFrom.isConnected?S.helpFrom:($("[data-settings]")||$("#th"));if(tgt&&tgt.focus)tgt.focus()}
 function openSettings(from){const from2=SHEET?S.helpFrom:from;if(SHEET)closeSheet();$("#setin").innerHTML=settingsHtml();updateBsum();openSheet($("#setsheet"),from2)}
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-reload],[data-gowk],[data-tab],[data-view],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],#fb,.head,.row");if(!t)return;
+  const t=e.target.closest("[data-reload],[data-gowk],[data-tab],[data-view],[data-unit],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],#fb,.head,.row");if(!t)return;
   if(t.dataset.reload){location.replace(location.pathname+"?v="+t.dataset.reload);return}
   if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
   else if(t.dataset.close!==undefined)closeSheet();
@@ -866,6 +869,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.tab){const sy=S.sy||(S.sy={});sy[S.tab]=window.scrollY;S.tab=t.dataset.tab;S.pdet={};$("#q").value="";saveUI();render();window.scrollTo(0,sy[S.tab]||0);if(S.tab==="matchups")refreshMatchups()}
   else if(t.dataset.mu){S.mopen[t.dataset.mu]=!S.mopen[t.dataset.mu];render()}
   else if(t.dataset.mfin!==undefined){S.mfin=t.dataset.open!=="1";render()}
+  else if(t.dataset.unit){S.money=t.dataset.unit==="usd";saveUI();render()}
   else if(t.dataset.view){S.view=t.dataset.view;saveUI();render()}
   else if(t.dataset.lg){S.lgOpen[t.dataset.lg]=!S.lgOpen[t.dataset.lg];render()}
   else if(t.dataset.more){S.more[t.dataset.more]=!S.more[t.dataset.more];render()}
@@ -888,7 +892,8 @@ document.addEventListener("input",e=>{
   if(v==="")delete S.buy[id];else if(!bad)S.buy[id]=n;
   t.setAttribute("aria-invalid",bad?"true":"false");
   const row=t.closest(".birow"),old=row&&row.querySelector(".bierr");if(old)old.remove();
-  if(bad&&row){const m=document.createElement("small");m.className="bierr";m.id="e-"+id;m.textContent="Enter a dollar amount, like 25";row.querySelector(".bn").appendChild(m);t.setAttribute("aria-describedby",m.id)}else t.removeAttribute("aria-describedby");
+  const cap=row&&row.querySelector(".bn small:not(.bierr)");if(cap)cap.hidden=bad;
+  if(bad&&row){const m=document.createElement("small");m.className="bierr";m.id="e-"+id;m.textContent="Not a number. Enter a dollar amount, like 25.";row.querySelector(".bn").appendChild(m);t.setAttribute("aria-describedby",m.id)}else t.removeAttribute("aria-describedby");
   store.set("rfa-buy",S.buy);updateBsum();render();
 });
 document.addEventListener("keydown",e=>{
@@ -903,7 +908,7 @@ document.addEventListener("change",e=>{
   if(e.target.id==="stsel"){S.status=e.target.value;saveUI();render();if(S.status==="done")loadFinished()}
   else if(e.target.id==="msortsel"){S.msort=e.target.value;saveUI();render()}
   else if(e.target.id==="vminsel"){S.vmin=+e.target.value;saveUI();render()}
-  else if(e.target.id==="ranksel"){const v=e.target.value;S.money=v==="usd";if(!S.money)S.sort=v;saveUI();render()}
+  else if(e.target.id==="ranksel"){S.sort=e.target.value;saveUI();render()}
 });
 const errMsg=e=>navigator.onLine===false?"You're offline.":e&&e.name==="AbortError"?"Sleeper took too long to respond.":"Couldn't load from Sleeper.";
 async function refresh(week){

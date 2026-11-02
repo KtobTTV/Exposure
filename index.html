@@ -143,7 +143,7 @@ h1 .short{display:none}
 <li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
 <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
 <li>The chip beside each team's score (+5, −1) adds up the nets of that team's players. "Game total" adds up everyone in the game.</li>
-<li>Finished games say "Went your way", "Went against you" or "Even": did the winning team's players net out in your favor? A rough guide, not your fantasy score.</li>
+<li>Finished games show the net points swing: each player's PPR points times his net, added up. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. It uses standard PPR, not each league's own scoring.</li>
 <li>Stat bars: the filled part is what he has so far and the tick is the DraftKings line. A stub past the tick means he's over the line, and the label says whether that helps or hurts you. "proj" means the line is a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts, which use Sleeper's PPR scoring).</li>
 </ul></details>
 </div>
@@ -372,14 +372,24 @@ function rowHtml(r,showGame){
 }
 const teamLean=(g,ab)=>g.rows.filter(r=>r.team===ab).reduce((t,r)=>t+r.net,0);
 const chipN=(n,ab)=>`<span class="chipn ${netCls(n)}"><span class="sr">${esc(ab)} lean </span>${sgn(n)}</span>`;
-function outcome(g,sc){
-  if(!sc)return{t:"Final",c:"z"};
-  const a=+sc.away.score,h=+sc.home.score;
-  if(!(a>=0)||!(h>=0)||a===h)return{t:"Tied",c:"z"};
-  const w=a>h?sc.away.abbr:sc.home.abbr,l=a>h?sc.home.abbr:sc.away.abbr,v=teamLean(g,w)-teamLean(g,l);
-  return v>0?{t:"Went your way",c:"p"}:v<0?{t:"Went against you",c:"n"}:{t:"Even",c:"z"};
+const ptsMap=()=>((S.pts[S.week]||{}).map)||null;
+function swingOf(g){
+  const m=ptsMap();if(!m)return null;
+  return Math.round(g.rows.reduce((t,r)=>t+r.net*(m[r.pid]||0),0));
 }
-const tally=gs=>{const c={p:0,n:0,z:0};for(const g of gs)c[outcome(g,S.sc[g.away+"@"+g.home]).c]++;return c};
+function outcome(g){
+  const v=swingOf(g);
+  if(v==null)return{t:"Final",c:"z",v:null};
+  if(Math.abs(v)<5)return{t:"Even",c:"z",v};
+  return v>0?{t:"Helped "+sgn(v)+" pts",c:"p",v}:{t:"Hurt "+sgn(v)+" pts",c:"n",v};
+}
+function movers(g){
+  const m=ptsMap()||{};
+  const rs=g.rows.map(r=>({r,v:Math.round(r.net*(m[r.pid]||0))})).filter(x=>x.v).sort((a,b)=>b.v-a.v);
+  const hi=rs.find(x=>x.v>0),lo=[...rs].reverse().find(x=>x.v<0);
+  return [hi?`Helped most: <b>${esc(shortName(hi.r.name))}</b> ${sgn(hi.v)}`:"",lo?`Hurt most: <b>${esc(shortName(lo.r.name))}</b> ${sgn(lo.v)}`:""].filter(Boolean).join(" · ");
+}
+const tally=gs=>{const c={h:0,u:0,e:0,pts:0,known:true};for(const g of gs){const o=outcome(g);if(o.v==null){c.known=false;continue}c.pts+=o.v;if(o.c==="p")c.h++;else if(o.c==="n")c.u++;else c.e++}return c};
 function linesHtml(up,dn){
   const two=l=>l.slice(0,2).map(r=>esc(shortName(r.name))+" "+sgn(r.net)).join(", ")+(l.length>2?` <span class="more">+${l.length-2} more</span>`:"");
   const out=[];
@@ -398,10 +408,10 @@ function gameCard(g,compact){
   const show=st!=="pre"&&sc, lead=!show?"":(+A.score>+H.score?"a":+H.score>+A.score?"h":"");
   const secs=`${sec("f","Root for",up)}${sec("a","Root against",dn)}${sec("e","Even · cancels out",ev)}`;
   if(compact){
-    const o=outcome(g,sc);
+    const o=outcome(g);
     return `<div class="card fin${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head fh" role="button" tabindex="0" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">
-     <div class="cline"><b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span></div><span class="pill ${o.c}">${o.t}</span></div>
-     <div class="body"><div class="fbody"><div class="lean">Team lean: ${esc(A.abbr)} ${chipN(teamLean(g,A.abbr),A.abbr)} · ${esc(H.abbr)} ${chipN(teamLean(g,H.abbr),H.abbr)}</div><div class="lines">${linesHtml(up,dn)}</div></div>${secs}</div></div>`;
+     <div class="cline"><b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span></div><span class="pill ${o.c}">${o.v==null?"":`<span class="sr">${o.c==="p"?"helped you":o.c==="n"?"hurt you":"even"} </span>`}${o.t}</span></div>
+     <div class="body"><div class="fbody"><div class="lean">${o.v==null?"":`Net swing ${sgn(o.v)} pts · ${movers(g)}<br>`}Team lean: ${esc(A.abbr)} ${chipN(teamLean(g,A.abbr),A.abbr)} · ${esc(H.abbr)} ${chipN(teamLean(g,H.abbr),H.abbr)}</div><div class="lines">${linesHtml(up,dn)}</div></div>${secs}</div></div>`;
   }
   const tm=(t,l)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span>${chipN(teamLean(g,t.abbr),t.abbr)}</div>`;
   const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
@@ -468,7 +478,7 @@ function renderInner(){
     let html="",last="";
     if(fin.length){
       const c=tally(fin),left=live.length+upc.length;
-      html+=`<p class="sumbar"><b>This week</b> · <span class="g">${c.p} went your way</span> · <span class="b">${c.n} went against you</span>${c.z?` · ${c.z} even`:""}${left?` · ${left} still to play`:""}</p>`;
+      if(c.known)html+=`<p class="sumbar"><b>Week ${d.week} so far</b> · <span class="g">${c.h} helped you</span> · <span class="b">${c.u} hurt you</span>${c.e?` · ${c.e} even`:""} · net <span class="${c.pts>=0?"g":"b"}">${sgn(c.pts)} pts</span>${left?` · ${left} still to play`:""}<br><span class="sub">Each player's PPR points × how many more of your leagues he helps than hurts. Standard PPR, not each league's own scoring.</span></p>`;
     }
     if(live.length)html+=`<div class="day livehd" role="heading" aria-level="2">Live now</div>`+live.map(g=>gameCard(g)).join("");
     for(const g of upc){
@@ -481,7 +491,7 @@ function renderInner(){
       if(o){
         const days={};for(const g of fin)(days[g.date||""]=days[g.date||""]||[]).push(g);
         for(const day in days){const c=tally(days[day]);
-          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))} · ${c.p} your way · ${c.n} against${c.z?` · ${c.z} even`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
+          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))}${c.known?` · ${c.h} helped · ${c.u} hurt · ${sgn(c.pts)} pts`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
       }
     }
     out.innerHTML=html||`<div class="empty">${!d.leagues?`No active leagues have matchups for Week ${d.week} yet.`:!d.schedGames?`No NFL games are scheduled for Week ${d.week}.`:"None of your starters or your opponents' starters play this week."}</div>`;
@@ -512,7 +522,7 @@ async function refresh(week){
   try{
     const data=await load(w); if(tok!==S.tok)return;
     S.week=data.week;S.data=data;S.err=null;store.set("rfa-"+data.week,data);
-    await loadScores(true); if(tok!==S.tok)return;
+    await Promise.all([loadScores(true),loadPts(S.week,true)]); if(tok!==S.tok)return;
     S.loading=false;render();
     await Promise.all(Object.keys(S.gs).map(gk=>loadGame(gk,true)));
   }catch(e){
@@ -538,7 +548,7 @@ setInterval(async()=>{
   if(document.hidden||!S.data||S.busy)return;
   const soon=x=>x.state==="in"||(x.state==="pre"&&new Date(x.date)-Date.now()<10*60000);
   if(!Object.values(S.sc).some(soon))return;
-  await loadScores(true);render();
+  await Promise.all([loadScores(true),loadPts(S.week,true)]);render();
   await Promise.all(Object.keys(S.gs).filter(k=>S.sc[k]&&S.sc[k].state==="in").map(k=>loadGame(k,true)));
 },45000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.data&&Date.now()-S.data.at>120000)refresh(S.week)});

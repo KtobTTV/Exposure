@@ -206,7 +206,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 /* last: overrides */
 .hh{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:18px 0 -4px}
 .mtally .tu{color:var(--warn)}
-.mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px}.mas{display:block;font-size:13px}.mhead .mtally{margin:0;min-width:0}
+.mhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;margin:2px 0 10px}.mhead .mtally{flex:1 1 180px}.mas{display:block;font-size:13px}.mhead .mtally{margin:0;min-width:0}
 .msl select{min-height:44px;font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--ctl);border-radius:99px;padding:0 10px;max-width:170px}
 .tkc{flex:none;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:6px;background:var(--warnbg);color:var(--warn)}
 .lgtog .tgr{white-space:nowrap}
@@ -253,10 +253,10 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
  </ul><h3 class="hh">Games</h3><ul>
  <li>"lean +4" beside a team adds up the nets of that team's players, counted in leagues: the team you want scoring.</li>
- <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
+ <li>Live and finished games show each player's line under his name, such as "14.2 pts · 5 rec · 72 yds · 1 TD". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
  <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  </ul><h3 class="hh">Stat bars</h3><ul>
- <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line, and "proj" means a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
+ <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line. "proj" means a Sleeper projection, used when no DraftKings line is posted. "game proj" is his projected fantasy points for the whole game. "anytime" is the touchdown line: 0.5, so one TD is over.</li>
  </ul><h3 class="hh">Matchups</h3><ul>
  <li>The Matchups tab shows your score in every league this week, the closest first. While players are left, the pill shows where you should finish ("Proj win by 10.8") and the line under it shows where you stand now ("Now: down 3.2"). Live players count what they have plus their projection for the time left. "Toss-up" means the projected finish is within 5 points. Scoring is each league's own. The count at the top says how many are headed your way. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Proj loss by 6.9 · good".</li>
  </ul><h3 class="hh">Players</h3><ul>
@@ -517,13 +517,13 @@ function liveLine(r){
   const td=(a.rushTD||0)+(a.recTD||0),bits=[],raw=gs.pts?gs.pts[r.pid]:undefined;
   if(noBox){if(!gs.pts||raw!==undefined)bits.push('<span class="nostat">no ESPN stats</span>')}
   else if(r.pos==="QB"){bits.push(`${a.passYd||0} pass yds`,`${a.passTD||0} TD`,`${a.passInt||0} INT`);if(a.rushYd)bits.push(`${a.rushYd} rush`)}
-  else if(r.pos==="RB"){bits.push(`${a.rushAtt||0} car`,`${a.rushYd||0} yds`);if(a.rec)bits.push(`${a.rec} rec`,`${a.recYd||0} rec yds`);bits.push(`${td} TD`)}
+  else if(r.pos==="RB"){bits.push(`${a.rushYd||0} rush yds`);if(a.rec)bits.push(`${a.rec} rec ${a.recYd||0} yds`);bits.push(`${td} TD`)}
   else if(r.pos==="WR"||r.pos==="TE"){bits.push(`${a.rec||0} rec`,`${a.recYd||0} yds`,`${td} TD`);if(a.rushYd)bits.push(`${a.rushYd} rush`)}
   let pt="";
   if(gs.pts){
     if(raw===undefined)pt='<span class="nostat">no stats</span>';
     else pt=`<b class="nw">${Math.round(raw*10)/10} pts</b>`+(gs.state==="post"&&r.net?` · <span class="nw">swing ${sgn(Math.round(r.net*raw))}</span>`:"");}
-  const line=[bits.map(b=>`<span class="nw">${b}</span>`).join(" · "),pt].filter(Boolean).join(" · ");
+  const line=[pt,bits.slice(0,3).map(b=>`<span class="nw">${b}</span>`).join(" · ")].filter(Boolean).join(" · ");
   return line?`<div class="sline">${line}</div>`:"";
 }
 function rowHtml(r,showGame){
@@ -565,8 +565,9 @@ function valueHtml(d,q){
   const gk=o=>RANK[rStateOf(o.r)]+(o.r.game||"z");
   rows.sort(S.sort==="alpha"?(a,b)=>a.r.name.localeCompare(b.r.name):S.sort==="game"?(a,b)=>gk(a).localeCompare(gk(b))||Math.abs(b.net)-Math.abs(a.net):(a,b)=>RANK[rStateOf(a.r)]-RANK[rStateOf(b.r)]||Math.abs(b.net)-Math.abs(a.net)||(b.f+b.a)-(a.f+a.a)||a.r.name.localeCompare(b.r.name));
   const unset=lgs.length-withBuy.length;
-  const note=`<div class="vnote">${q?"":S.sort==="impact"?"Live first, then biggest $ net. ":""}Counting ${counted.length} of ${lgs.length} leagues${S.vmin?` with a buy-in of ${money(S.vmin)} or more`:""}${unset&&!S.vmin?` (${unset} count as $0)`:""}. Tap a player to see which leagues.${unset&&!S.vmin?`<button class="fclear" data-settings="1"><span>Set ${unset} missing buy-in${unset===1?"":"s"}</span>${CHEV.replace('class="chev"','class="chev side"')}</button>`:""}</div>`;
-  const vcard=l=>`<div class="card">${l.slice(0,100).map(valRow).join("")}</div>${l.length>100?`<div class="vnote">Showing 100 of ${l.length}. Search to find the rest.</div>`:""}`;
+  const note=`<div class="vnote"><b>Ranked by buy-in $.</b> ${q?"":S.sort==="impact"?"Live first, then biggest $ net. ":""}Counting ${counted.length} of ${lgs.length} leagues${S.vmin?` with a buy-in of ${money(S.vmin)} or more`:""}${unset&&!S.vmin?` (${unset} count as $0)`:""}. Tap a player to see which leagues.${unset&&!S.vmin?`<button class="fclear" data-settings="1"><span>Set ${unset} missing buy-in${unset===1?"":"s"}</span>${CHEV.replace('class="chev"','class="chev side"')}</button>`:""}</div>`;
+  const vrows=l=>{if(S.sort!=="game"||q)return l.slice(0,100).map(valRow).join("");let h="",last;for(const o of l.slice(0,100)){if(o.r.game!==last){last=o.r.game;const sc=last&&S.sc[last];h+=`<div class="gdiv">${last?esc(last.replace("@"," @ "))+(sc?" · "+esc(stText(sc)):""):"Bye / no game"}</div>`}h+=valRow(o)}return h};
+  const vcard=l=>`<div class="card">${vrows(l)}</div>${l.length>100?`<div class="vnote">Showing 100 of ${l.length}. Search to find the rest.</div>`:""}`;
   const grouped=!q&&S.status==="all"&&S.sort==="impact",vact=rows.filter(o=>rStateOf(o.r)!=="post"),vdone=rows.filter(o=>rStateOf(o.r)==="post"),fo=S.pfin??!vact.length;
   const list=rows.length?(grouped&&vdone.length?(vact.length?vcard(vact):"")+`<button class="fint" data-fk="pf" data-pfin="1" data-open="${fo?1:0}" aria-expanded="${fo}"><span>Finished · ${vdone.length} player${vdone.length===1?"":"s"}</span>${CHEV}</button>${fo?vcard(vdone):""}`:vcard(rows)):`<div class="card"><div class="empty">${S.status==="active"?"No live or upcoming players match.":S.status==="done"?"No finished players match.":"No players match this filter."}${S.status==="all"?"":'<button data-showall="1">Show all players</button>'}</div></div>`;
   return note+list;
@@ -664,7 +665,7 @@ function matchupsHtml(d){
   const ctl=`<label class="msl"><span class="sr">Sort matchups</span><select id="msortsel" data-fk="ms">${[["proj","Closest projected"],["close","Closest now"],["stake","Biggest buy-in"],["left","Most left"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.msort===k?" selected":""}>${l}</option>`).join("")}</select></label>`;
   const asOf=new Date(Math.max(S.mAt,d.at)).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
   const toss=c=>!!c.m.them&&!c.over&&Math.abs(c.pm)<5,way=c=>{const v=c.over?c.margin:c.pm;return c.m.them&&!toss(c)&&Math.abs(v)>=.05?(c.m.tank?v<0:v>0):null},yes=full.filter(c=>way(c)===true).length,no=full.filter(c=>way(c)===false).length,ts=full.filter(toss).length,nt=full.filter(c=>c.m.tank).length;
-  const tally=`<div class="mhead"><p class="mtally"><span class="nw"><b class="g">${yes} your way</b> · <b class="b">${no} not</b>${ts?` · <b class="tu">${ts} toss-up${ts===1?"":"s"}</b>`:""}${full.length-yes-no-ts?` · ${full.length-yes-no-ts} even`:""}</span><span class="sub mas">${full.some(c=>!c.over)?"Projected · ":""}as of ${asOf}</span></p>${ctl}</div>`;
+  const tally=`<div class="mhead"><p class="mtally"><b class="g nw">${yes} your way</b> · <b class="b nw">${no} not</b>${ts?` · <b class="tu nw">${ts} toss-up${ts===1?"":"s"}</b>`:""}${full.length-yes-no-ts?` · <span class="nw">${full.length-yes-no-ts} even</span>`:""}<span class="sub mas">${full.some(c=>!c.over)?"Projected · ":""}as of ${asOf}</span></p>${ctl}</div>`;
 
   const o=S.mfin??(!act.length);
   if(qq&&!all.length)return tally+`<div class="card"><div class="empty">No league or opponent matches “${esc(qq)}”.</div></div>`;
@@ -724,7 +725,7 @@ function gameCard(g,compact){
   };
   const A=sc?sc.away:{abbr:g.away,score:""},H=sc?sc.home:{abbr:g.home,score:""};
   const show=st!=="pre"&&sc, lead=!show?"":(+A.score>+H.score?"a":+H.score>+A.score?"h":"");
-  const secs=`${sec("f","Root for",up)}${sec("a","Root against",dn)}${sec("e","Even · cancels out",ev)}`;
+  const secs=`${sec("f",compact?"Counted for you":"Root for",up)}${sec("a",compact?"Counted against you":"Root against",dn)}${sec("e","Even · cancels out",ev)}`;
   if(compact){
     const o=outcome(g),mv=movers(g),nl=(S.data&&S.data.leagues)||0,per=o.v!=null&&nl?Math.round(o.v/nl):0;
     const total=o.v==null?"":`<div class="lean"><b>${sgn(o.v)} pts</b> across your ${nl} leagues${Math.abs(per)>=1?` (about ${sgn(per)} each)`:""}</div>`;
@@ -738,7 +739,8 @@ function gameCard(g,compact){
   const tm=(t,l,n)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span><span class="tl"><span class="sr">${esc(t.abbr)} </span>lean <b class="${netCls(n)}">${sgn(n)}</b></span></div>`;
   const la=teamLean(g,A.abbr),lh=teamLean(g,H.abbr);
   const vd="";
-  const hc=`<div class="hc"><b>${esc(A.abbr)}</b> ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b><span class="sub"> · ${esc(stText(sc)||(st==="post"?"Final":""))}</span></div>`;
+  const hl=n=>` <span class="tl"><b class="${netCls(n)}">${sgn(n)}</b></span>`;
+  const hc=`<div class="hc"><b>${esc(A.abbr)}</b>${hl(la)} ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b>${hl(lh)}<span class="sub"> · ${esc(stText(sc)||(st==="post"?"Final":""))}</span></div>`;
   const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
     :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
   const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+sgn(r.net)).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
@@ -796,7 +798,7 @@ function renderInner(){
   const act=[];
   if(S.view!=="all")act.push({for:"Root for",against:"Root against"}[S.view]);
   if(S.status!=="all")act.push({active:"Live & upcoming",done:"Finished"}[S.status]);
-  if(S.money&&S.vmin)act.push(`Buy-ins ${money(S.vmin)} and up`);
+  if(S.money)act.push(S.vmin?`Buy-in $ · ${money(S.vmin)} and up`:"Counting buy-in $");
   const searchSkips=q&&act.length;
   
   setFa(onTab==="players"&&act.length&&!S.fopen?(q?`<div class="fnote">Search ignores your filters (${esc(act.join(" · "))}).</div>`:`<div class="fsum"><span>${esc(act.join(" · "))}</span><button class="fx ic" data-clearf="1" aria-label="Clear filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`):"");
@@ -898,7 +900,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.pfin!==undefined){S.pfin=t.dataset.open!=="1";render();if(S.pfin)loadFinished()}
   else if(t.dataset.pbye!==undefined){S.pbye=t.dataset.open!=="1";render()}
   else if(t.dataset.peven!==undefined){S.peven=t.dataset.open!=="1";render()}
-  else if(t.dataset.clearf!==undefined){S.view="all";S.status="all";S.vmin=0;saveUI();render()}
+  else if(t.dataset.clearf!==undefined){S.view="all";S.status="all";S.vmin=0;S.money=false;saveUI();render()}
   else if(t.dataset.final!==undefined){S.finalOpen=t.dataset.open!=="1";render()}
   else if(t.classList.contains("head")){
     const c=t.parentElement,nowOpen=!c.classList.contains("open");S.open[c.dataset.gk]=nowOpen;render();

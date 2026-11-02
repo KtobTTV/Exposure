@@ -204,6 +204,8 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .empty button{display:block;margin:10px auto 0}
 .chev.side{transform:rotate(-90deg)}
 /* last: overrides */
+.ctl .flab{flex:1 1 100%;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:4px 0 -4px}
+.mt .tkc{margin-right:4px;vertical-align:2px}
 .sheet li,.vnote,.empty{text-wrap:pretty}
 @media (prefers-color-scheme:dark){:root{--btrkb:#7f93b8}.tick{background:var(--bg);box-shadow:0 0 0 1.5px var(--ink)}}
 .hh{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:18px 0 -4px}
@@ -626,7 +628,7 @@ const muWho=x=>`${slotTag(x)}<b>${esc(x.name)}</b> <span class="sub nw">${x.slot
 function muRows(c,side,calc){
   const rows=[...calc.empty.map(x=>`<div class="mrow emp"><div class="mn">${slotTag(x)}<b>Empty slot</b></div><div class="mv">0.0<small>pts</small></div></div>`),
    ...calc.left.map(o=>{const x=o.x,live=o.st==="in";
-    return `<div class="mrow"><div class="mn">${muWho(x)}<div class="sub">${esc(whenOf(x))}${live?` · scored ${f1(x.pts)}`:""}</div></div><div class="mv">${f1(live?x.pts+remProj(x):x.proj)}<small>proj</small></div></div>`}),
+    return `<div class="mrow"><div class="mn">${muWho(x)}<div class="sub">${esc(whenOf(x))}</div></div><div class="mv">${live?`${f1(x.pts)}<small>pts · proj ${f1(x.pts+remProj(x))}</small>`:`${f1(x.proj)}<small>proj</small>`}</div></div>`}),
    ...calc.done.map(x=>`<div class="mrow dn"><div class="mn">${muWho(x)}<div class="sub">${x.game?"Final":"no game"}</div></div><div class="mv">${f1(x.pts)}<small>pts</small></div></div>`)];
   return rows.join("");
 }
@@ -647,7 +649,7 @@ function muCard(c){
     :`<div class="msd"><div class="msh"><b>You · ${f1(c.a.pts)}</b><span>${c.a.left.length} left</span></div>${muRows(c,"me",c.a)}</div>`;
   const aria=[m.name+(m.tank?" (tank)":""),m.them?"vs "+m.opp:"",txt+(!m.tank&&(good||bad)?(good?", good for you":", bad for you"):""),verdict].filter(Boolean).join(". ");
   return `<div class="card mu${open?" open":""}"><div class="head mh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${open}" data-mu="${esc(m.id)}" data-fk="mu:${esc(m.id)}">${CHEV}
-   <div class="mt"><b>${esc(m.name)}</b>${m.tank?' <span class="tk nw">(tank)</span>':""}</div><div class="hc">${m.tank?'<span class="tkc">Tank</span>':""}<b class="hn">${esc(m.name)}</b><span class="hs">${f1(c.a.pts)}${m.them?"–"+f1(c.b.pts):""} <span class="pill ${cls}">${esc(short)}</span></span></div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
+   <div class="mt">${m.tank?'<span class="tkc">Tank</span> ':""}<b>${esc(m.name)}</b></div><div class="hc">${m.tank?'<span class="tkc">Tank</span>':""}<b class="hn">${esc(m.name)}</b><span class="hs">${f1(c.a.pts)}${m.them?"–"+f1(c.b.pts):""} <span class="pill ${cls}">${esc(short)}</span></span></div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
    <div class="ms">You <b>${f1(c.a.pts)}</b>${m.them?` – <b>${f1(c.b.pts)}</b> ${esc(m.opp)}`:""}</div>
    <div class="mx">${!c.over&&m.them&&Math.abs(c.pm)<5?'<span class="warn">Toss-up</span> · ':""}${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
    <div class="body">${body}</div></div>`;
@@ -667,7 +669,7 @@ function matchupsHtml(d){
   const ctl=`<label class="msl"><span class="sr">Sort matchups</span><select id="msortsel" data-fk="ms">${[["proj","Closest projected"],["close","Closest now"],["stake","Biggest buy-in"],["left","Most left"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.msort===k?" selected":""}>${l}</option>`).join("")}</select></label>`;
   const asOf=new Date(Math.max(S.mAt,d.at)).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
   const toss=c=>!!c.m.them&&!c.over&&Math.abs(c.pm)<5,way=c=>{const v=c.over?c.margin:c.pm;return c.m.them&&!toss(c)&&Math.abs(v)>=.05?(c.m.tank?v<0:v>0):null},yes=full.filter(c=>way(c)===true).length,no=full.filter(c=>way(c)===false).length,ts=full.filter(toss).length,nt=full.filter(c=>c.m.tank).length;
-  const tally=`<div class="mhead"><p class="mtally"><b class="g nw">${yes} your way</b> · <b class="b nw">${no} not</b>${ts?` · <b class="tu nw">${ts} toss-up${ts===1?"":"s"}</b>`:""}${full.length-yes-no-ts?` · <span class="nw">${full.length-yes-no-ts} even</span>`:""}<span class="sub mas">${full.some(c=>!c.over)?"Projected · ":""}as of ${asOf}</span></p>${ctl}</div>`;
+  const tally=`<div class="mhead"><p class="mtally"><b class="g nw">${yes} your way</b> · <b class="b nw">${no} not</b>${ts?` · <b class="tu nw">${ts} toss-up${ts===1?"":"s"}</b>`:""}${full.length-yes-no-ts?` · <span class="nw">${full.length-yes-no-ts} even</span>`:""}<span class="sub mas">${qq?"All leagues · ":""}${full.some(c=>!c.over)?"Projected · ":""}as of ${asOf}</span></p>${ctl}</div>`;
 
   const o=S.mfin??(!act.length);
   if(qq&&!all.length)return tally+`<div class="card"><div class="empty">No league or opponent matches “${esc(qq)}”.</div></div>`;
@@ -705,7 +707,7 @@ function movers(g){
 }
 const tally=gs=>{const c={h:0,u:0,e:0,pts:0,known:true};for(const g of gs){const o=outcome(g);if(o.v==null){c.known=false;continue}c.pts+=o.v;if(o.c==="p")c.h++;else if(o.c==="n")c.u++;else c.e++}return c};   // sums the rounded game values so the shown totals add up
 function linesHtml(up,dn){
-  const two=l=>l.slice(0,2).map(r=>`<span class="nw">${esc(shortName(r.name))} ${sgn(r.net)}</span>`).join(", ")+(l.length>2?` <span class="more">· ${l.length-2} more</span>`:"");
+  const two=l=>{const n=l.slice(0,2).map(r=>`${esc(shortName(r.name))} ${sgn(r.net)}`),m=l.length>2?` <span class="more">· ${l.length-2} more</span>`:"";return n.slice(0,-1).map(x=>`<span class="nw">${x}</span>, `).join("")+`<span class="nw">${n[n.length-1]}${m}</span>`};
   const out=[];
   if(up.length)out.push(`<div><b class="lf">For</b> ${two(up)}</div>`);
   if(dn.length)out.push(`<div><b class="la">Against</b> ${two(dn)}</div>`);
@@ -730,7 +732,7 @@ function gameCard(g,compact){
   const secs=`${sec("f",compact?"Rooted for":"Root for",up)}${sec("a",compact?"Rooted against":"Root against",dn)}${sec("e","Even · cancels out",ev)}`;
   if(compact){
     const o=outcome(g),mv=movers(g),nl=(S.data&&S.data.leagues)||0,per=o.v!=null&&nl?Math.round(o.v/nl):0;
-    const total=o.v==null?"":`<div class="lean"><b>${sgn(o.v)} pts</b> across your ${nl} leagues${Math.abs(per)>=1?` (about ${sgn(per)} each)`:""}</div>`;
+    const total=o.v!=null&&Math.abs(per)>=1?`<div class="lean">About ${sgn(per)} pts per league across your ${nl} leagues</div>`:"";
     const lns=(mv.hi||mv.lo)?`<div class="lines">${mv.hi?`<div><b class="lf">Helped most</b> ${esc(shortName(mv.hi.r.name))} ${sgn(mv.hi.v)}</div>`:""}${mv.lo?`<div><b class="la">Hurt most</b> ${esc(shortName(mv.lo.r.name))} ${sgn(mv.lo.v)}</div>`:""}</div>`:"";
     const miss=mv.miss.length?`<div class="lean">No Sleeper stats for ${esc(mv.miss.slice(0,3).join(", "))}${mv.miss.length>3?` +${mv.miss.length-3} more`:""} (counted as 0).</div>`:"";
     const aria=`${A.abbr} ${A.score}, ${H.abbr} ${H.score}. ${stText(sc)||"Final"}. ${o.t}`;
@@ -788,7 +790,8 @@ function renderInner(){
     return;
   }
   const ago=Math.round((Date.now()-d.at)/60000);
-  setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · didn't load: ${(d.failedNames||[]).slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${(d.failedNames||[]).length>2?` +${d.failedNames.length-2} more`:""}`:""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}).replace(/\s/g,"\u00a0"):""}`);
+  {const lv=Object.values(S.sc).some(x=>x.state==="in")&&S.sb,fn=d.failedNames||[];
+  setText($("#meta"),[`${d.leagues} leagues`,`${d.rows.length} players`,S.loading?"updating…":lv?"scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}).replace(/\s/g,"\u00a0"):"updated "+fmtAgo(ago),d.failed?`didn't load: ${fn.slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${fn.length>2?` +${fn.length-2} more`:""}`:""].filter(Boolean).join(" · "))}
   const liveOld=S.sb&&Object.values(S.sc).some(x=>x.state==="in")&&Date.now()-S.sb.at>5*60000;
   setWarn(S.err?`<span>${esc(S.err)}.</span><button data-retry="1">Try again</button>`
     :S.curWeek&&S.week!==S.curWeek?`<span>Showing Week ${S.week}, not this week.</span><button data-gowk="1">Back to Week ${S.curWeek}</button>`
@@ -799,15 +802,15 @@ function renderInner(){
   const fb=$("#fb");fb.hidden=onTab!=="players";fb.setAttribute("aria-expanded",S.fopen);fb.classList.toggle("on",nf>0&&!S.fopen);setText(fb,"Sort & filter"+(nf?" · "+nf:""));
   const act=[];
   if(S.view!=="all")act.push({for:"Root for",against:"Root against"}[S.view]);
-  if(S.status!=="all")act.push({active:"Live & upcoming",done:"Finished"}[S.status]);
+  if(S.status!=="all")act.push({active:"Not final",done:"Final"}[S.status]);
   if(S.money&&S.vmin)act.push(`Buy-ins ${money(S.vmin)} and up`);
   const searchSkips=q&&act.length;
   
   setFa(onTab==="players"&&act.length&&!S.fopen?(q?`<div class="fnote">Search ignores your filters (${esc(act.join(" · "))}).</div>`:`<div class="fsum"><span>${esc(act.join(" · "))}</span><button class="fx ic" data-clearf="1" aria-label="Clear filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`):"");
-  setCtl(onTab==="players"&&S.fopen?`<div class="ctl"><div class="seg" role="group" aria-label="Count by">${[["lg","Count leagues"],["usd","Count buy-in $"]].map(([k,l])=>`<button class="chip${S.money===(k==="usd")?" on":""}" data-unit="${k}" data-fk="u:${k}" aria-pressed="${S.money===(k==="usd")}">${l}</button>`).join("")}</div><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
-    ${`<div class="seg" role="group" aria-label="Rank">${[["impact","Strongest"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<button class="chip${S.sort===k?" on":""}" data-rank="${k}" data-fk="k:${k}" aria-pressed="${S.sort===k}">${l}</button>`).join("")}</div>`}
+  setCtl(onTab==="players"&&S.fopen?`<div class="ctl"><span class="flab">Count</span><div class="seg" role="group" aria-label="Count by">${[["lg","Count leagues"],["usd","Count buy-in $"]].map(([k,l])=>`<button class="chip${S.money===(k==="usd")?" on":""}" data-unit="${k}" data-fk="u:${k}" aria-pressed="${S.money===(k==="usd")}">${l}</button>`).join("")}</div><span class="flab">Players</span><div class="seg" role="group" aria-label="Players">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
+    ${`<span class="flab">Rank</span><div class="seg" role="group" aria-label="Rank">${[["impact","Strongest"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<button class="chip${S.sort===k?" on":""}" data-rank="${k}" data-fk="k:${k}" aria-pressed="${S.sort===k}">${l}</button>`).join("")}</div>`}
     ${S.money?`<label class="sortl"><span class="sub">Buy-in</span><select id="vminsel" data-fk="vm" aria-label="Count leagues with a buy-in of at least">${[[0,"Any"],[10,"$10 and up"],[25,"$25 and up"],[50,"$50 and up"],[100,"$100 and up"],[250,"$250 and up"]].map(([k,l])=>`<option value="${k}"${S.vmin===k?" selected":""}>${l}</option>`).join("")}</select></label>`:""}
-    <div class="seg" role="group" aria-label="Show">${[["all","All games"],["active","Not final"],["done","Final"]].map(([k,l])=>`<button class="chip${S.status===k?" on":""}" data-show="${k}" data-fk="w:${k}" aria-pressed="${S.status===k}">${l}</button>`).join("")}</div>
+    <span class="flab">Games</span><div class="seg" role="group" aria-label="Games">${[["all","All games"],["active","Not final"],["done","Final"]].map(([k,l])=>`<button class="chip${S.status===k?" on":""}" data-show="${k}" data-fk="w:${k}" aria-pressed="${S.status===k}">${l}</button>`).join("")}</div>
     ${nf?`<button class="fclear" data-clearf="1"><span>Clear filters</span><span aria-hidden="true">✕</span></button>`:""}</div>`:"");
   if(S.tab==="players"){
     if(S.money){out.innerHTML=valueHtml(d,q);return}
@@ -870,7 +873,7 @@ function renderInner(){
       if(o){
         const days={};for(const g of fin)(days[g.date||""]=days[g.date||""]||[]).push(g);
         for(const day in days){const c=tally(days[day]);
-          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))}${c.known?` · ${sgn(c.pts)} pts${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
+          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))}${c.known&&Object.keys(days).length>1?` · ${sgn(c.pts)} pts${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
       }
     }
     out.innerHTML=html||`<div class="empty">${!d.leagues?`No active leagues have matchups for Week ${d.week} yet.`:!d.schedGames?`No NFL games are scheduled for Week ${d.week}.`:"None of your starters or your opponents' starters play this week."}</div>`;

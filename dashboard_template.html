@@ -204,6 +204,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .empty button{display:block;margin:10px auto 0}
 .chev.side{transform:rotate(-90deg)}
 /* last: overrides */
+@media (prefers-color-scheme:dark){:root{--btrkb:#7f93b8}.tick{background:var(--bg);box-shadow:0 0 0 1.5px var(--ink)}}
 .hh{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:18px 0 -4px}
 .mtally .tu{color:var(--warn)}
 .mhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;margin:2px 0 10px}.mhead .mtally{flex:1 1 180px}.mas{display:block;font-size:13px}.mhead .mtally{margin:0;min-width:0}
@@ -492,7 +493,7 @@ function lgItem(x,side){
 }
 function detail(r){
   const nf=r.fl.length,na=r.al.length,open=!!S.lgOpen[r.pid],n=nf+na;
-  const list=open?`${nf?`<div class="lgh f">With you · ${nf}</div><ul class="lgl">${r.fl.map(x=>lgItem(x,"f")).join("")}</ul>`:""}${na?`<div class="lgh a">Against · ${na}</div><ul class="lgl">${r.al.map(x=>lgItem(x,"a")).join("")}</ul>`:""}`:"";
+  const list=open?`${nf?`<div class="lgh f">Root for · ${nf}</div><ul class="lgl">${r.fl.map(x=>lgItem(x,"f")).join("")}</ul>`:""}${na?`<div class="lgh a">Root against · ${na}</div><ul class="lgl">${r.al.map(x=>lgItem(x,"a")).join("")}</ul>`:""}`:"";
   const tog=`<button class="lgtog" data-lg="${esc(r.pid)}" data-fk="l:${esc(r.pid)}" aria-expanded="${open}"><span class="nw">${nf} for · ${na} against</span><span class="tgr">${open?"Hide leagues":`Show ${n} league${n===1?"":"s"}`}${CHEV}</span></button>`;
   return `<div class="det${S.pdet[r.pid]?" show":""}">${barsHtml(r)}${tog}${list}</div>`;
 }
@@ -549,14 +550,14 @@ function dollars(r,min){
 }
 function valRow(o){
   const r=o.r,gp=gameParts(r),cls=o.net>0?"p":o.net<0?"n":"z",open=!!S.pdet[r.pid];
-  const li=(l,side)=>l.length?`<div class="lgh ${side==="f"?"f":"a"}">${side==="f"?"With you":"Against"} · ${money(l.reduce((t,x)=>t+x.b,0))}</div><ul class="lgl">${l.map(x=>`<li>${money(x.b)} · ${esc(baseName(x.x.lg))}${x.x.t?' <span class="tk">tank</span>':""} <span class="sub">${side==="f"?(x.x.t?esc(x.x.opp)+" starts him":"vs "+esc(x.x.opp)):(x.x.t?"you start him":esc(x.x.opp)+" starts him")}</span></li>`).join("")}</ul>`:"";
+  const li=(l,side)=>l.length?`<div class="lgh ${side==="f"?"f":"a"}">${side==="f"?"Root for":"Root against"} · ${money(l.reduce((t,x)=>t+x.b,0))}</div><ul class="lgl">${l.map(x=>`<li>${money(x.b)} · ${esc(baseName(x.x.lg))}${x.x.t?' <span class="tk">tank</span>':""} <span class="sub">${side==="f"?(x.x.t?esc(x.x.opp)+" starts him":"vs "+esc(x.x.opp)):(x.x.t?"you start him":esc(x.x.opp)+" starts him")}</span></li>`).join("")}</ul>`:"";
   return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${open}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm"><b>${esc(r.name)}</b> <span class="sub nw">${esc(r.pos)} ${esc(r.team)}${gp.opp?" · "+esc(gp.opp):""}</span><div class="sub nw">${gp.when?gp.when+" · ":""}for ${money(o.f)} · against ${money(o.a)}</div>${liveLine(r)}</div><span class="net ${cls} big"><span class="sr">dollar net </span>${smoney(o.net)}</span></div>
    <div class="det${open?" show":""}">${barsHtml(r)}${li(o.F,"f")}${li(o.A,"a")}</div></div>`;
 }
 function valueHtml(d,q){
   const lgs=leaguesOf(d),withBuy=lgs.filter(l=>effBuy(l.id,l.name)>0),counted=lgs.filter(l=>effBuy(l.id,l.name)>0&&effBuy(l.id,l.name)>=S.vmin);
   if(!withBuy.length)return `<div class="card"><div class="empty">No buy-ins set yet.<br>Add what each league costs and Players ranks by the dollars riding on each player.<button data-settings="1">Set league buy-ins</button></div></div>`;
-  let rows=d.rows.map(r=>dollars(r,S.vmin)).filter(o=>o.F.length||o.A.length);
+  let rows=d.rows.map(r=>dollars(r,q?0:S.vmin)).filter(o=>o.F.length||o.A.length);
   if(q)rows=rows.filter(o=>o.r.name.toLowerCase().includes(q)||o.r.team.toLowerCase()===q);   // searching searches everyone, still in dollars
   else{
     if(S.status==="active")rows=rows.filter(o=>{const x=rStateOf(o.r);return x==="in"||x==="pre"});
@@ -569,7 +570,7 @@ function valueHtml(d,q){
   const vrows=l=>{if(S.sort!=="game"||q)return l.slice(0,100).map(valRow).join("");let h="",last;for(const o of l.slice(0,100)){if(o.r.game!==last){last=o.r.game;const sc=last&&S.sc[last];h+=`<div class="gdiv">${last?esc(last.replace("@"," @ "))+(sc?" · "+esc(stText(sc)):""):"Bye / no game"}</div>`}h+=valRow(o)}return h};
   const vcard=l=>`<div class="card">${vrows(l)}</div>${l.length>100?`<div class="vnote">Showing 100 of ${l.length}. Search to find the rest.</div>`:""}`;
   const grouped=!q&&S.status==="all"&&S.sort==="impact",vact=rows.filter(o=>rStateOf(o.r)!=="post"),vdone=rows.filter(o=>rStateOf(o.r)==="post"),fo=S.pfin??!vact.length;
-  const list=rows.length?(grouped&&vdone.length?(vact.length?vcard(vact):"")+`<button class="fint" data-fk="pf" data-pfin="1" data-open="${fo?1:0}" aria-expanded="${fo}"><span>Finished · ${vdone.length} player${vdone.length===1?"":"s"}</span>${CHEV}</button>${fo?vcard(vdone):""}`:vcard(rows)):`<div class="card"><div class="empty">${S.status==="active"?"No live or upcoming players match.":S.status==="done"?"No finished players match.":"No players match this filter."}${S.status==="all"?"":'<button data-showall="1">Show all players</button>'}</div></div>`;
+  const list=rows.length?(grouped&&vdone.length?(vact.length?vcard(vact):"")+`<button class="fint" data-fk="pf" data-pfin="1" data-open="${fo?1:0}" aria-expanded="${fo}"><span>Finished · ${vdone.length} player${vdone.length===1?"":"s"}</span>${CHEV}</button>${fo?vcard(vdone):""}`:vcard(rows)):`<div class="card"><div class="empty">${q?`No player matches “${esc(q)}” in leagues with a buy-in.`:S.status==="active"?"No live or upcoming players match.":S.status==="done"?"No finished players match.":"No players match this filter."}${S.status==="all"||q?"":'<button data-showall="1">Show all players</button>'}</div></div>`;
   return note+list;
 }
 function settingsHtml(){
@@ -725,7 +726,7 @@ function gameCard(g,compact){
   };
   const A=sc?sc.away:{abbr:g.away,score:""},H=sc?sc.home:{abbr:g.home,score:""};
   const show=st!=="pre"&&sc, lead=!show?"":(+A.score>+H.score?"a":+H.score>+A.score?"h":"");
-  const secs=`${sec("f",compact?"Counted for you":"Root for",up)}${sec("a",compact?"Counted against you":"Root against",dn)}${sec("e","Even · cancels out",ev)}`;
+  const secs=`${sec("f",compact?"Rooted for":"Root for",up)}${sec("a",compact?"Rooted against":"Root against",dn)}${sec("e","Even · cancels out",ev)}`;
   if(compact){
     const o=outcome(g),mv=movers(g),nl=(S.data&&S.data.leagues)||0,per=o.v!=null&&nl?Math.round(o.v/nl):0;
     const total=o.v==null?"":`<div class="lean"><b>${sgn(o.v)} pts</b> across your ${nl} leagues${Math.abs(per)>=1?` (about ${sgn(per)} each)`:""}</div>`;
@@ -798,14 +799,14 @@ function renderInner(){
   const act=[];
   if(S.view!=="all")act.push({for:"Root for",against:"Root against"}[S.view]);
   if(S.status!=="all")act.push({active:"Live & upcoming",done:"Finished"}[S.status]);
-  if(S.money)act.push(S.vmin?`Buy-in $ · ${money(S.vmin)} and up`:"Counting buy-in $");
+  if(S.money&&S.vmin)act.push(`Buy-ins ${money(S.vmin)} and up`);
   const searchSkips=q&&act.length;
   
   setFa(onTab==="players"&&act.length&&!S.fopen?(q?`<div class="fnote">Search ignores your filters (${esc(act.join(" · "))}).</div>`:`<div class="fsum"><span>${esc(act.join(" · "))}</span><button class="fx ic" data-clearf="1" aria-label="Clear filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`):"");
   setCtl(onTab==="players"&&S.fopen?`<div class="ctl"><div class="seg" role="group" aria-label="Count by">${[["lg","Count leagues"],["usd","Count buy-in $"]].map(([k,l])=>`<button class="chip${S.money===(k==="usd")?" on":""}" data-unit="${k}" data-fk="u:${k}" aria-pressed="${S.money===(k==="usd")}">${l}</button>`).join("")}</div><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
-    ${`<label class="sortl"><span class="sub">Rank</span><select id="ranksel" data-fk="sel0" aria-label="Rank players by">${[["impact","Live first, strongest net"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<option value="${k}"${S.sort===k?" selected":""}>${l}</option>`).join("")}</select></label>`}
+    ${`<div class="seg" role="group" aria-label="Rank">${[["impact","Strongest"],["game","By game"],["alpha","A–Z"]].map(([k,l])=>`<button class="chip${S.sort===k?" on":""}" data-rank="${k}" data-fk="k:${k}" aria-pressed="${S.sort===k}">${l}</button>`).join("")}</div>`}
     ${S.money?`<label class="sortl"><span class="sub">Buy-in</span><select id="vminsel" data-fk="vm" aria-label="Count leagues with a buy-in of at least">${[[0,"Any"],[10,"$10 and up"],[25,"$25 and up"],[50,"$50 and up"],[100,"$100 and up"],[250,"$250 and up"]].map(([k,l])=>`<option value="${k}"${S.vmin===k?" selected":""}>${l}</option>`).join("")}</select></label>`:""}
-    <label class="sortl"><span class="sub">Show</span><select id="stsel" data-fk="sel2" aria-label="Which games">${[["all","All players"],["active","Live & upcoming"],["done","Finished"]].map(([k,l])=>`<option value="${k}"${S.status===k?" selected":""}>${l}</option>`).join("")}</select></label>
+    <div class="seg" role="group" aria-label="Show">${[["all","All games"],["active","Not final"],["done","Final"]].map(([k,l])=>`<button class="chip${S.status===k?" on":""}" data-show="${k}" data-fk="w:${k}" aria-pressed="${S.status===k}">${l}</button>`).join("")}</div>
     ${nf?`<button class="fclear" data-clearf="1"><span>Clear filters</span><span aria-hidden="true">✕</span></button>`:""}</div>`:"");
   if(S.tab==="players"){
     if(S.money){out.innerHTML=valueHtml(d,q);return}
@@ -880,7 +881,7 @@ function openSheet(el,from){SHEET=el;S.helpFrom=from||document.activeElement;el.
 function closeSheet(){if(!SHEET)return;SHEET.hidden=true;SHEET=null;$(".wrap").inert=false;$(".bnav").inert=false;document.body.style.overflow="";const tgt=S.helpFrom&&S.helpFrom.isConnected?S.helpFrom:($("[data-settings]")||$("#th"));if(tgt&&tgt.focus)tgt.focus()}
 function openSettings(from){const from2=SHEET?S.helpFrom:from;if(SHEET)closeSheet();$("#setin").innerHTML=settingsHtml();updateBsum();openSheet($("#setsheet"),from2)}
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-reload],[data-gowk],[data-tab],[data-view],[data-unit],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],#fb,.head,.row");if(!t)return;
+  const t=e.target.closest("[data-reload],[data-gowk],[data-tab],[data-view],[data-unit],[data-rank],[data-show],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],#fb,.head,.row");if(!t)return;
   if(t.dataset.reload){location.replace(location.pathname+"?v="+t.dataset.reload);return}
   if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
   else if(t.dataset.close!==undefined)closeSheet();
@@ -893,6 +894,8 @@ document.addEventListener("click",e=>{
   else if(t.dataset.tab){const sy=S.sy||(S.sy={});sy[S.tab]=window.scrollY;S.tab=t.dataset.tab;S.pdet={};$("#q").value="";saveUI();render();window.scrollTo(0,sy[S.tab]||0);if(S.tab==="matchups")refreshMatchups()}
   else if(t.dataset.mu){S.mopen[t.dataset.mu]=!S.mopen[t.dataset.mu];render()}
   else if(t.dataset.mfin!==undefined){S.mfin=t.dataset.open!=="1";render()}
+  else if(t.dataset.rank){S.sort=t.dataset.rank;saveUI();render()}
+  else if(t.dataset.show){S.status=t.dataset.show;saveUI();render();if(S.status==="done")loadFinished()}
   else if(t.dataset.unit){S.money=t.dataset.unit==="usd";saveUI();render()}
   else if(t.dataset.view){S.view=t.dataset.view;saveUI();render()}
   else if(t.dataset.lg){S.lgOpen[t.dataset.lg]=!S.lgOpen[t.dataset.lg];render()}
@@ -900,7 +903,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.pfin!==undefined){S.pfin=t.dataset.open!=="1";render();if(S.pfin)loadFinished()}
   else if(t.dataset.pbye!==undefined){S.pbye=t.dataset.open!=="1";render()}
   else if(t.dataset.peven!==undefined){S.peven=t.dataset.open!=="1";render()}
-  else if(t.dataset.clearf!==undefined){S.view="all";S.status="all";S.vmin=0;S.money=false;saveUI();render()}
+  else if(t.dataset.clearf!==undefined){S.view="all";S.status="all";S.vmin=0;saveUI();render()}
   else if(t.dataset.final!==undefined){S.finalOpen=t.dataset.open!=="1";render()}
   else if(t.classList.contains("head")){
     const c=t.parentElement,nowOpen=!c.classList.contains("open");S.open[c.dataset.gk]=nowOpen;render();

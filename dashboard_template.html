@@ -119,6 +119,10 @@ h1 .short{display:none}
 .fbody{padding:10px 12px;display:grid;gap:8px}.lean{font-size:13px;color:var(--mute);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 #upd{margin:8px 0 0}#upd button{width:100%;min-height:44px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:700;font-size:15px}
 .lines .more{white-space:nowrap}
+.tl{font-size:12px;color:var(--mute);white-space:nowrap}.tl b{font-weight:700}.tl .p,.gt .p{color:var(--good)}.tl .n,.gt .n{color:var(--bad)}
+.gt{font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}.gt b{font-weight:700}
+.gdiv{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding:10px 12px 4px;border-top:1px solid var(--line)}.card>.gdiv:first-child{border-top:0}
+.bi[aria-invalid="true"]{border-color:var(--bad)}.bierr{display:block;color:var(--bad);font-size:12px}
 .fint .g{color:var(--good)}.fint .b{color:var(--bad)}
 .lv{color:var(--warn);font-weight:700}
 /* player detail v3: bars first, leagues behind a toggle */
@@ -154,6 +158,7 @@ h1 .short{display:none}
 .fclear{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:8px;text-align:left;font-size:14px}
 .fnote{font-size:13px;color:var(--mute);margin-top:8px}
 .card.open>.head .lines{display:none}
+.card{overflow:clip}.card.open>.head{position:sticky;top:var(--hdr,57px);z-index:3;background:var(--card);border-radius:12px 12px 0 0;box-shadow:0 1px 0 var(--line)}
 .lines b{margin-right:2px}
 .bh>span:first-child{min-width:0}.bh>span:last-child{white-space:nowrap}
 .nostat{font-style:italic}
@@ -211,11 +216,11 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  <ul>
  <li><b>+3</b> means he's in your lineups in 3 more leagues than your opponents' lineups: root for him. <b>−3</b> is the reverse: root against him.</li>
  <li>Tank leagues are flipped: your own players count against you, your opponents' players count for you.</li>
- <li>The chip beside each team's score (+5, −1) adds up the nets of that team's players. "Game total" adds up everyone in the game.</li>
+ <li>"lean +5" beside a team's score adds up the nets of that team's players. "Game total +7 / −6" adds up everyone in the game you root for, and everyone you root against.</li>
  <li>Live and finished games show each player's line under his name, such as "5 rec · 72 yds · 1 TD · 14.2 pts". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
- <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you (about +1 per league across 41 leagues). Standard PPR, not each league's own scoring, so defensive players add 0. Players Sleeper has no stats for count as 0, and the card says who.</li>
+ <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring, so defensive players add 0. Players Sleeper has no stats for count as 0, and the card says who.</li>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line, and "proj" means a Sleeper projection (used when no DraftKings line is posted, and always for Fantasy pts).</li>
- <li>The Matchups tab shows your score in every league this week, the closest first. "Down 3.2 · Proj win by 10.8" is where you stand now and where you should finish: live players count what they have plus their projection for the time left. Scoring is each league's own. "Up 3.5" is good, except in tank leagues, where it shows red.</li>
+ <li>The Matchups tab shows your score in every league this week, the closest first. "Down 3.2 · Proj win by 10.8" is where you stand now and where you should finish: live players count what they have plus their projection for the time left. Scoring is each league's own. "Up 3.5" is good. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Down 1.4 · good".</li>
  <li>On the Players tab, Filter opens the filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
  <li>In Filter, Rank "Buy-in $" adds up the buy-ins of every league where a player is for or against you. "+$320" means he's for you in $320 more of buy-ins than against you. Set the buy-ins in Settings, the gear at the top; they stay on this device only.</li>
  </ul></div></div>
@@ -266,7 +271,7 @@ async function load(week){
   const games={};
   for(const g of sched){if(g.week!==w)continue;games[g.away+"@"+g.home]={away:g.away,home:g.home,date:g.date,status:g.status,rows:[]}}
   const teamGame={};for(const k in games){teamGame[games[k].away]=k;teamGame[games[k].home]=k}
-  const shares={}, lgList=[], muOut=[]; let nLg=0, failed=0;
+  const shares={}, lgList=[], muOut=[], failedNames=[]; let nLg=0, failed=0;
   const projs=await projFor(w,true).catch(()=>({}));
   await pool(lgs,async lg=>{
     try{
@@ -290,7 +295,7 @@ async function load(week){
           if(!pid||pid==="0"||pid==="None")continue;
           (shares[pid]=shares[pid]||{f:[],a:[]})[side].push({lg:lname,id:String(lg.league_id),opp:oname,t:tank});
         }}
-    }catch(e){failed++;console.warn(lg.name,e)}
+    }catch(e){failed++;failedNames.push((lg.name||"").trim()||"a league");console.warn(lg.name,e)}
   });
   const rows=[];
   for(const pid in shares){
@@ -303,7 +308,7 @@ async function load(week){
   gl.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||(b.rows.reduce((t,r)=>t+r.f+r.a,0)-a.rows.reduce((t,r)=>t+r.f+r.a,0)));
   for(const m of muOut)for(const sd of [m.me,m.them]){if(!sd)continue;for(const x of sd.st){if(x.pid==="0")continue;const [nme,pos,team]=await pinfo(x.pid);x.name=nme;x.pos=pos;x.team=team;x.game=teamGame[team]||null}}
   const gstat={};for(const k in games)gstat[k]=games[k].status;
-  return {week:w,season:S.season,leagues:nLg,failed,gstat,lgList,matchups:muOut,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
+  return {week:w,season:S.season,leagues:nLg,failed,failedNames,gstat,lgList,matchups:muOut,rows,games:gl,at:Date.now(),schedGames:Object.keys(games).length};
 }
 
 /* ---------- per-game stat bars: DraftKings lines (ESPN) vs live ESPN box score ---------- */
@@ -462,7 +467,13 @@ function gameParts(r){
 }
 function liveLine(r){
   if(!r.game)return"";
-  const gs=S.gs[r.game];if(!gs||!gs.ok||gs.state==="pre")return"";
+  const gs=S.gs[r.game];
+  if(!gs||!gs.ok){   // game not loaded yet: show Sleeper's PPR points if there are any
+    const st=rStateOf(r),m=ptsMap(),raw=m?m[r.pid]:undefined;
+    if(st==="pre"||st==="none"||raw===undefined)return"";
+    return `<div class="sline"><b>${Math.round(raw*10)/10} pts</b>${st==="post"&&r.net?` · swing ${sgn(Math.round(r.net*raw))}`:""}</div>`;
+  }
+  if(gs.state==="pre")return"";
   if(!SPECS[r.pos]&&r.pos!=="K"&&r.pos!=="DEF")return"";   // IDP: standard PPR doesn't score them
   const eid=r.espn||gs.byName[nm(r.name)]||"",a=gs.stats[eid]||{},noBox=!!SPECS[r.pos]&&!gs.stats[eid];
   const td=(a.rushTD||0)+(a.recTD||0),bits=[],raw=gs.pts?gs.pts[r.pid]:undefined;
@@ -577,7 +588,7 @@ function muCard(c){
   const m=c.m,open=!!S.mopen[m.id];
   const good=m.tank?c.margin<0:c.margin>0,bad=m.tank?c.margin>0:c.margin<0;
   const mg=Math.abs(c.margin).toFixed(1);
-  const txt=!m.them?"No opponent":c.margin===0?"Tied":c.over?(c.margin>0?"Won by ":"Lost by ")+mg:(c.margin>0?"Up ":"Down ")+mg;
+  const txt=(!m.them?"No opponent":c.margin===0?"Tied":c.over?(c.margin>0?"Won by ":"Lost by ")+mg:(c.margin>0?"Up ":"Down ")+mg)+(m.tank&&m.them&&c.margin?(good?" · good":" · bad"):"");
   const cls=!m.them||c.margin===0?"z":good?"p":bad?"n":"z";
   const verdict=!m.them||c.over?"":Math.abs(c.pm)<.05?"Proj tie":(c.pm>0?"Proj win by ":"Proj loss by ")+Math.abs(c.pm).toFixed(1);
   const leftTxt=c.over?"Final":m.them?`You ${c.a.left.length} left · them ${c.b.left.length}`:`${c.a.left.length} left`;
@@ -624,7 +635,7 @@ async function refreshMatchups(force){
   }finally{S.mBusy=false}
 }
 const teamLean=(g,ab)=>g.rows.filter(r=>r.team===ab).reduce((t,r)=>t+r.net,0);
-const chipN=(n,ab)=>`<span class="chipn ${netCls(n)}"><span class="sr">${esc(ab)} lean </span>${sgn(n)}</span>`;
+const chipN=(n,ab)=>n?`<span class="tl"><span class="sr">${esc(ab)} </span>lean <b class="${netCls(n)}">${sgn(n)}</b></span>`:"";
 const ptsMap=()=>((S.pts[S.week]||{}).map)||null;
 function swingExact(g){const m=ptsMap();if(!m)return null;return g.rows.reduce((t,r)=>t+r.net*(m[r.pid]||0),0)}
 function outcome(g){
@@ -682,7 +693,7 @@ function gameCard(g,compact){
   const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
    <div class="sb">${tm(A,lead==="a")}${tm(H,lead==="h")}</div><div class="stc">${stc}</div>
-   <div class="tot" title="Game total: everyone in this game"><span>Game total</span><div class="nets"><span class="net p"><span class="sr">Root for </span>+${sum(up)}</span><span class="net n"><span class="sr">Root against </span>−${sum(dn)}</span></div></div>
+   <div class="tot"><span>Game total</span><span class="gt"><b class="p"><span class="sr">Root for </span>+${sum(up)}</b> / <b class="n"><span class="sr">Root against </span>−${sum(dn)}</b></span></div>
    <div class="lines">${linesHtml(up,dn)}</div></div>
    <div class="body">${secs}</div></div>`;
 }
@@ -710,7 +721,7 @@ function renderInner(){
   setText($("#an"),S.err||(d?`Week ${d.week} loaded`:""));
   const wk=S.week||(d&&d.week)||null;
   setText($("#wk"),"Wk "+(wk||"–"));
-  $("#pw").disabled=!!wk&&wk<=1;$("#nw").disabled=!!wk&&wk>=18;
+  $("#pw").disabled=!wk||wk<=1;$("#nw").disabled=!wk||wk>=18;
   if(!d){
     setCtl("");setFa("");$("#fb").hidden=true;
     setText($("#meta"),S.err?"":wk?`Loading Week ${wk}…`:"Loading your leagues…");
@@ -718,7 +729,7 @@ function renderInner(){
     return;
   }
   const ago=Math.round((Date.now()-d.at)/60000);
-  setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · ${d.failed} ${d.failed===1?"league":"leagues"} didn't load`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`);
+  setText($("#meta"),`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+fmtAgo(ago)}${d.failed?` · didn't load: ${(d.failedNames||[]).slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${(d.failedNames||[]).length>2?` +${d.failedNames.length-2} more`:""}`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`);
   const onTab=S.tab;
   for(const [id,k] of [["#tg","games"],["#tp","players"],["#tm","matchups"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-current",onTab===k?"page":"false")}
   $("#sh").classList.toggle("stick",onTab==="players"&&!S.fopen);
@@ -764,6 +775,11 @@ function renderInner(){
     }else if(!q&&S.status==="all"&&ranked){
       const act=rows.filter(r=>{const x=rStateOf(r);return x==="in"||x==="pre"}),live=act.filter(r=>r.net),even=act.filter(r=>!r.net),byes=rows.filter(r=>rStateOf(r)==="none"),done=rows.filter(r=>rStateOf(r)==="post");
       html=(live.length?card(live):"")+(even.length?grp("pe","Even · cancels out",even,S.peven??!live.length):"")+(byes.length?grp("pb","Bye / no game",byes,S.pbye??false):"")+(done.length?grp("pf","Finished",done,S.pfin??(!live.length&&!byes.length)):"");
+    }else if(S.sort==="game"&&!q&&!S.money){
+      let h="",last=null;
+      for(const r of rows.slice(0,200)){if(r.game!==last){last=r.game;const sc=r.game&&S.sc[r.game];
+        h+=`<div class="gdiv">${r.game?esc(r.game.replace("@"," @ "))+(sc?" · "+esc(stText(sc)):""):"Bye / no game"}</div>`}h+=rowHtml(r,true)}
+      html=`<div class="card">${h}</div>`;
     }else html=card(rows);
     out.innerHTML=html;
   }else if(S.tab==="matchups"){
@@ -784,9 +800,9 @@ function renderInner(){
     }
     if(fin.length){
       const o=S.finalOpen??(!live.length&&!upc.length);
-      const c=tally(fin),cnt=(n,w,k)=>n?`<span class="${k}">${n} ${w}</span>`:`${n} ${w}`;
-      const ft=c.known?` · ${cnt(c.h,"helped","g")} · ${cnt(c.u,"hurt","b")}${c.e?` · ${c.e} even`:""} · <span class="${c.pts>0?"g":c.pts<0?"b":""}">${sgn(c.pts)} pts</span>`:"";
-      html+=`<button class="fint" data-fk="f" data-final="1" data-open="${o?1:0}" aria-expanded="${o}"><span>Final · ${fin.length}${ft}</span>${CHEV}</button>`;
+      const c=tally(fin),n=fin.length;
+      const ft=!c.known?"":` · <span class="${c.pts>0?"g":c.pts<0?"b":""}">${c.pts>0?"helped ":c.pts<0?"hurt ":"even "}${sgn(c.pts)} pts</span>${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`;
+      html+=`<button class="fint" data-fk="f" data-final="1" data-open="${o?1:0}" aria-expanded="${o}"><span>${n} final game${n===1?"":"s"}${ft}</span>${CHEV}</button>`;
       if(o){
         const days={};for(const g of fin)(days[g.date||""]=days[g.date||""]||[]).push(g);
         for(const day in days){const c=tally(days[day]);
@@ -817,7 +833,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.view){S.view=t.dataset.view;saveUI();render()}
   else if(t.dataset.lg){S.lgOpen[t.dataset.lg]=!S.lgOpen[t.dataset.lg];render()}
   else if(t.dataset.more){S.more[t.dataset.more]=!S.more[t.dataset.more];render()}
-  else if(t.dataset.pfin!==undefined){S.pfin=t.dataset.open!=="1";render()}
+  else if(t.dataset.pfin!==undefined){S.pfin=t.dataset.open!=="1";render();if(S.pfin)loadFinished()}
   else if(t.dataset.pbye!==undefined){S.pbye=t.dataset.open!=="1";render()}
   else if(t.dataset.peven!==undefined){S.peven=t.dataset.open!=="1";render()}
   else if(t.dataset.clearf!==undefined){S.view="all";S.status="all";S.sort="impact";S.money=false;S.vmin=0;saveUI();render()}
@@ -832,7 +848,11 @@ $("#q").addEventListener("input",render);
 document.addEventListener("input",e=>{
   const t=e.target;if(!t.classList||!t.classList.contains("bi"))return;
   const id=t.dataset.lid,v=t.value.trim();
-  if(v==="")delete S.buy[id];else{const n=parseFloat(v.replace(/[$,]/g,""));if(isFinite(n)&&n>=0)S.buy[id]=n}
+  const n=parseFloat(v.replace(/[$,]/g,"")),bad=v!==""&&!(/^\$?[\d,]*\.?\d*$/.test(v)&&isFinite(n)&&n>=0);
+  if(v==="")delete S.buy[id];else if(!bad)S.buy[id]=n;
+  t.setAttribute("aria-invalid",bad?"true":"false");
+  const row=t.closest(".birow"),old=row&&row.querySelector(".bierr");if(old)old.remove();
+  if(bad&&row){const m=document.createElement("small");m.className="bierr";m.id="e-"+id;m.textContent="Enter a dollar amount, like 25";row.querySelector(".bn").appendChild(m);t.setAttribute("aria-describedby",m.id)}else t.removeAttribute("aria-describedby");
   store.set("rfa-buy",S.buy);updateBsum();render();
 });
 document.addEventListener("keydown",e=>{
@@ -844,7 +864,7 @@ document.addEventListener("keydown",e=>{
   const t=e.target;if(t&&t.getAttribute&&t.getAttribute("role")==="button"){e.preventDefault();t.click()}
 });
 document.addEventListener("change",e=>{
-  if(e.target.id==="stsel"){S.status=e.target.value;saveUI();render()}
+  if(e.target.id==="stsel"){S.status=e.target.value;saveUI();render();if(S.status==="done")loadFinished()}
   else if(e.target.id==="msortsel"){S.msort=e.target.value;saveUI();render()}
   else if(e.target.id==="vminsel"){S.vmin=+e.target.value;saveUI();render()}
   else if(e.target.id==="ranksel"){const v=e.target.value;S.money=v==="usd";if(!S.money)S.sort=v;saveUI();render()}
@@ -877,6 +897,7 @@ function go(n){
   render();
   clearTimeout(S.stepT);S.stepT=setTimeout(()=>refresh(n),250);
 }
+function loadFinished(){for(const g of (S.data&&S.data.games)||[])if(effState(g)==="post")loadGame(g.away+"@"+g.home)}
 function ensureLive(force){
   for(const g of (S.data&&S.data.games)||[])if(effState(g)==="in")loadGame(g.away+"@"+g.home,force);   // open or not: Players rows read these too
 }

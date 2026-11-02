@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6fdb'/%3E%3Cpath d='M9 16h14M16 9v14' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>Root For or Against</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--mute:#5d6877;--line:#e1e5eb;--good:#0d7a3f;--goodbg:#e2f5e9;
@@ -9,47 +13,42 @@
 --good:#6ee7a0;--goodbg:#123d1e;--bad:#ff9ca3;--badbg:#47161a;--warn:#f0c36a;--warnbg:#3d2f0e;--info:#7fb3ff;--infobg:#14284a;--btrk:#2a3a55;--bfill:#6aa5ff}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:720px;margin:0 auto;padding:0 16px 70px}
-header{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px;border-bottom:1px solid var(--line)}
+.wrap{max-width:720px;margin:0 auto}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0;border-bottom:1px solid var(--line)}
 .top{display:flex;align-items:center;gap:8px}
-h1{font-size:18px;margin:0;flex:1}
-button{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer}
+h1{font-size:17px;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+button{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 11px;min-height:44px;min-width:44px;cursor:pointer}
 button:active{opacity:.6}
 .wk{display:flex;align-items:center;gap:6px;font-weight:600}
-input[type=search]{width:100%;margin-top:9px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);
-border-radius:10px;padding:10px 12px;-webkit-appearance:none}
-.tabs{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
-.chip{border-radius:99px;padding:4px 12px;font-size:13px}
+input[type=search]{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);
+border-radius:10px;padding:0 12px;min-height:44px;-webkit-appearance:none}
+.chip{border-radius:99px;padding:0 16px;min-height:44px;font-size:14px}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .meta{color:var(--mute);font-size:12.5px;margin:8px 0}
 .day{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:18px 0 6px;font-weight:700}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 8px;overflow:hidden}
-.head{padding:10px 12px;cursor:pointer;display:flex;gap:8px;align-items:flex-start}
-.head .main{flex:1;min-width:0}
-.title{font-weight:700}
 .prev{color:var(--mute);font-size:12.5px;margin-top:2px}
 .body{border-top:1px solid var(--line);display:none}
 .card.open .body{display:block}
-.sec{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px 2px}
+.sec{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px 2px}
 .sec.f{color:var(--good)}.sec.a{color:var(--bad)}.sec.e{color:var(--mute)}
-.row{padding:7px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;border-top:1px solid var(--line)}
+.row{padding:8px 12px;min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;border-top:1px solid var(--line)}
 .row:first-of-type{border-top:0}
 .row .nm{flex:1;min-width:0}.row b{font-weight:600}
 .sub{color:var(--mute);font-size:12.5px}
 .net{min-width:44px;text-align:center;font-weight:700;border-radius:99px;padding:2px 8px;font-variant-numeric:tabular-nums}
-.net.p{background:var(--goodbg);color:var(--good)}.net.n{background:var(--badbg);color:var(--bad)}.net.z{background:var(--line);color:var(--mute)}
-.cnt{color:var(--mute);font-size:12px;white-space:nowrap}
+.net.p{background:var(--goodbg);color:var(--good)}.net.n{background:var(--badbg);color:var(--bad)}.cnt{color:var(--mute);font-size:12px;white-space:nowrap}
 .det{padding:2px 12px 10px 12px;font-size:13px;display:none}
 .det.show{display:block}
 .det div{margin:2px 0}.det .w{color:var(--good);font-weight:600}.det .x{color:var(--bad);font-weight:600}
-.pill{font-size:11px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.pill{font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
 .pill.live{background:var(--warnbg);color:var(--warn)}.pill.fin{background:var(--infobg);color:var(--info)}
 .empty,.err{color:var(--mute);text-align:center;padding:30px 10px}
 .err{color:var(--bad)}
 .bars{padding:2px 0 8px}
 .bar{margin:8px 0}.bh{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:3px}
 .bh b{font-weight:700}
-.ovr{font-size:11px;font-weight:700;letter-spacing:.03em;margin-left:4px}
+.ovr{font-size:12px;font-weight:700;letter-spacing:.03em;margin-left:4px}
 .eff{font-weight:700}.eff.g{color:var(--good)}.eff.b{color:var(--bad)}
 .bw{display:flex;align-items:center}
 .trk{flex:1;height:14px;background:var(--btrk);border-radius:7px 0 0 7px;overflow:hidden}
@@ -57,15 +56,15 @@ border-radius:10px;padding:10px 12px;-webkit-appearance:none}
 .tick{width:2px;height:22px;background:var(--ink);flex:none;border-radius:1px}
 .gut{width:44px;display:flex;align-items:center;flex:none}
 .ext{height:14px;background:var(--bfill);border-radius:0 7px 7px 0}
-.lt{margin-left:6px;font-size:11px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums}
+.lt{margin-left:6px;font-size:12px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums}
 .help{margin:0 0 10px;font-size:12.5px;color:var(--mute)}
-.help summary{cursor:pointer;font-weight:600;padding:6px 0}
+.help summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 .help ul{margin:2px 0 8px;padding-left:18px}.help li{margin:4px 0}
 input::placeholder{color:var(--mute);opacity:1}
 .net.z{background:transparent;box-shadow:inset 0 0 0 1px var(--line);color:var(--mute)}
-.src{color:var(--mute);font-size:11px;margin-top:4px}
+.src{color:var(--mute);font-size:12px;margin-top:4px}
 /* scoreboard game cards */
-.head{display:grid;grid-template-columns:auto 1fr auto;column-gap:12px;row-gap:6px;align-items:center;padding:10px 12px}
+.head{display:grid;grid-template-columns:auto 1fr auto;column-gap:12px;row-gap:6px;align-items:center;padding:10px 12px;cursor:pointer}
 .sb{display:grid;gap:3px;min-width:96px}
 .tm{display:flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
 .tm i{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 0 1px var(--line)}
@@ -88,17 +87,10 @@ button:disabled{opacity:.4;cursor:default}
 /* adapt + accessibility */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wrap{padding:0 max(16px,env(safe-area-inset-left)) calc(92px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-header{padding:6px 0}
-h1{font-size:17px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:359px){h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.top{justify-content:flex-end}}
-button{min-height:44px;min-width:44px}
 #pw,#nw,#rf{padding:0}
 .wk{gap:2px}.wk #wk{min-width:44px;text-align:center}
-.chip{min-height:44px;padding:0 16px;font-size:14px}
-.row{min-height:44px;padding:8px 12px}
-.help summary{min-height:44px;display:flex;align-items:center}
 .searchbar{margin:4px 0 10px}
-input[type=search]{margin-top:0;min-height:44px;font-size:16px}
 .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
 .seg{display:flex;gap:6px;flex:1 1 100%}.seg .chip{flex:1;padding:0 8px}
 .sortl{display:flex;align-items:center;gap:8px;flex:1 1 100%}
@@ -108,7 +100,14 @@ input[type=search]{margin-top:0;min-height:44px;font-size:16px}
 .bnav button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 :focus-visible{outline:2px solid var(--info);outline-offset:2px}
 .head:focus-visible,.row:focus-visible{outline-offset:-2px}
-.pill,.ovr,.lt,.src,.sec{font-size:12px}
+/* browser surfaces, touch feedback, numerals */
+:root{color-scheme:light dark;accent-color:var(--bfill)}
+::selection{background:var(--infobg);color:var(--ink)}
+input{caret-color:var(--bfill)}
+.head,.row{scroll-margin-top:72px;scroll-margin-bottom:84px}
+.head:active,.row:active{background:var(--bg)}
+@media (hover:hover){.head:hover,.row:hover{background:var(--bg)}button:not(:disabled):not(.on):hover{border-color:var(--mute)}}
+.net,.cnt,.bh,.meta,.sc,.clk{font-variant-numeric:tabular-nums}
 </style></head><body><div class="wrap">
 <header>
  <div class="top"><h1>Root for / against</h1>
@@ -132,7 +131,7 @@ const UID="677404197456531456", PLAYERS={"6462":["Ellis Richardson","TE","FA","3
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let S={week:null,season:null,curWeek:null,data:null,tab:"games",hideFinal:false,view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,projs:{},tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
+let S={week:null,season:null,curWeek:null,data:null,tab:"games",view:"all",sort:"impact",busy:false,open:{},pdet:{},gs:{},sb:null,sc:{},finalOpen:null,projs:{},tok:0,epoch:0,busyWeek:null,loading:false,err:null,stepT:null};
 
 async function get(u,tries=2){
   const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),15000);
@@ -367,7 +366,7 @@ function renderInner(){
     return;
   }
   const ago=Math.round((Date.now()-d.at)/60000);
-  $("#meta").textContent=`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+(ago<1?"just now":ago+" min ago")}${d.failed?` · ${d.failed} ${d.failed===1?"league":"leagues"} didn't load`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit",second:"2-digit"})+", refreshing every 45s":""}`;
+  $("#meta").textContent=`${d.leagues} leagues · ${d.rows.length} players · ${S.loading?"updating…":"updated "+(ago<1?"just now":ago+" min ago")}${d.failed?` · ${d.failed} ${d.failed===1?"league":"leagues"} didn't load`:""}${S.err?" · "+S.err:""}${S.week!==S.curWeek&&S.curWeek?" · not the current week":""}${Object.values(S.sc).some(x=>x.state==="in")&&S.sb?" · live scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):""}`;
   const onTab=q?"players":S.tab;
   for(const [id,k] of [["#tg","games"],["#tp","players"]]){$(id).classList.toggle("on",onTab===k);$(id).setAttribute("aria-pressed",onTab===k)}
   setCtl(onTab==="players"?`<div class="ctl"><div class="seg">${["all","for","against"].map(v=>`<button class="chip${S.view===v?" on":""}" data-view="${v}" data-fk="c:${v}" aria-pressed="${S.view===v}">${{all:"All",for:"Root for",against:"Root against"}[v]}</button>`).join("")}</div>
@@ -378,7 +377,8 @@ function renderInner(){
     if(q)rows=rows.filter(r=>r.name.toLowerCase().includes(q)||r.team.toLowerCase()===q||(r.pos+" "+r.team).toLowerCase().includes(q));
     const bySort={impact:(a,b)=>(b.f+b.a)-(a.f+a.a)||Math.abs(b.net)-Math.abs(a.net),
       plus:(a,b)=>b.net-a.net||(b.f+b.a)-(a.f+a.a),minus:(a,b)=>a.net-b.net||(b.f+b.a)-(a.f+a.a)};
-    rows.sort((a,b)=>(q&&S.sort==="impact"?0:bySort[S.sort](a,b))||a.name.localeCompare(b.name));
+    const isTeam=r=>q&&r.team.toLowerCase()===q?0:1;
+    rows.sort((a,b)=>isTeam(a)-isTeam(b)||(q&&S.sort==="impact"?0:bySort[S.sort](a,b))||a.name.localeCompare(b.name));
     let html=rows.slice(0,200).map(r=>rowHtml(r,true)).join("");
     if(q&&rows.length===0){
       const hits=Object.entries(PLAYERS).filter(([id,p])=>p[0].toLowerCase().includes(q)).slice(0,8);
@@ -409,11 +409,10 @@ function renderInner(){
 }
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-view],[data-sort],[data-final],[data-retry],.head,.row");if(!t)return;
+  const t=e.target.closest("[data-tab],[data-view],[data-final],[data-retry],.head,.row");if(!t)return;
   if(t.dataset.retry){refresh(S.week)}
   else if(t.dataset.tab){S.tab=t.dataset.tab;$("#q").value="";render()}
   else if(t.dataset.view){S.view=t.dataset.view;if(S.view==="for")S.sort="plus";else if(S.view==="against")S.sort="minus";else S.sort="impact";render()}
-  else if(t.dataset.sort){S.sort=t.dataset.sort;render()}
   else if(t.dataset.final!==undefined){S.finalOpen=t.dataset.open!=="1";render()}
   else if(t.classList.contains("head")){const c=t.parentElement;S.open[c.dataset.gk]=!c.classList.contains("open");render()}
   else if(t.classList.contains("row")){const pr=t.parentElement;S.pdet[pr.dataset.pid]=!S.pdet[pr.dataset.pid];render();if(S.pdet[pr.dataset.pid]&&pr.dataset.gk)loadGame(pr.dataset.gk)}

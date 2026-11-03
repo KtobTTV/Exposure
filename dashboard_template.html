@@ -206,7 +206,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .chev.side{transform:rotate(-90deg)}
 /* last: overrides */
 .hlean{display:block;color:var(--mute);font-size:13px;line-height:1.3}.card.open>.head:not(.mh):not(.fh){padding-top:4px;padding-bottom:4px}.hlean b{font-weight:700}.hlean .p{color:var(--good)}.hlean .n{color:var(--bad)}
-.sofar{font-size:14px}.sofar b{font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-right:2px}
+.vd .vs{font-size:26px;line-height:1.05;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}.vd .vs small{font-size:12px;font-weight:700}.vd .vs.p{color:var(--good)}.vd .vs.n{color:var(--bad)}
 .wic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.wbar>span{flex:1}
 .unit{display:flex;flex:none;border:1px solid var(--ctl);border-radius:10px;overflow:hidden}.unit button{border:0;border-radius:0;min-width:40px;font-weight:700;background:var(--card)}.unit button.on{background:var(--ink);color:var(--bg)}
 #fb.ic{position:relative;width:44px;padding:0}#fb svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
@@ -270,7 +270,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
  </ul><h3 class="hh">Games</h3><ul>
  <li>"lean +4" beside a team adds up the nets of that team's players, counted in leagues: the team you want scoring.</li>
  <li>Live and finished games show each player's line under his name, such as "14.2 pts · 5 rec · 72 yds · 1 TD". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
- <li>Finished games show the net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
+ <li>Live games show the swing so far on the right of the card, and finished games show the final net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  </ul><h3 class="hh">Stat bars</h3><ul>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line. "proj" means a Sleeper projection, used when no DraftKings line is posted. "game proj" is his projected fantasy points for the whole game. "anytime" is the touchdown line: 0.5, so one TD is over.</li>
  </ul><h3 class="hh">Matchups</h3><ul>
@@ -755,19 +755,17 @@ function gameCard(g,compact){
   }
   const tm=(t,l,n)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span><span class="tl"><span class="sr">${esc(t.abbr)} </span>lean <b class="${netCls(n)}">${sgn(n)}</b></span></div>`;
   const la=teamLean(g,A.abbr),lh=teamLean(g,H.abbr);
-  const vd="";
-  
   const hc=`<div class="hc"><b>${esc(A.abbr)}</b> ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b><span class="sub"> · ${esc(stText(sc)||(st==="post"?"Final":""))}</span>${la||lh?`<span class="hlean">lean ${esc(A.abbr)} <b class="${netCls(la)}">${sgn(la)}</b> / ${esc(H.abbr)} <b class="${netCls(lh)}">${sgn(lh)}</b></span>`:""}</div>`;
   const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
     :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
   const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+sgn(r.net)).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
   const se=st==="in"?swingExact(g):null,sv=se==null?null:Math.round(se);
-  const sofar=sv==null?"":`<div class="sofar"><b class="${sv>0?"lf":sv<0?"la":""}">So far</b> ${sv>0?`helping you ${sgn(sv)} pts`:sv<0?`hurting you ${sgn(sv)} pts`:"even"}</div>`;
+  const vd=sv==null?"":`<div class="vd"><span class="vl">So far</span><span class="vs ${netCls(sv)}">${sgn(sv)}<small> pts</small></span><span class="vl">${sv>0?"helping you":sv<0?"hurting you":"even"}</span></div>`;
   const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),sv==null?"":`So far ${sv>0?"helping you "+sgn(sv)+" points":sv<0?"hurting you "+sgn(sv)+" points":"even"}`,`Team lean ${A.abbr} ${sgn(la)}, ${H.abbr} ${sgn(lh)}`,up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
    <div class="sb">${tm(A,lead==="a",la)}${tm(H,lead==="h",lh)}</div><div class="stc">${stc}</div>
    ${vd}${hc}
-   <div class="lines">${linesHtml(up,dn)}${sofar}</div></div>
+   <div class="lines">${linesHtml(up,dn)}</div></div>
    <div class="body">${secs}</div></div>`;
 }
 

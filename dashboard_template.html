@@ -192,7 +192,7 @@ h1 .short{display:none}
 .mrow .mv{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}.mrow .mv small{display:block;font-weight:400;color:var(--mute);font-size:12px}
 .mrow.dn b,.mrow.dn .mv{font-weight:500}
 .mrow.emp b{color:var(--bad)}
-.mx b{color:var(--ink);font-weight:600}.mx .warn{color:var(--bad);font-weight:600}
+.mx b{color:var(--ink);font-weight:600}.mx .warn{color:var(--bad);font-weight:600}.mx .tu{color:var(--warn);font-weight:600}
 .mnote{font-size:13px;color:var(--mute);margin:8px 0}
 /* v8: drawn header icons, control borders */
 .ic{padding:0;flex:none;display:grid;place-items:center}
@@ -661,7 +661,7 @@ function muCard(c){
   return `<div class="card mu${open?" open":""}"><div class="head mh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${open}" data-mu="${esc(m.id)}" data-fk="mu:${esc(m.id)}">${CHEV}
    <div class="mt">${m.tank?'<span class="tkc">Tank</span> ':""}<b>${esc(m.name)}</b></div><div class="hc">${m.tank?'<span class="tkc">Tank</span>':""}<b class="hn">${esc(m.name)}</b><span class="hs">${f1(c.a.pts)}${m.them?"–"+f1(c.b.pts):""} <span class="pill ${cls}">${esc(short)}</span></span></div><span class="pill ${cls}">${m.tank?"":`<span class="sr">${good?"good for you":bad?"bad for you":""} </span>`}${txt}</span>
    <div class="ms">You <b>${f1(c.a.pts)}</b>${m.them?` – <b>${f1(c.b.pts)}</b> ${esc(m.opp)}`:""}</div>
-   <div class="mx">${!c.over&&m.them&&Math.abs(c.pm)<5?'<span class="warn">Toss-up</span> · ':""}${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
+   <div class="mx">${!c.over&&m.them&&Math.abs(c.pm)<5?'<span class="tu">Toss-up</span> · ':""}${verdict?`<b>${verdict}</b> · `:""}${leftTxt}${emp}</div></div>
    <div class="body">${body}</div></div>`;
 }
 function matchupsHtml(d){

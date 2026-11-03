@@ -1,4 +1,4 @@
-"""Build the phone dashboard: one self-contained HTML page that pulls your live
+"""Build Exposure, the phone dashboard: one self-contained HTML page that pulls your live
 lineups from Sleeper and shows, game by game, who to root for / against, plus a
 player search with the + / - for each name.
 

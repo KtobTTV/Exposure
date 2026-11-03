@@ -32,7 +32,7 @@ Aggregates exposure across all of one person's leagues into a single net (+/−)
 - Undecided: whether to pursue wider distribution and what that would require.
 
 ## Brand Commitments
-None stated. The working title in use is "Root for / against".
+The product is named **Exposure**: a multi-league player's exposure to each NFL player, net of opponents. "Root for" / "Root against" stay as the in-app labels. The public page is still served from the `root-for-against` repo so existing links and home-screen bookmarks keep working.
 
 ## Evidence on Hand
 Live data against the owner's real leagues (41 leagues, 14 games in Week 8) was used to verify the dashboard. No testimonials, user counts, or external usage evidence exist; do not invent any.

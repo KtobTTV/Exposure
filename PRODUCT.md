@@ -21,7 +21,7 @@ Aggregates exposure across all of one person's leagues into a single net (+/−)
 ## Operating Context
 - Data comes from Sleeper's public API (leagues, rosters, matchups, schedule, projections), ESPN (live box scores; DraftKings player-prop lines hosted by ESPN), all fetched client-side by the dashboard.
 - The owner's lineup bot (separate repo `KtobTTV/sleeper-lineup-bot`) runs on their Windows PC; Exposure does not depend on it.
-- Exposure lives at https://ktobttv.github.io/root-for-against/ (this repo, `KtobTTV/root-for-against`: the source and the published `index.html`, which holds a player-name table, the owner's Sleeper user id and tank-league ids, never lineups). A Refresh button reloads lineups and stats; a build id lets an open copy offer a reload when a new version is published.
+- Exposure lives at https://ktobttv.github.io/exposure/ (this repo, `KtobTTV/exposure`, renamed from `root-for-against`: the source and the published `index.html`, which holds a player-name table, the owner's Sleeper user id and tank-league ids, never lineups). A Refresh button reloads lineups and stats; a build id lets an open copy offer a reload when a new version is published.
 - Publishing: `python build.py <username>`, then commit and push `index.html`.
 
 ## Capabilities and Constraints
@@ -32,7 +32,7 @@ Aggregates exposure across all of one person's leagues into a single net (+/−)
 - Undecided: whether to pursue wider distribution and what that would require.
 
 ## Brand Commitments
-The product is named **Exposure**: a multi-league player's exposure to each NFL player, net of opponents. "Root for" / "Root against" stay as the in-app labels. The public page is still served from the `root-for-against` repo so existing links and home-screen bookmarks keep working.
+The product is named **Exposure**: a multi-league player's exposure to each NFL player, net of opponents. "Root for" / "Root against" stay as the in-app labels. The repo is `KtobTTV/exposure` and the page is served at https://ktobttv.github.io/exposure/ (the old `/root-for-against/` address no longer works).
 
 ## Evidence on Hand
 Live data against the owner's real leagues (41 leagues, 14 games in Week 8) was used to verify the dashboard. No testimonials, user counts, or external usage evidence exist; do not invent any.

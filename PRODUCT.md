@@ -7,22 +7,22 @@
 web
 
 ## Stack
-Existing codebase: Python 3.10 tooling (Flask local app, reportlab PDF, openpyxl Excel) and a single self-contained vanilla HTML/CSS/JS dashboard page with no framework or build step. The dashboard is a static file served from GitHub Pages and fetches live data in the browser.
+Existing codebase: a single self-contained vanilla HTML/CSS/JS page (`dashboard_template.html`) with no framework, plus `build.py` (standard-library Python) that bakes in the player-name table, user id and tank list and writes `index.html`. GitHub Pages serves `index.html` from this repo; the page fetches live data in the browser.
 
 ## Users
 The owner (Sleeper username `ktob`) plays in roughly 40 Sleeper fantasy football leagues at once and is the primary user. The stated ambition is to share the tools with a wider fantasy-football audience later; no audience beyond the owner and friends who received the share zip is confirmed yet. The dashboard is used on a phone, in quick glances while NFL games are live.
 
 ## Product Purpose
-Automates and informs a many-league Sleeper fantasy football operation: a bot that sets the projected-best legal lineup in every league (and handles IR moves), plus reporting that tells the owner, per NFL game and per player, how many of their leagues start each player versus how many opponents start him, so they know who to root for and against. Success is correct lineups without manual work, and a Sunday glance that answers "who do I root for in this game?" without opening 40 leagues.
+Exposure tells someone in many Sleeper leagues, per NFL game and per player, how many of their leagues start each player versus how many opponents start him, so they know who to root for and against, plus where every matchup is headed. Success is a Sunday glance that answers "who do I root for in this game?" without opening 40 leagues. The automated lineup-setting bot is a separate project (`KtobTTV/sleeper-lineup-bot`).
 
 ## Positioning
 Aggregates exposure across all of one person's leagues into a single net (+/−) per player, game by game, with the matchup perspective built in: leagues where the owner is tanking are listed in `tanking_leagues.txt` and reverse the sign. Stock fantasy apps show one league at a time.
 
 ## Operating Context
 - Data comes from Sleeper's public API (leagues, rosters, matchups, schedule, projections), ESPN (live box scores; DraftKings player-prop lines hosted by ESPN), all fetched client-side by the dashboard.
-- The lineup bot and reports run on the owner's Windows PC via Task Scheduler (Thursday 6 PM, Sunday 12 PM, Tuesday 10 AM analysis) and push summaries to the owner's phone via ntfy.
-- The dashboard lives at https://ktobttv.github.io/root-for-against/ (public repo `KtobTTV/root-for-against`, holding only the page and a player-name table, never lineups). A Refresh button reloads lineups and stats.
-- Other surfaces: local Flask lineup UI (`ui.py`, `templates/index.html`); HTML, PDF and Excel exposure reports; a team-analysis report.
+- The owner's lineup bot (separate repo `KtobTTV/sleeper-lineup-bot`) runs on their Windows PC; Exposure does not depend on it.
+- Exposure lives at https://ktobttv.github.io/root-for-against/ (this repo, `KtobTTV/root-for-against`: the source and the published `index.html`, which holds a player-name table, the owner's Sleeper user id and tank-league ids, never lineups). A Refresh button reloads lineups and stats; a build id lets an open copy offer a reload when a new version is published.
+- Publishing: `python build.py <username>`, then commit and push `index.html`.
 
 ## Capabilities and Constraints
 - Dashboard: Games tab (per-game cards of players to root for / against / even, net counts; collapsed by default so the digest stays glanceable), Players tab (search, Root for / Root against filters, rank by league count or buy-in dollars), Matchups tab (score and projected finish in every league), Settings in the header (league buy-ins, stored on the device). Tap a player for the leagues involved and, in game cards, stat bars (line vs live actual stat).

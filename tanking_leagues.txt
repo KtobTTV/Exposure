@@ -1,0 +1,7 @@
+# League ids you are TANKING in. In Exposure the sign is
+# reversed for these: players you start count as root AGAINST (you want them to flop) and
+# players your opponent starts count as root FOR (you want them to score on you).
+# One league id per line; anything after # is a comment.
+
+1345185126019002368   # The League of Extraordinary Degenerates
+1313589099096981504   # Dynasty Delinquents

@@ -6,7 +6,7 @@ Exposure adds up every lineup in all your leagues and gives each player one numb
 he's in 4 more of your lineups than your opponents' lineups (root for him), **−3** is the reverse
 (root against him). Leagues you're tanking in are flipped.
 
-Live at **https://ktobttv.github.io/root-for-against/** (open it on your phone and add it to the
+Live at **https://ktobttv.github.io/Exposure/** (open it on your phone and add it to the
 home screen).
 
 ## What's on it

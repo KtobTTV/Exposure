@@ -2,15 +2,19 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f7f9">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6fdb'/%3E%3Cpath d='M9 16h14M16 9v14' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>Exposure</title>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--mute:#5d6877;--line:#e1e5eb;--good:#0d7a3f;--goodbg:#e2f5e9;
+/* Themes: .dk marks the dark family (Dark, Sporty, Sunset, Ocean, or Auto on a dark phone). A [data-theme] element carries its theme's colors, so Settings swatches can show them. */
+:root,[data-theme=light]{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--mute:#5d6877;--line:#e1e5eb;--good:#0d7a3f;--goodbg:#e2f5e9;
 --bad:#b3261e;--badbg:#fbe7e5;--warn:#8a5a00;--warnbg:#fff1d6;--info:#1f5fbf;--infobg:#e4eefc;--btrk:#dbe3f1;--btrkb:#8795ad;--bfill:#2f6fdb;--ctl:#7f8a99}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--card:#171c22;--ink:#e7ecf2;--mute:#8b98a5;--line:#262d36;
---good:#6ee7a0;--goodbg:#123d1e;--bad:#ff9ca3;--badbg:#47161a;--warn:#f0c36a;--warnbg:#3d2f0e;--info:#7fb3ff;--infobg:#14284a;--btrk:#2a3a55;--btrkb:#5f7396;--bfill:#6aa5ff;--ctl:#66717e}}
+.dk,[data-theme=dark]{--bg:#0f1216;--card:#171c22;--ink:#e7ecf2;--mute:#8b98a5;--line:#262d36;
+--good:#6ee7a0;--goodbg:#123d1e;--bad:#ff9ca3;--badbg:#47161a;--warn:#f0c36a;--warnbg:#3d2f0e;--info:#7fb3ff;--infobg:#14284a;--btrk:#2a3a55;--btrkb:#7f93b8;--bfill:#6aa5ff;--ctl:#66717e}
+[data-theme=sporty]{--bg:#0a2a6b;--card:#0f3a8a;--ink:#fff;--mute:#b9c9ee;--line:#2a56ad;--good:#7cf0a8;--goodbg:#0d4a3a;--bad:#ffb0b5;--badbg:#5a1f3a;--warn:#ffc72c;--warnbg:#3d3a1e;--info:#ffc72c;--infobg:#1d4796;--btrk:#2a56ad;--btrkb:#8fa8dc;--bfill:#ffc72c;--ctl:#6f8cc9}
+[data-theme=sunset]{--bg:#2c1336;--card:#44204e;--ink:#fff3e6;--mute:#dcb9c6;--line:#66336d;--good:#9af2b8;--goodbg:#1f4a3a;--bad:#ffb4bb;--badbg:#5c2236;--warn:#ffd166;--warnbg:#4f3420;--info:#ff9a62;--infobg:#5a2a4a;--btrk:#66336d;--btrkb:#b889b8;--bfill:#ff9a62;--ctl:#9c6b9e}
+[data-theme=ocean]{--bg:#06303d;--card:#0b4757;--ink:#ecfbfb;--mute:#a5d0d6;--line:#1b6476;--good:#8df0b2;--goodbg:#0d5240;--bad:#ffb1b1;--badbg:#5a2a33;--warn:#ffd479;--warnbg:#3f4a2c;--info:#5fe3d6;--infobg:#0f5a68;--btrk:#1b6476;--btrkb:#6fb3bf;--bfill:#5fe3d6;--ctl:#4f8f9c}
+[data-theme=daylight]{--bg:#fff8ec;--card:#fff;--ink:#1d2433;--mute:#5f6675;--line:#f0e2c8;--good:#0d7a3f;--goodbg:#dff6e6;--bad:#c0261c;--badbg:#fde4e1;--warn:#9a5a00;--warnbg:#ffeac2;--info:#c2410c;--infobg:#ffe8d6;--btrk:#fde3c8;--btrkb:#c9a27a;--bfill:#c2410c;--ctl:#8f7d62}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
 .wrap{max-width:720px;margin:0 auto}
@@ -90,7 +94,7 @@ button:disabled{opacity:.4;cursor:default}
 :focus-visible{outline:2px solid var(--info);outline-offset:2px}
 .head:focus-visible,.row:focus-visible{outline-offset:-2px}
 /* browser surfaces, touch feedback, numerals */
-:root{color-scheme:light dark;accent-color:var(--bfill)}
+:root{color-scheme:light;accent-color:var(--bfill)}:root.dk{color-scheme:dark}
 ::selection{background:var(--infobg);color:var(--ink)}
 input{caret-color:var(--bfill)}
 .head,.row{scroll-margin-top:120px;scroll-margin-bottom:84px}
@@ -210,15 +214,15 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .wic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.wbar>span{flex:1}
 .unit{display:flex;flex:none;border:1px solid var(--ctl);border-radius:10px;overflow:hidden}.unit button{border:0;border-radius:0;min-width:40px;font-weight:700;background:var(--card)}.unit button.on{background:var(--ink);color:var(--bg)}
 #fb.ic{position:relative;width:44px;padding:0}#fb svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.fbn{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--info);color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.fbn{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:var(--info);color:var(--bg);font-size:11px;font-weight:700;line-height:18px;text-align:center}
 .mrow[role=button]{cursor:pointer;position:relative;padding-right:18px}.mrow>.chev.side{position:absolute;right:-4px;top:50%;margin-top:-8px}
-@media (prefers-color-scheme:dark){.unit button.on{background:var(--info);color:var(--bg)}}
+.dk .unit button.on{background:var(--info);color:var(--bg)}
 .head.mh>.mt{overflow-wrap:anywhere}
 @media (max-width:359px){.head.mh>.pill{grid-column:1/-1;justify-self:start}}
 .ctl .flab{flex:1 1 100%;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:4px 0 -4px}
 .mt .tkc{margin-right:4px;vertical-align:2px}
 .sheet li,.vnote,.empty{text-wrap:pretty}
-@media (prefers-color-scheme:dark){:root{--btrkb:#7f93b8}.tick{background:var(--bg);box-shadow:0 0 0 1.5px var(--ink)}}
+.dk .tick{background:var(--bg);box-shadow:0 0 0 1.5px var(--ink)}
 .hh{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:18px 0 -4px}
 .mtally .tu{color:var(--warn)}
 .mhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;margin:2px 0 10px}.mhead .mtally{flex:1 1 180px}.mas{display:block;font-size:13px}.mhead .mtally{margin:0;min-width:0}
@@ -252,10 +256,23 @@ body.noauth .wk,body.noauth #th,body.noauth #st,body.noauth .bnav,body.noauth #m
 .ctl .sortl .sub{flex:none;width:48px}
 .bn .bierr{color:var(--bad);font-weight:600}
 .sheeth h2{font-size:24px}.sh3{font-size:19px}
-@media (prefers-color-scheme:dark){.chip.on,.bnav button.on,#fb[aria-expanded="true"]{background:var(--info);color:var(--bg);border-color:var(--info)}}
+.dk .chip.on,.dk .bnav button.on,.dk #fb[aria-expanded="true"]{background:var(--info);color:var(--bg);border-color:var(--info)}
+.thms{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 4px}.thm{display:grid;justify-items:center;gap:4px;padding:8px 2px;font-size:12px;font-weight:600}.thm[aria-pressed="true"]{border:2px solid var(--bfill);padding:7px 1px}
+.sw{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 1.5px var(--line)}.sw i{width:14px;height:14px;border-radius:50%;background:var(--bfill)}.sw.auto{background:linear-gradient(135deg,#f6f7f9 50%,#0f1216 50%)}
 #fb.on:not([aria-expanded="true"]){background:var(--card);color:var(--ink);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 @media (max-width:359px){.vd{grid-column:1/-1;justify-items:start;text-align:left;display:flex;gap:8px;align-items:baseline}#rf{margin-left:0}}
-</style></head><body><div class="wrap">
+</style>
+<script>
+const THEMES=[["","Auto"],["light","Light"],["dark","Dark"],["sporty","Sporty"],["sunset","Sunset"],["ocean","Ocean"],["daylight","Daylight"]],DARKS=["dark","sporty","sunset","ocean"];
+function applyTheme(t){   // "" is Auto: follow the phone's light or dark setting
+  const r=document.documentElement;if(!THEMES.some(x=>x[0]===t))t="";
+  if(t)r.dataset.theme=t;else delete r.dataset.theme;
+  r.classList.toggle("dk",t?DARKS.includes(t):matchMedia("(prefers-color-scheme: dark)").matches);
+  document.querySelector('meta[name="theme-color"]').content=getComputedStyle(r).getPropertyValue("--bg").trim();
+  return t;
+}
+try{applyTheme(JSON.parse(localStorage.getItem("rfa-theme"))||"")}catch(e){applyTheme("")}
+</script></head><body><div class="wrap">
 <header>
  <div class="top"><h1><span class="full">Exposure</span><span class="short">Exposure</span></h1>
   <div class="wk"><button id="pw" class="ic" aria-label="Previous week"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><span id="wk">Wk –</span><button id="nw" class="ic" aria-label="Next week"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
@@ -601,7 +618,10 @@ function settingsHtml(){
   const d=S.data,lgs=leaguesOf(d).slice().sort((a,b)=>TANK.has(b.id)-TANK.has(a.id)||baseName(a.name).localeCompare(baseName(b.name)));
   const rows=lgs.map(l=>{const own=S.buy[l.id],g=guessBuy(l.name),nm=esc(baseName(l.name)),tk=TANK.has(l.id),seg=(v,on,lab)=>`<button class="${on?"on":""}${v?" tk":""}" data-tank="${v}" data-lid="${esc(l.id)}" aria-pressed="${on}">${lab}</button>`;
     return `<div class="birow lgr"><span class="bn">${nm}${own==null?`<small>${g?`Using $${g} from the league name`:"Buy-in not set · counts as $0"}</small>`:""}</span><div class="lgc"><div class="unit" role="group" aria-label="Your goal in ${nm}">${seg(0,!tk,"Competing")}${seg(1,tk,"Tanking")}</div><span class="bin">$<input class="bi" inputmode="decimal" data-lid="${esc(l.id)}" aria-label="Buy-in for ${nm}" value="${own!=null?esc(own):""}" placeholder="${g||""}"></span></div></div>`}).join("");
+  const cur=store.get("rfa-theme")||"",thm=THEMES.map(([id,lab])=>`<button class="thm" data-themepick="${id}" aria-pressed="${cur===id}"><span class="sw${id?"":" auto"}"${id?` data-theme="${id}"`:""}>${id?"<i></i>":""}</span>${lab}</button>`).join("");
   return `<div class="sheeth"><h2 id="setT">Settings</h2><button data-close="1">Close</button></div>
+   <h3 class="sh3">Theme</h3>
+   <div class="thms" role="group" aria-label="Theme">${thm}</div>
    <h3 class="sh3">Sleeper account</h3>
    <div class="birow"><span class="bn"><b>${esc(USER?USER.name:"")}</b><small>Saved on this device only</small></span><button data-signout="1">Change</button></div>
    <h3 class="sh3">Leagues</h3>
@@ -948,11 +968,12 @@ async function signIn(raw){
 }
 document.addEventListener("submit",e=>{if(e.target.id==="signin"){e.preventDefault();signIn($("#su").value)}});
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-reload],[data-gowk],[data-goto],[data-tab],[data-view],[data-unit],[data-rank],[data-show],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],[data-tank],[data-lgs],[data-signout],[data-nudgex],#fb,.head,.row");if(!t)return;
+  const t=e.target.closest("[data-reload],[data-gowk],[data-goto],[data-tab],[data-view],[data-unit],[data-rank],[data-show],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],[data-tank],[data-lgs],[data-signout],[data-nudgex],[data-themepick],#fb,.head,.row");if(!t)return;
   if(t.dataset.reload){location.replace(location.pathname+"?v="+t.dataset.reload);return}
   if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
   else if(t.dataset.close!==undefined)closeSheet();
   else if(t.dataset.tank!==undefined)setTank(t);
+  else if(t.dataset.themepick!==undefined){const id=applyTheme(t.dataset.themepick);store.set("rfa-theme",id);for(const b of t.parentElement.children)b.setAttribute("aria-pressed",b===t)}
   else if(t.dataset.lgs!==undefined){S.lgsOpen=!S.lgsOpen;t.setAttribute("aria-expanded",S.lgsOpen);$("#lglist").hidden=!S.lgsOpen}
   else if(t.dataset.signout!==undefined)signOut();
   else if(t.dataset.nudgex!==undefined){store.set("rfa-tanknudge",1);render()}
@@ -1054,6 +1075,7 @@ setInterval(async()=>{
   if(S.tab==="matchups")await refreshMatchups(true);
   ensureLive(true);
 },45000);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>applyTheme(store.get("rfa-theme")||""));
 document.addEventListener("visibilitychange",()=>{if(document.hidden)return;checkVersion();if(S.data&&Date.now()-S.data.at>120000)refresh(S.week)});
 // A home-screen web app can keep showing an old copy of this page. Ask the server
 // for the current page and offer a reload when its build id differs from ours.

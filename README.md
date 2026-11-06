@@ -16,7 +16,7 @@ and add it to the home screen.
   counting leagues (**#**) and counting league buy-ins (**$**).
 - **Matchups:** every league's projected finish and live score, with a "your way / not / toss-ups"
   tally, tank leagues handled.
-- **Settings:** your Sleeper account, plus a Leagues dropdown with a Competing / Tanking switch and
+- **Settings:** a color theme (Auto, Light, Dark, Sporty, Sunset, Ocean or Daylight), your Sleeper account, plus a Leagues dropdown with a Competing / Tanking switch and
   buy-in for each league.
 
 Everything is fetched live in the browser from Sleeper's public API and ESPN. There's no password;

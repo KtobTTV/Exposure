@@ -45,4 +45,4 @@ Live data against the owner's real leagues (41 leagues, 14 games in Week 8) was 
 - Private by construction: nothing personal or secret goes in the public page.
 
 ## Accessibility & Inclusion
-Phone-first, used one-handed and in glances; follows the OS light/dark setting. No further accessibility needs were stated; the principle above (meaning not carried by color alone) is a product choice, not a stated user requirement.
+Phone-first, used one-handed and in glances; follows the OS light/dark setting by default (Auto), with Light, Dark, Sporty, Sunset, Ocean and Daylight color themes in Settings. Every theme keeps text and the good/bad colors at WCAG AA contrast or better. No further accessibility needs were stated; the principle above (meaning not carried by color alone) is a product choice, not a stated user requirement.

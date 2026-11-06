@@ -17,7 +17,8 @@ and add it to the home screen.
 - **Matchups:** every league's projected finish and live score, with a "your way / not / toss-ups"
   tally, tank leagues handled.
 - **Settings:** a color theme (Auto, Light, Dark, Sporty, Sunset, Ocean or Daylight), your Sleeper account, plus a Leagues dropdown with a Competing / Tanking switch and
-  buy-in for each league.
+  buy-in for each league. "Copy my setup link" moves all of it to another device (computer, home-screen
+  app) without an account.
 
 Everything is fetched live in the browser from Sleeper's public API and ESPN. There's no password;
 your username, tank choices and buy-ins stay on your device.

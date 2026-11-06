@@ -257,6 +257,7 @@ body.noauth .wk,body.noauth #th,body.noauth #st,body.noauth .bnav,body.noauth #m
 .bn .bierr{color:var(--bad);font-weight:600}
 .sheeth h2{font-size:24px}.sh3{font-size:19px}
 .dk .chip.on,.dk .bnav button.on,.dk #fb[aria-expanded="true"]{background:var(--info);color:var(--bg);border-color:var(--info)}
+.setupurl{display:block;width:100%;margin-top:6px;text-align:left;font-size:13px}
 .thms{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 4px}.thm{display:grid;justify-items:center;gap:4px;padding:8px 2px;font-size:12px;font-weight:600}.thm[aria-pressed="true"]{border:2px solid var(--bfill);padding:7px 1px}
 .sw{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 1.5px var(--line)}.sw i{width:14px;height:14px;border-radius:50%;background:var(--bfill)}.sw.auto{background:linear-gradient(135deg,#f6f7f9 50%,#0f1216 50%)}
 #fb.on:not([aria-expanded="true"]){background:var(--card);color:var(--ink);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
@@ -625,6 +626,9 @@ function settingsHtml(){
    <div class="thms" role="group" aria-label="Theme">${thm}</div>
    <h3 class="sh3">Sleeper account</h3>
    <div class="birow"><span class="bn"><b>${esc(USER?USER.name:"")}</b><small>Saved on this device only</small></span><button data-signout="1">Change</button></div>
+   <h3 class="sh3">Use on another device</h3>
+   <p class="sub">Copy a link with your username, tank leagues, buy-ins and theme, then open it on your computer or home-screen app to load them there. The settings ride in the part of the link after the #, which browsers never send to any server.</p>
+   <p><button data-setuplink="1">Copy my setup link</button></p><p class="sub" id="setupst" role="status"></p>
    <h3 class="sh3">Leagues</h3>
    <button class="fint lgdd" data-lgs="1" aria-expanded="${!!S.lgsOpen}" aria-controls="lglist"><span id="lgsum">${lgSum()}</span>${CHEV}</button>
    <div id="lglist"${S.lgsOpen?"":" hidden"}>
@@ -952,6 +956,27 @@ function setTank(t){
   setText($("#lgsum"),lgSum());
   clearTimeout(S.tankT);S.tankT=setTimeout(()=>{clearCache();S.busy=false;refresh(S.week)},400);   // a newer choice replaces a load still running
 }
+// Setup link: this device's settings packed after #setup= so another device can load them; nothing leaves the browsers involved
+const b64u={enc:s=>btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""),
+  dec:s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")),c=>c.charCodeAt(0)))};
+async function copySetup(){
+  const url=location.origin+location.pathname+"#setup="+b64u.enc(JSON.stringify({v:1,u:USER,t:[...TANK],b:S.buy,th:store.get("rfa-theme")||""}));
+  const st=$("#setupst");
+  try{await navigator.clipboard.writeText(url);st.textContent="Copied. Send it to yourself, then open it on the other device."}
+  catch(e){st.innerHTML=`Couldn't copy automatically. Copy this link:<input class="bi setupurl" readonly value="${esc(url)}">`;const i=st.querySelector("input");i.focus();i.select()}
+}
+function importSetup(){   // true when the page reloads with the loaded settings
+  const m=/^#setup=([\w-]+)$/.exec(location.hash);if(!m)return false;
+  history.replaceState(null,"",location.pathname+location.search);
+  let d;try{d=JSON.parse(b64u.dec(m[1]))}catch(e){d=null}
+  const id=s=>/^\d{1,25}$/.test(String(s)),u=d&&d.u;
+  if(!d||d.v!==1||!u||!id(u.id)||typeof u.name!=="string"){alert("That setup link is incomplete or damaged. Copy a fresh one from Settings on your other device.");return false}
+  if(!confirm(`Load the Exposure setup for ${u.name.slice(0,40)}? It replaces this device's username, tank leagues, buy-ins and theme.`))return false;
+  const buy={};for(const [k,v] of Object.entries(d.b||{}))if(id(k)&&isFinite(v)&&v>=0)buy[k]=+v;
+  store.set("rfa-user",{id:String(u.id),name:u.name.slice(0,40)});store.set("rfa-tank",(d.t||[]).filter(id).map(String));store.set("rfa-buy",buy);
+  store.set("rfa-theme",THEMES.some(x=>x[0]===d.th)?d.th:"");store.set("rfa-tanknudge",1);clearCache();
+  location.reload();return true;
+}
 function signOut(){
   clearTimeout(S.stepT);clearTimeout(S.tankT);closeSheet();clearCache();
   try{localStorage.removeItem("rfa-user")}catch(e){}
@@ -972,11 +997,12 @@ async function signIn(raw){
 }
 document.addEventListener("submit",e=>{if(e.target.id==="signin"){e.preventDefault();signIn($("#su").value)}});
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-reload],[data-gowk],[data-goto],[data-tab],[data-view],[data-unit],[data-rank],[data-show],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],[data-tank],[data-lgs],[data-signout],[data-nudgex],[data-themepick],#fb,.head,.row");if(!t)return;
+  const t=e.target.closest("[data-reload],[data-gowk],[data-goto],[data-tab],[data-view],[data-unit],[data-rank],[data-show],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],[data-tank],[data-lgs],[data-signout],[data-nudgex],[data-themepick],[data-setuplink],#fb,.head,.row");if(!t)return;
   if(t.dataset.reload){location.replace(location.pathname+"?v="+t.dataset.reload);return}
   if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
   else if(t.dataset.close!==undefined)closeSheet();
   else if(t.dataset.tank!==undefined)setTank(t);
+  else if(t.dataset.setuplink!==undefined)copySetup();
   else if(t.dataset.themepick!==undefined){const id=applyTheme(t.dataset.themepick);store.set("rfa-theme",id);for(const b of t.parentElement.children)b.setAttribute("aria-pressed",b===t)}
   else if(t.dataset.lgs!==undefined){S.lgsOpen=!S.lgsOpen;t.setAttribute("aria-expanded",S.lgsOpen);$("#lglist").hidden=!S.lgsOpen}
   else if(t.dataset.signout!==undefined)signOut();
@@ -1094,5 +1120,5 @@ async function checkVersion(){
 setTimeout(checkVersion,3000);
 function boot(){const c=store.get("rfa-last");if(c&&c.rows){S.data=c;render()}
   refresh().then(()=>{if(S.data)store.set("rfa-last",S.data)})}
-if(UID)boot();else render();
+if(!importSetup()){if(UID)boot();else render()}
 </script></body></html>

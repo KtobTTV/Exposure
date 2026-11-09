@@ -307,7 +307,7 @@ try{applyTheme(JSON.parse(localStorage.getItem("rfa-theme"))||"")}catch(e){apply
  <li>"lean +4" beside a team adds up the nets of that team's players, counted in leagues: the team you want scoring.</li>
  <li>Live and finished games show each player's line under his name, such as "14.2 pts · 5 rec · 72 yds · 1 TD". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
  <li>"Proj" is the projected swing for the whole game: each player's projected PPR points times his net, added up. Upcoming games show it on the right, and live and finished games show it in small type under their swing.</li>
- <li>Live games show the swing so far on the right of the card, and finished games show the final net points swing: each player's PPR points times his net, added up over all your leagues. Swings are shown per league ("/lg"): the total divided by how many leagues you play, so "Helped +3.2/lg" means your players were worth 3.2 points to you in an average league. The total across every league is in smaller type, under half a point a league counts as even, and projections before kickoff are gray. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
+ <li>Live games show the swing so far on the right of the card, and finished games show the final net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Under 5 points counts as even, and projections before kickoff are gray. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  </ul><h3 class="hh">Stat bars</h3><ul>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line. "proj" means a Sleeper projection, used when no DraftKings line is posted. "game proj" is his projected fantasy points for the whole game. "anytime" is the touchdown line: 0.5, so one TD is over.</li>
  </ul><h3 class="hh">Matchups</h3><ul>
@@ -540,9 +540,6 @@ const shortName=n=>{
 };
 const dayName=d=>{if(!d)return"";const[y,m,x]=d.split("-").map(Number);return new Date(y,m-1,x).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})};
 const sgn=n=>n>0?"+"+n:n<0?"−"+(-n):"0";
-const NL=()=>(S.data&&S.data.leagues)||1;
-const perN=v=>{const x=v/NL();return Math.abs(x)>=10?Math.round(x):Math.round(x*10)/10};   // swing per league: totals across 40 leagues have no human scale
-const per=v=>sgn(perN(v));
 const netCls=n=>n>0?"p":n<0?"n":"z";
 function netBadge(r){return `<span class="net ${netCls(r.net)}"><span class="sr">net </span>${sgn(r.net)}</span>`}
 function lgItem(x,side){
@@ -569,7 +566,7 @@ function liveLine(r){
   if(!gs||!gs.ok){   // game not loaded yet: show Sleeper's PPR points if there are any
     const st=rStateOf(r),m=ptsMap(),raw=m?m[r.pid]:undefined;
     if(st==="pre"||st==="none"||raw===undefined)return"";
-    return `<div class="sline"><b>${Math.round(raw*10)/10} pts</b>${st==="post"&&r.net?` · swing ${per(r.net*raw)}/lg`:""}</div>`;
+    return `<div class="sline"><b>${Math.round(raw*10)/10} pts</b>${st==="post"&&r.net?` · swing ${sgn(Math.round(r.net*raw))}`:""}</div>`;
   }
   if(gs.state==="pre")return"";
   if(!SPECS[r.pos]&&r.pos!=="K"&&r.pos!=="DEF")return"";   // IDP: standard PPR doesn't score them
@@ -582,7 +579,7 @@ function liveLine(r){
   let pt="";
   if(gs.pts){
     if(raw===undefined)pt='<span class="nostat">no stats</span>';
-    else pt=`<b class="nw">${Math.round(raw*10)/10} pts</b>`+(gs.state==="post"&&r.net?` · <span class="nw">swing ${per(r.net*raw)}/lg</span>`:"");}
+    else pt=`<b class="nw">${Math.round(raw*10)/10} pts</b>`+(gs.state==="post"&&r.net?` · <span class="nw">swing ${sgn(Math.round(r.net*raw))}</span>`:"");}
   const line=[pt,bits.slice(0,3).map(b=>`<span class="nw">${b}</span>`).join(" · ")].filter(Boolean).join(" · ");
   return line?`<div class="sline">${line}</div>`:"";
 }
@@ -765,8 +762,8 @@ function swingProj(g){const p=S.projs[S.week];if(!p)return null;const v=g.rows.r
 function outcome(g){
   const e=swingExact(g);if(e==null)return{t:"Final",c:"z",v:null,e:null};
   const v=Math.round(e);
-  if(Math.abs(e/NL())<0.5)return{t:perN(e)===0?"Even":"Even "+per(e)+"/lg",c:"z",v,e};   // under half a point a league is even
-  return e>0?{t:"Helped "+per(e)+"/lg",c:"p",v,e}:{t:"Hurt "+per(e)+"/lg",c:"n",v,e};
+  if(Math.abs(e)<5)return{t:v===0?"Even":"Even "+sgn(v)+" pts",c:"z",v,e};   // under 5 pts in total is even
+  return e>0?{t:"Helped "+sgn(v)+" pts",c:"p",v,e}:{t:"Hurt "+sgn(v)+" pts",c:"n",v,e};
 }
 function movers(g){
   const m=ptsMap()||{};
@@ -787,7 +784,7 @@ function rootLine(up,dn,nv,fv){   // collapsed card: the top player to root for 
   if(!up.length&&!dn.length)return '<div class="lines one"><span class="ev">Even · nothing to root for or against</span></div>';
   return `<div class="lines one">${up.length?`<span class="nw"><b class="lf">For</b> ${one(up)}</span>`:""}${dn.length?`<span class="nw"><b class="la">Against</b> ${one(dn)}</span>`:""}</div>`;
 }
-const moversHtml=(hi,lo)=>(hi||lo)?`<div class="lines">${hi?`<div><b class="lf">Helped most</b> ${esc(shortName(hi.r.name))} ${per(hi.v)}/lg</div>`:""}${lo?`<div><b class="la">Hurt most</b> ${esc(shortName(lo.r.name))} ${per(lo.v)}/lg</div>`:""}</div>`:"";
+const moversHtml=(hi,lo)=>(hi||lo)?`<div class="lines">${hi?`<div><b class="lf">Helped most</b> ${esc(shortName(hi.r.name))} ${sgn(hi.v)}</div>`:""}${lo?`<div><b class="la">Hurt most</b> ${esc(shortName(lo.r.name))} ${sgn(lo.v)}</div>`:""}</div>`:"";
 function gameCard(g,compact){
   const key=g.away+"@"+g.home, sc=S.sc[key], st=effState(g), isOpen=!!S.open[key];
   const D=S.money?new Map(g.rows.map(r=>[r.pid,dollars(r,S.vmin)])):null;   // $ mode: rank by buy-in dollars instead of league counts
@@ -808,14 +805,13 @@ function gameCard(g,compact){
   const secs=`${sec("f",compact?"Rooted for":"Root for",up)}${sec("a",compact?"Rooted against":"Root against",dn)}${sec("e","Even · cancels out",ev)}${sec("x",S.vmin?`Not counted · buy-in under ${money(S.vmin)} or not set`:"Not counted · no buy-in set",nc)}`;
   if(compact){
     const o=outcome(g),mv=movers(g),nl=(S.data&&S.data.leagues)||0;
-    const total=o.v!=null&&nl>1?`<div class="lean">${sgn(o.v)} pts in total across your ${nl} leagues</div>`:"";
     const lns=moversHtml(mv.hi,mv.lo);
     const miss=mv.miss.length?`<div class="lean">No Sleeper stats for ${esc(mv.miss.slice(0,3).join(", "))}${mv.miss.length>3?` +${mv.miss.length-3} more`:""} (counted as 0).</div>`:"";
     const hasSc=!!sc&&A.score!==""&&H.score!=="";
-    const pv=swingProj(g),aria=`${hasSc?`${A.abbr} ${A.score}, ${H.abbr} ${H.score}`:`${A.abbr} at ${H.abbr}`}. ${stText(sc)||"Final"}. ${o.t.replace("/lg"," points a league")}${pv==null?"":`, projected ${per(pv)} a league`}`;
+    const pv=swingProj(g),aria=`${hasSc?`${A.abbr} ${A.score}, ${H.abbr} ${H.score}`:`${A.abbr} at ${H.abbr}`}. ${stText(sc)||"Final"}. ${o.t.replace("pts","points")}${pv==null?"":`, projected ${sgn(pv)} points`}`;
     return `<div class="card fin${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head fh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
-     <div class="cline">${hasSc?`<b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:`<b>${esc(A.abbr)}</b>@ <b>${esc(H.abbr)}</b><span class="sub">Final</span>`}</div><span class="fr"><span class="pill ${o.c}">${o.t}</span>${pv==null?"":`<span class="vl">proj ${per(pv)}/lg</span>`}</span></div>
-     <div class="body"><div class="fbody">${total}${lns}${miss}</div>${secs}</div></div>`;
+     <div class="cline">${hasSc?`<b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:`<b>${esc(A.abbr)}</b>@ <b>${esc(H.abbr)}</b><span class="sub">Final</span>`}</div><span class="fr"><span class="pill ${o.c}">${o.t}</span>${pv==null?"":`<span class="vl">proj ${sgn(pv)}</span>`}</span></div>
+     <div class="body"><div class="fbody">${lns}${miss}</div>${secs}</div></div>`;
   }
   const si=sitOf(sc),slot=st==="in";
   const tm=(t,l,n)=>`<div class="tm${l?" lead":""}">${slot?`<span class="po">${si&&si.pos===t.abbr?BALL+'<span class="sr">has the ball </span>':""}</span>`:""}<span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span><span class="tl"><span class="sr">${esc(t.abbr)} </span>lean <b class="${netCls(n)}">${fv(n)}</b></span></div>`;
@@ -826,9 +822,9 @@ function gameCard(g,compact){
   const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+fv(nv(r))).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
   const se=st==="in"?swingExact(g):null,sv=se==null?null:Math.round(se);
   const pv=st==="post"?null:swingProj(g);
-  const vd=sv!=null?`<div class="vd"><span class="vl">So far</span><span class="vs ${netCls(perN(se))}">${per(se)}<small>/lg</small></span><span class="vl">${sgn(sv)} total</span>${pv!=null?`<span class="vl">proj ${per(pv)}/lg</span>`:""}</div>`
-    :st==="pre"&&pv!=null?`<div class="vd"><span class="vl">Proj</span><span class="vs vp">${per(pv)}<small>/lg</small></span><span class="vl">${sgn(pv)} total</span></div>`:"";   // a pre-game guess stays muted; only live and final numbers get color
-  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),sitText(sc),sv==null?"":`So far ${sv>0?"helping you":sv<0?"hurting you":"even,"} ${per(se)} points a league, ${sgn(sv)} in total`,pv==null?"":`Projected ${per(pv)} points a league for the game`,`Team lean ${A.abbr} ${fv(la)}, ${H.abbr} ${fv(lh)}`,up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
+  const vd=sv!=null?`<div class="vd"><span class="vl">So far</span><span class="vs ${netCls(sv)}">${sgn(sv)}<small> pts</small></span><span class="vl">${pv!=null?"proj "+sgn(pv):sv>0?"helping you":sv<0?"hurting you":"even"}</span></div>`
+    :st==="pre"&&pv!=null?`<div class="vd"><span class="vl">Proj</span><span class="vs vp">${sgn(pv)}<small> pts</small></span></div>`:"";   // a pre-game guess stays muted; only live and final numbers get color
+  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),sitText(sc),sv==null?"":`So far ${sv>0?"helping you":sv<0?"hurting you":"even,"} ${sgn(sv)} points`,pv==null?"":`Projected ${sgn(pv)} points for the game`,`Team lean ${A.abbr} ${fv(la)}, ${H.abbr} ${fv(lh)}`,up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
    <div class="sb">${tm(A,lead==="a",la)}${tm(H,lead==="h",lh)}</div><div class="stc">${stc}</div>
    ${vd}${hc}
@@ -840,24 +836,24 @@ function gameCard(g,compact){
 function weekRecap(d){   // Games tab: any other week, or this week once every game is final
   const gs=d.games||[];if(!gs.length)return"";
   const fin=gs.filter(g=>effState(g)==="post"),c=tally(fin),pAll=gs.map(swingProj),hasP=pAll.every(v=>v!=null);
-  const pFin=fin.reduce((t,g)=>t+(swingProj(g)||0),0),pTot=hasP?pAll.reduce((t,v)=>t+v,0):null,nl=NL();
-  const cl=n=>n>0?"p":n<0?"n":"z",unit='<small> pts a league</small>';
+  const pFin=fin.reduce((t,g)=>t+(swingProj(g)||0),0),pTot=hasP?pAll.reduce((t,v)=>t+v,0):null,nl=(S.data&&S.data.leagues)||0;
+  const cl=n=>n>0?"p":n<0?"n":"z",unit='<small> pts</small>';
   let hd,lbl,sub=[];
   if(fin.length&&c.known){
-    const part=fin.length<gs.length,ev=Math.abs(c.pts/nl)<0.5;   // same rule as outcome()
+    const part=fin.length<gs.length,ev=Math.abs(c.pts)<5;   // same rule as outcome()
     lbl=`Week ${d.week}${part?" so far":""}`;
-    hd=`${lbl}: <b class="${ev?"z":cl(c.pts)}">${ev?"even":c.pts>0?"helped":"hurt"} ${per(c.pts)}</b>${unit}`;
-    if(hasP){const df=c.pts-pFin,dv=perN(df);sub.push(`<div class="rvp"><b class="nw ${cl(dv)}">${dv===0?"Right on projection":`${Math.abs(dv)} a league ${df>0?"better":"worse"} than projected`}</b> <span class="nw sub">(projected ${per(pFin)})</span></div>`)}
-    sub.push(`<div class="sub">${[`<span class="nw">${sgn(c.pts)} pts in total across ${nl} leagues</span>`,c.h&&`<span class="nw">${c.h} game${c.h===1?"":"s"} helped</span>`,c.u&&`<span class="nw">${c.u} hurt</span>`,c.e&&`<span class="nw">${c.e} even</span>`].filter(Boolean).join(" · ")}${part?` · <span class="nw">${fin.length} of ${gs.length} final</span>`:""}</div>`);
+    hd=`${lbl}: <b class="${ev?"z":cl(c.pts)}">${ev?"even":c.pts>0?"helped":"hurt"} ${sgn(c.pts)}</b>${unit}`;
+    if(hasP){const df=c.pts-pFin;sub.push(`<div class="rvp"><b class="nw ${cl(df)}">${df===0?"Right on projection":`${Math.abs(df)} pts ${df>0?"better":"worse"} than projected`}</b> <span class="nw sub">(projected ${sgn(pFin)})</span></div>`)}
+    sub.push(`<div class="sub">${[nl&&`<span class="nw">across ${nl} leagues</span>`,c.h&&`<span class="nw">${c.h} game${c.h===1?"":"s"} helped</span>`,c.u&&`<span class="nw">${c.u} hurt</span>`,c.e&&`<span class="nw">${c.e} even</span>`].filter(Boolean).join(" · ")}${part?` · <span class="nw">${fin.length} of ${gs.length} final</span>`:""}</div>`);
     const m=ptsMap()||{},all=fin.flatMap(g=>g.rows).map(r=>({r,v:Math.round(r.net*(m[r.pid]||0))})).filter(x=>x.v);
     sub.push(moversHtml(all.filter(x=>x.v>0).sort((a,b)=>b.v-a.v)[0],all.filter(x=>x.v<0).sort((a,b)=>a.v-b.v)[0]));
-    if(part&&pTot!=null)sub.push(`<div class="sub">Whole week projected ${per(pTot)} a league</div>`);
+    if(part&&pTot!=null)sub.push(`<div class="sub">Whole week projected ${sgn(pTot)} pts</div>`);
   }else if(fin.length){
     lbl=`Week ${d.week}`;hd=`${lbl}: final`;sub.push('<div class="sub">Sleeper has no stats for this week yet.</div>');
   }else{
     lbl=`Week ${d.week} preview`;
-    hd=pTot!=null?`${lbl}: <b class="z">projected ${per(pTot)}</b>${unit}`:`${lbl}: no projection yet`;
-    sub.push(`<div class="sub">${pTot!=null?`${sgn(pTot)} pts in total · `:""}${gs.length} game${gs.length===1?"":"s"} with your players</div>`);
+    hd=pTot!=null?`${lbl}: <b class="z">projected ${sgn(pTot)}</b>${unit}`:`${lbl}: no projection yet`;
+    sub.push(`<div class="sub">${gs.length} game${gs.length===1?"":"s"} with your players</div>`);
   }
   return `<section class="recap" aria-label="${esc(lbl)}"><h2 class="rh">${hd}</h2>${sub.join("")}</section>`;
 }
@@ -985,13 +981,13 @@ function renderInner(){
     if(fin.length){
       const o=S.finalOpen??(!live.length&&!upc.length);
       const c=tally(fin),n=fin.length;
-      const ft=!c.known||recap?"":` · <span class="nw ${c.pts>0?"g":c.pts<0?"b":""}">${c.pts>0?"helped ":c.pts<0?"hurt ":"even "}${per(c.pts)}<span class="nt">/lg</span></span>${c.h&&c.u?` · <span class="nw">${c.h} helped · ${c.u} hurt</span>`:""}`;   // the recap already says it
+      const ft=!c.known||recap?"":` · <span class="nw ${c.pts>0?"g":c.pts<0?"b":""}">${c.pts>0?"helped ":c.pts<0?"hurt ":"even "}${sgn(c.pts)} pts</span>${c.h&&c.u?` · <span class="nw">${c.h} helped · ${c.u} hurt</span>`:""}`;   // the recap already says it
       const fb=`<button class="fint" data-fk="f" data-final="1" data-open="${o?1:0}" aria-expanded="${o}"><span><span class="nw">${n} final game${n===1?"":"s"}</span>${ft}</span>${CHEV}</button>`;
       html+=uc?`<div class="hrow">${fb}${uc}</div>`:fb;uc="";   // no live or upcoming heading: the # / $ switch sits beside this one
       if(o){
         const days={};for(const g of fin)(days[g.date||""]=days[g.date||""]||[]).push(g);
         for(const day in days){const c=tally(days[day]);
-          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))}${c.known&&Object.keys(days).length>1?` · ${per(c.pts)}<span class="nt">/lg</span>${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
+          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))}${c.known&&Object.keys(days).length>1?` · ${sgn(c.pts)} pts${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
       }
     }
     const nudge=d.leagues&&!TANK.size&&!store.get("rfa-tanknudge")?`<div class="nudge1"><button class="lnk" data-settings="1"><b>Tanking a league?</b> Flip its signs in Settings</button><button class="ic nx" data-nudgex="1" aria-label="Dismiss the tanking tip" title="Dismiss"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button></div>`:"";

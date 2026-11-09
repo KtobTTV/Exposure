@@ -10,9 +10,11 @@ Live at **https://ktobttv.github.io/Exposure/**. Open it on your phone, enter yo
 and add it to the home screen.
 
 ## What's on it
-- **Games:** every game with who to root for and against, team lean, a live "so far" points swing,
-  per-player stat bars (DraftKings lines vs. the live ESPN box score), and finished-game results.
-- **Players:** every player with his net across your leagues; search, filter, and switch between
+- **Games:** every game with team lean, live down, distance and who has the ball (tap a game for who to
+  root for and against), a week picker at the top, and on any other week a recap of how much
+  that week helped or hurt you against its projection, a live "so far" points swing shown per league (with the all-league total beneath),
+  a Leagues / Buy-in $ switch that ranks who to root for by buy-in dollars, per-player stat bars (DraftKings lines vs. the live ESPN box score), and finished-game results.
+- **Players:** every player with his team logo and his net across your leagues; search, filter, and switch between
   counting leagues (**#**) and counting league buy-ins (**$**).
 - **Matchups:** every league's projected finish and live score, with a "your way / not / toss-ups"
   tally, tank leagues handled.

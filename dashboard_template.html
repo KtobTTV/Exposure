@@ -11,7 +11,7 @@
 --bad:#b3261e;--badbg:#fbe7e5;--warn:#8a5a00;--warnbg:#fff1d6;--info:#1f5fbf;--infobg:#e4eefc;--btrk:#dbe3f1;--btrkb:#8795ad;--bfill:#2f6fdb;--ctl:#7f8a99}
 .dk,[data-theme=dark]{--bg:#0f1216;--card:#171c22;--ink:#e7ecf2;--mute:#8b98a5;--line:#262d36;
 --good:#6ee7a0;--goodbg:#123d1e;--bad:#ff9ca3;--badbg:#47161a;--warn:#f0c36a;--warnbg:#3d2f0e;--info:#7fb3ff;--infobg:#14284a;--btrk:#2a3a55;--btrkb:#7f93b8;--bfill:#6aa5ff;--ctl:#66717e}
-[data-theme=sporty]{--bg:#0a2a6b;--card:#0f3a8a;--ink:#fff;--mute:#b9c9ee;--line:#2a56ad;--good:#7cf0a8;--goodbg:#0d4a3a;--bad:#ffb0b5;--badbg:#5a1f3a;--warn:#ffc72c;--warnbg:#3d3a1e;--info:#ffc72c;--infobg:#1d4796;--btrk:#2a56ad;--btrkb:#8fa8dc;--bfill:#ffc72c;--ctl:#6f8cc9}
+[data-theme=sporty]{--bg:#0a2a6b;--card:#0f3a8a;--ink:#fff;--mute:#b9c9ee;--line:#2a56ad;--good:#7cf0a8;--goodbg:#0d4a3a;--bad:#ffb0b5;--badbg:#5a1f3a;--warn:#ffc72c;--warnbg:#3d3a1e;--info:#8fd3ff;--infobg:#1d4796;--btrk:#2a56ad;--btrkb:#8fa8dc;--bfill:#ffc72c;--ctl:#6f8cc9}
 [data-theme=sunset]{--bg:#2c1336;--card:#44204e;--ink:#fff3e6;--mute:#dcb9c6;--line:#66336d;--good:#9af2b8;--goodbg:#1f4a3a;--bad:#ffb4bb;--badbg:#5c2236;--warn:#ffd166;--warnbg:#4f3420;--info:#ff9a62;--infobg:#5a2a4a;--btrk:#66336d;--btrkb:#b889b8;--bfill:#ff9a62;--ctl:#9c6b9e}
 [data-theme=ocean]{--bg:#06303d;--card:#0b4757;--ink:#ecfbfb;--mute:#a5d0d6;--line:#1b6476;--good:#8df0b2;--goodbg:#0d5240;--bad:#ffb1b1;--badbg:#5a2a33;--warn:#ffd479;--warnbg:#3f4a2c;--info:#5fe3d6;--infobg:#0f5a68;--btrk:#1b6476;--btrkb:#6fb3bf;--bfill:#5fe3d6;--ctl:#4f8f9c}
 [data-theme=daylight]{--bg:#fff8ec;--card:#fff;--ink:#1d2433;--mute:#5f6675;--line:#f0e2c8;--good:#0d7a3f;--goodbg:#dff6e6;--bad:#c0261c;--badbg:#fde4e1;--warn:#9a5a00;--warnbg:#ffeac2;--info:#c2410c;--infobg:#ffe8d6;--btrk:#fde3c8;--btrkb:#c9a27a;--bfill:#c2410c;--ctl:#8f7d62}
@@ -81,8 +81,10 @@ button:disabled{opacity:.4;cursor:default}
 /* adapt + accessibility */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wrap{padding:0 max(16px,env(safe-area-inset-left)) calc(92px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-#pw,#nw,#rf{padding:0}
-.wk{gap:2px}.wk #wk{min-width:44px;text-align:center}
+#rf{padding:0}
+.wk{gap:2px}
+#wks.off{border-color:var(--warn);color:var(--warn);background-color:var(--warnbg)}
+#wks{font:inherit;font-weight:600;color:var(--ink);background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/14px;border:1px solid var(--line);border-radius:99px;min-height:44px;padding:0 30px 0 14px;-webkit-appearance:none;appearance:none;cursor:pointer}
 .searchbar{margin:4px 0 10px}
 .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
 .seg{display:flex;gap:6px;flex:1 1 100%}.seg .chip{flex:1;padding:0 8px}
@@ -170,6 +172,18 @@ h1 .short{display:none}
 .lines b{margin-right:2px}
 .bh>span:first-child{min-width:0}.bh>span:last-child{white-space:nowrap}
 .nostat{font-style:italic}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 6px}.hrow>.day{margin:0}.hrow>.fint{margin:0;flex:1;min-width:0}.nt{text-transform:none}
+.lines.one{display:flex;flex-wrap:wrap;gap:2px 14px}
+.po{width:13px;flex:none;display:grid;place-items:center}.ball{width:13px;height:8px;fill:var(--ink)}.ball path{stroke:var(--card);stroke-width:1;fill:none}
+.fld{grid-column:1/-1;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums;margin-top:-2px}.fld .dn{color:var(--ink);font-weight:600}.fld .rz{color:var(--warn);font-weight:700;margin-left:4px;white-space:nowrap}
+@media (max-width:389px){.head:not(.mh):not(.fh){grid-template-columns:auto 1fr}.head:not(.mh):not(.fh)>.vd{grid-column:1/-1;justify-items:start;text-align:left;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}}
+.vd .vs.vp{color:var(--mute)}
+.nudge1{display:flex;align-items:center;gap:4px;margin:10px 0 0;border-radius:12px;background:var(--infobg)}.nudge1 .lnk{flex:1;min-width:0;text-align:left;background:none;border:0;font-size:14px;padding:0 12px}.nudge1 b{color:var(--info)}.nudge1 .nx{background:none;border:0;width:44px}
+.recap{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0 4px;display:grid;gap:6px}
+.recap .rh{margin:0;font-size:22px;font-weight:700;line-height:1.25;font-variant-numeric:tabular-nums;text-wrap:balance}.recap .rh b{font-weight:800;white-space:nowrap}.recap .rh small{font-size:15px;font-weight:600;color:var(--mute)}
+.recap .p{color:var(--good)}.recap .n{color:var(--bad)}.recap .z{color:var(--ink)}
+.recap .rvp{font-size:15px}.recap .rvp b{font-weight:700}
+.tlogo{width:18px;height:18px;object-fit:contain;vertical-align:-3px;margin-right:6px}
 /* v6: $ value + settings */
 .net.big{min-width:76px}
 .vctl{margin:0 0 10px}
@@ -225,7 +239,7 @@ input[type=search],.sortl select,.bi{border-color:var(--ctl)}
 .dk .tick{background:var(--bg);box-shadow:0 0 0 1.5px var(--ink)}
 .hh{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:18px 0 -4px}
 .mtally .tu{color:var(--warn)}
-.mhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;margin:2px 0 10px}.mhead .mtally{flex:1 1 180px}.mas{display:block;font-size:13px}.mhead .mtally{margin:0;min-width:0}
+.mhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;margin:2px 0 10px}.mhead .mtally{flex:1 1 100%}.mas{display:block;font-size:13px}.mhead .mtally{margin:0;min-width:0}
 .msl select{min-height:44px;font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--ctl);border-radius:99px;padding:0 10px;max-width:170px}
 .tkc{flex:none;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:6px;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--mute)}
 .lgtog .tgr{white-space:nowrap}
@@ -252,7 +266,6 @@ body.noauth .wk,body.noauth #th,body.noauth #st,body.noauth .bnav,body.noauth #m
 .head,.row{scroll-margin-top:110px}
 .fsum{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding-left:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:14px}.fx{border:0;background:none}
 .err{color:var(--ink)}
-.wk #wk{min-width:52px}
 .ctl .sortl .sub{flex:none;width:48px}
 .bn .bierr{color:var(--bad);font-weight:600}
 .sheeth h2{font-size:24px}.sh3{font-size:19px}
@@ -276,7 +289,7 @@ try{applyTheme(JSON.parse(localStorage.getItem("rfa-theme"))||"")}catch(e){apply
 </script></head><body><div class="wrap">
 <header>
  <div class="top"><h1><span class="full">Exposure</span><span class="short">Exposure</span></h1>
-  <div class="wk"><button id="pw" class="ic" aria-label="Previous week"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><span id="wk">Wk –</span><button id="nw" class="ic" aria-label="Next week"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
+  <div class="wk"><select id="wks" aria-label="Week"><option>Wk –</option></select></div>
   <button id="th" class="ic" data-help="1" aria-haspopup="dialog" aria-label="Help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.2a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.6-2.8 4"/><path d="M12 17.6v.1"/></svg></button>
   <button id="st" class="ic" data-settings="1" title="Settings" aria-label="Settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
 </header>
@@ -294,13 +307,13 @@ try{applyTheme(JSON.parse(localStorage.getItem("rfa-theme"))||"")}catch(e){apply
  <li>"lean +4" beside a team adds up the nets of that team's players, counted in leagues: the team you want scoring.</li>
  <li>Live and finished games show each player's line under his name, such as "14.2 pts · 5 rec · 72 yds · 1 TD". The points are Sleeper's standard PPR. "no ESPN stats" means ESPN has no box-score entry for him, so nothing is shown rather than a false 0.</li>
  <li>"Proj" is the projected swing for the whole game: each player's projected PPR points times his net, added up. Upcoming games show it on the right, and live and finished games show it in small type under their swing.</li>
- <li>Live games show the swing so far on the right of the card, and finished games show the final net points swing: each player's PPR points times his net, added up over all your leagues. "Helped +40 pts" means your players, on balance, scored 40 more points for you than against you. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
+ <li>Live games show the swing so far on the right of the card, and finished games show the final net points swing: each player's PPR points times his net, added up over all your leagues. Swings are shown per league ("/lg"): the total divided by how many leagues you play, so "Helped +3.2/lg" means your players were worth 3.2 points to you in an average league. The total across every league is in smaller type, under half a point a league counts as even, and projections before kickoff are gray. Standard PPR, not each league's own scoring. Players Sleeper has no stats for count as 0, and the card says who.</li>
  </ul><h3 class="hh">Stat bars</h3><ul>
  <li>Stat bars: the filled part is what he has so far and the tick is the line. A stub past the tick means he's over it. Bars only compare him to the line; swing and points tell you whether he helped. "DK" means a DraftKings line. "proj" means a Sleeper projection, used when no DraftKings line is posted. "game proj" is his projected fantasy points for the whole game. "anytime" is the touchdown line: 0.5, so one TD is over.</li>
  </ul><h3 class="hh">Matchups</h3><ul>
  <li>The Matchups tab shows your score in every league this week, the closest first. While players are left, the pill shows where you should finish ("Proj win by 10.8") and the line under it shows where you stand now ("Now: down 3.2"). Live players count what they have plus their projection for the time left. "Toss-up" means the projected finish is within 5 points. Scoring is each league's own. The count at the top says how many are headed your way. In tank leagues, losing is the goal, so the pill also says "good" or "bad", e.g. "Proj loss by 6.9 · good".</li>
  </ul><h3 class="hh">Players</h3><ul>
- <li>On the Players tab, # and $ switch between counting leagues and counting buy-in dollars, and the sliders button opens the ranking and filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
+ <li>On the Players tab, # and $ switch between counting leagues and counting buy-in dollars (the Games tab has the same switch, "Leagues / Buy-in $", and the choice is shared), and the sliders button opens the ranking and filters. The strongest root-for and root-against players come first. Players who cancel out (0) sit in a collapsed "Even" group, and finished players in a collapsed group at the bottom.</li>
  <li>"$" (count buy-in dollars) adds up the buy-ins of every league where a player is for or against you. "+$320" means he's for you in $320 more of buy-ins than against you. Set the buy-ins under Leagues in Settings; they stay on this device only.</li>
  </ul></div></div>
 <nav class="bnav" aria-label="Views"><button id="tg" data-tab="games" aria-current="page">Games</button><button id="tp" data-tab="players">Players</button><button id="tm" data-tab="matchups">Matchups</button><button id="rf" class="ic" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button></nav>
@@ -420,9 +433,10 @@ const SBURL=w=>`https://site.api.espn.com/apis/site/v2/sports/football/nfl/score
 function parseScores(d){
   const m={};
   for(const e of d.events||[]){
-    const c=e.competitions[0],t=e.status.type,cm={};
-    for(const x of c.competitors)cm[x.homeAway]={abbr:normTeam(x.team.abbreviation),score:x.score,color:/^[0-9a-f]{6}$/i.test(x.team.color||"")?x.team.color:""};
-    if(cm.home&&cm.away)m[cm.away.abbr+"@"+cm.home.abbr]={away:cm.away,home:cm.home,tv:c.timeValid!==false,state:t.state,name:t.name,period:e.status.period,clock:e.status.displayClock,date:e.date};
+    const c=e.competitions[0],t=e.status.type,cm={},ids={},si=c.situation||null;
+    for(const x of c.competitors){cm[x.homeAway]={abbr:normTeam(x.team.abbreviation),score:x.score,color:/^[0-9a-f]{6}$/i.test(x.team.color||"")?x.team.color:""};ids[String(x.team.id||x.id)]=cm[x.homeAway].abbr}
+    const sit=si&&t.state==="in"?{dd:si.downDistanceText||"",sh:si.shortDownDistanceText||"",spot:si.possessionText||"",pos:si.possession!=null?ids[String(si.possession)]||"":"",rz:!!si.isRedZone}:null;   // down, distance and who has the ball (live only)
+    if(cm.home&&cm.away)m[cm.away.abbr+"@"+cm.home.abbr]={away:cm.away,home:cm.home,tv:c.timeValid!==false,state:t.state,name:t.name,period:e.status.period,clock:e.status.displayClock,date:e.date,sit};
   }
   return m;
 }
@@ -431,7 +445,7 @@ function loadScores(force){
   const w=S.week;
   if(S.sb&&S.sb.week===w&&Date.now()-S.sb.at<(force?5000:600000))return Promise.resolve();
   if(sbP&&sbP.w===w)return sbP.p;
-  const p=get(SBURL(w)).then(d=>{if(w!==S.week)return;S.sb={week:w,at:Date.now(),data:d};S.sc=parseScores(d)}).catch(()=>{}).finally(()=>{sbP=null});
+  const p=get(SBURL(w)).then(d=>{if(w!==S.week)return;S.sb={week:w,at:Date.now(),data:d};S.sc=parseScores(d);S.sbErr=false}).catch(()=>{if(w===S.week)S.sbErr=true}).finally(()=>{sbP=null});
   sbP={w,p};return p;
 }
 const effState=g=>{const sc=S.sc[g.away+"@"+g.home];return sc?sc.state:g.status==="in_game"?"in":g.status==="complete"?"post":"pre"};
@@ -526,6 +540,9 @@ const shortName=n=>{
 };
 const dayName=d=>{if(!d)return"";const[y,m,x]=d.split("-").map(Number);return new Date(y,m-1,x).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})};
 const sgn=n=>n>0?"+"+n:n<0?"−"+(-n):"0";
+const NL=()=>(S.data&&S.data.leagues)||1;
+const perN=v=>{const x=v/NL();return Math.abs(x)>=10?Math.round(x):Math.round(x*10)/10};   // swing per league: totals across 40 leagues have no human scale
+const per=v=>sgn(perN(v));
 const netCls=n=>n>0?"p":n<0?"n":"z";
 function netBadge(r){return `<span class="net ${netCls(r.net)}"><span class="sr">net </span>${sgn(r.net)}</span>`}
 function lgItem(x,side){
@@ -552,7 +569,7 @@ function liveLine(r){
   if(!gs||!gs.ok){   // game not loaded yet: show Sleeper's PPR points if there are any
     const st=rStateOf(r),m=ptsMap(),raw=m?m[r.pid]:undefined;
     if(st==="pre"||st==="none"||raw===undefined)return"";
-    return `<div class="sline"><b>${Math.round(raw*10)/10} pts</b>${st==="post"&&r.net?` · swing ${sgn(Math.round(r.net*raw))}`:""}</div>`;
+    return `<div class="sline"><b>${Math.round(raw*10)/10} pts</b>${st==="post"&&r.net?` · swing ${per(r.net*raw)}/lg`:""}</div>`;
   }
   if(gs.state==="pre")return"";
   if(!SPECS[r.pos]&&r.pos!=="K"&&r.pos!=="DEF")return"";   // IDP: standard PPR doesn't score them
@@ -565,14 +582,15 @@ function liveLine(r){
   let pt="";
   if(gs.pts){
     if(raw===undefined)pt='<span class="nostat">no stats</span>';
-    else pt=`<b class="nw">${Math.round(raw*10)/10} pts</b>`+(gs.state==="post"&&r.net?` · <span class="nw">swing ${sgn(Math.round(r.net*raw))}</span>`:"");}
+    else pt=`<b class="nw">${Math.round(raw*10)/10} pts</b>`+(gs.state==="post"&&r.net?` · <span class="nw">swing ${per(r.net*raw)}/lg</span>`:"");}
   const line=[pt,bits.slice(0,3).map(b=>`<span class="nw">${b}</span>`).join(" · ")].filter(Boolean).join(" · ");
   return line?`<div class="sline">${line}</div>`:"";
 }
+const tlogo=t=>t&&t!=="FA"?`<img class="tlogo" src="https://sleepercdn.com/images/team_logos/nfl/${esc(t.toLowerCase())}.png" alt="" width="18" height="18" loading="lazy" onerror="this.remove()">`:"";
 function rowHtml(r,showGame){
   const gp=showGame?gameParts(r):null,counts=`for ${r.f} · against ${r.a}`;
   const meta=showGame?`<span class="sub nw">${esc(r.pos)} ${esc(r.team)}${gp.opp?" · "+esc(gp.opp):""}</span><div class="sub nw">${gp.when?gp.when+" · ":""}${counts}</div>`:`<span class="sub nw">${esc(r.pos)} ${esc(r.team)}</span>`;
-  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${!!S.pdet[r.pid]}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm"><b>${esc(r.name)}</b> ${meta}${liveLine(r)}</div>
+  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${!!S.pdet[r.pid]}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm">${showGame?tlogo(r.team):""}<b>${esc(r.name)}</b> ${meta}${liveLine(r)}</div>
    ${netBadge(r)}</div>${detail(r)}</div>`;
 }
 const guessBuy=name=>{const m=/\$\s?(\d{1,5})(?!\d)/.exec(name||"");return m?+m[1]:0};
@@ -590,10 +608,10 @@ function dollars(r,min){
   const F=pick(r.fl),A=pick(r.al),f=F.reduce((t,o)=>t+o.b,0),a=A.reduce((t,o)=>t+o.b,0);
   return {r,F,A,f,a,net:f-a};
 }
-function valRow(o){
-  const r=o.r,gp=gameParts(r),cls=o.net>0?"p":o.net<0?"n":"z",open=!!S.pdet[r.pid];
+function valRow(o,inGame){
+  const r=o.r,gp=inGame?{opp:"",when:""}:gameParts(r),cls=o.net>0?"p":o.net<0?"n":"z",open=!!S.pdet[r.pid];
   const li=(l,side)=>l.length?`<div class="lgh ${side==="f"?"f":"a"}">${side==="f"?"Root for":"Root against"} · ${money(l.reduce((t,x)=>t+x.b,0))}</div><ul class="lgl">${l.map(x=>`<li>${money(x.b)} · ${esc(baseName(x.x.lg))}${x.x.t?' <span class="tk">tank</span>':""} <span class="sub">${side==="f"?(x.x.t?esc(x.x.opp)+" starts him":"vs "+esc(x.x.opp)):(x.x.t?"you start him":esc(x.x.opp)+" starts him")}</span></li>`).join("")}</ul>`:"";
-  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${open}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm"><b>${esc(r.name)}</b> <span class="sub nw">${esc(r.pos)} ${esc(r.team)}${gp.opp?" · "+esc(gp.opp):""}</span><div class="sub">${gp.when?`<span class="nw">${gp.when}</span> · `:""}<span class="nw">for ${money(o.f)}</span> · <span class="nw">against ${money(o.a)}</span></div>${liveLine(r)}</div><span class="net ${cls} big"><span class="sr">dollar net </span>${smoney(o.net)}</span></div>
+  return `<div class="prow" data-pid="${esc(r.pid)}" data-gk="${esc(r.game||"")}"><div class="row" role="button" tabindex="0" aria-expanded="${open}" data-fk="r:${esc(r.pid)}">${CHEV}<div class="nm">${inGame?"":tlogo(r.team)}<b>${esc(r.name)}</b> <span class="sub nw">${esc(r.pos)} ${esc(r.team)}${gp.opp?" · "+esc(gp.opp):""}</span><div class="sub">${gp.when?`<span class="nw">${gp.when}</span> · `:""}<span class="nw">for ${money(o.f)}</span> · <span class="nw">against ${money(o.a)}</span></div>${liveLine(r)}</div><span class="net ${cls} big"><span class="sr">dollar net </span>${smoney(o.net)}</span></div>
    <div class="det${open?" show":""}">${barsHtml(r)}${li(o.F,"f")}${li(o.A,"a")}</div></div>`;
 }
 function valueHtml(d,q){
@@ -747,8 +765,8 @@ function swingProj(g){const p=S.projs[S.week];if(!p)return null;const v=g.rows.r
 function outcome(g){
   const e=swingExact(g);if(e==null)return{t:"Final",c:"z",v:null,e:null};
   const v=Math.round(e);
-  if(Math.abs(e)<5)return{t:v===0?"Even":"Even "+sgn(v)+" pts",c:"z",v,e};
-  return e>0?{t:"Helped "+sgn(v)+" pts",c:"p",v,e}:{t:"Hurt "+sgn(v)+" pts",c:"n",v,e};
+  if(Math.abs(e/NL())<0.5)return{t:perN(e)===0?"Even":"Even "+per(e)+"/lg",c:"z",v,e};   // under half a point a league is even
+  return e>0?{t:"Helped "+per(e)+"/lg",c:"p",v,e}:{t:"Hurt "+per(e)+"/lg",c:"n",v,e};
 }
 function movers(g){
   const m=ptsMap()||{};
@@ -758,58 +776,91 @@ function movers(g){
   return {hi,lo,miss};
 }
 const tally=gs=>{const c={h:0,u:0,e:0,pts:0,known:true};for(const g of gs){const o=outcome(g);if(o.v==null){c.known=false;continue}c.pts+=o.v;if(o.c==="p")c.h++;else if(o.c==="n")c.u++;else c.e++}return c};   // sums the rounded game values so the shown totals add up
-function linesHtml(up,dn){
-  const two=l=>{const n=l.slice(0,2).map(r=>`${esc(shortName(r.name))} ${sgn(r.net)}`),m=l.length>2?` <span class="more">· ${l.length-2} more</span>`:"";return n.slice(0,-1).map(x=>`<span class="nw">${x}</span>, `).join("")+`<span class="nw">${n[n.length-1]}${m}</span>`};
-  const out=[];
-  if(up.length)out.push(`<div><b class="lf">For</b> ${two(up)}</div>`);
-  if(dn.length)out.push(`<div><b class="la">Against</b> ${two(dn)}</div>`);
-  if(!out.length)out.push('<div class="ev">Even · nothing to root for or against</div>');
-  return out.join("");
+const sitOf=sc=>{   // live field state: who has the ball, down and distance, spot
+  const t=sc&&sc.state==="in"&&sc.sit;if(!t||(!t.pos&&!t.dd))return null;
+  const [a,b]=t.dd.split(" at ");return{pos:t.pos,sh:t.sh||a||"",spot:t.spot||b||"",rz:t.rz};
+};
+const sitText=sc=>{const t=sitOf(sc);return t?[t.pos&&t.pos+" ball",t.sh,t.spot&&"at "+t.spot,t.rz&&"red zone"].filter(Boolean).join(", "):""};
+const BALL='<svg class="ball" viewBox="0 0 16 10" aria-hidden="true"><ellipse cx="8" cy="5" rx="7.5" ry="4.5"/><path d="M5 5h6M6.5 3.6v2.8M8 3.6v2.8M9.5 3.6v2.8"/></svg>';
+function rootLine(up,dn,nv,fv){   // collapsed card: the top player to root for and against
+  const one=l=>`${esc(shortName(l[0].name))} ${fv(nv(l[0]))}${l.length>1?` <span class="more">· ${l.length-1} more</span>`:""}`;
+  if(!up.length&&!dn.length)return '<div class="lines one"><span class="ev">Even · nothing to root for or against</span></div>';
+  return `<div class="lines one">${up.length?`<span class="nw"><b class="lf">For</b> ${one(up)}</span>`:""}${dn.length?`<span class="nw"><b class="la">Against</b> ${one(dn)}</span>`:""}</div>`;
 }
+const moversHtml=(hi,lo)=>(hi||lo)?`<div class="lines">${hi?`<div><b class="lf">Helped most</b> ${esc(shortName(hi.r.name))} ${per(hi.v)}/lg</div>`:""}${lo?`<div><b class="la">Hurt most</b> ${esc(shortName(lo.r.name))} ${per(lo.v)}/lg</div>`:""}</div>`:"";
 function gameCard(g,compact){
   const key=g.away+"@"+g.home, sc=S.sc[key], st=effState(g), isOpen=!!S.open[key];
-  const up=g.rows.filter(r=>r.net>0),dn=g.rows.filter(r=>r.net<0),ev=g.rows.filter(r=>r.net===0);
-  const sum=l=>l.reduce((t,r)=>t+Math.abs(r.net),0);
-  up.sort((a,b)=>b.net-a.net||b.f-a.f);dn.sort((a,b)=>a.net-b.net||b.a-a.a);
+  const D=S.money?new Map(g.rows.map(r=>[r.pid,dollars(r,S.vmin)])):null;   // $ mode: rank by buy-in dollars instead of league counts
+  const nv=r=>D?D.get(r.pid).net:r.net,fv=n=>D?smoney(n):sgn(n),one=r=>D?valRow(D.get(r.pid),true):rowHtml(r,false);
+  const unc=r=>D&&!D.get(r.pid).F.length&&!D.get(r.pid).A.length;   // no league with a counted buy-in: not the same as cancelling out
+  const up=g.rows.filter(r=>nv(r)>0),dn=g.rows.filter(r=>nv(r)<0),ev=g.rows.filter(r=>nv(r)===0&&!unc(r)),nc=g.rows.filter(unc);
+  up.sort((a,b)=>nv(b)-nv(a)||b.f-a.f);dn.sort((a,b)=>nv(a)-nv(b)||b.a-a.a);
   const CAP=4;
   const sec=(cls,label,l)=>{
     if(!l.length)return"";
-    if(cls==="e"){const ek=key+"|e",eo=!!S.more[ek];return `<button class="evt" data-more="${esc(ek)}" data-fk="m:${esc(ek)}" aria-expanded="${eo}"><span>${label} · ${l.length}</span>${CHEV}</button>`+(eo?l.map(r=>rowHtml(r,false)).join(""):"")}
+    if(cls==="e"||cls==="x"){const ek=key+"|"+cls,eo=!!S.more[ek];return `<button class="evt" data-more="${esc(ek)}" data-fk="m:${esc(ek)}" aria-expanded="${eo}"><span>${label} · ${l.length}</span>${CHEV}</button>`+(eo?l.map(one).join(""):"")}
     const mk=key+"|"+cls,long=!compact&&l.length>CAP+1,all=!long||!!S.more[mk];
-    return `<div class="sec ${cls}">${label}</div>`+(all?l:l.slice(0,CAP)).map(r=>rowHtml(r,false)).join("")
+    return `<div class="sec ${cls}">${label}</div>`+(all?l:l.slice(0,CAP)).map(one).join("")
       +(long?`<button class="morebtn" data-more="${esc(mk)}" data-fk="m:${esc(mk)}">${all?"Show fewer":`Show ${l.length-CAP} more`}</button>`:"");
   };
   const A=sc?sc.away:{abbr:g.away,score:""},H=sc?sc.home:{abbr:g.home,score:""};
   const show=st!=="pre"&&sc, lead=!show?"":(+A.score>+H.score?"a":+H.score>+A.score?"h":"");
-  const secs=`${sec("f",compact?"Rooted for":"Root for",up)}${sec("a",compact?"Rooted against":"Root against",dn)}${sec("e","Even · cancels out",ev)}`;
+  const secs=`${sec("f",compact?"Rooted for":"Root for",up)}${sec("a",compact?"Rooted against":"Root against",dn)}${sec("e","Even · cancels out",ev)}${sec("x",S.vmin?`Not counted · buy-in under ${money(S.vmin)} or not set`:"Not counted · no buy-in set",nc)}`;
   if(compact){
-    const o=outcome(g),mv=movers(g),nl=(S.data&&S.data.leagues)||0,per=o.v!=null&&nl?Math.round(o.v/nl):0;
-    const total=o.v!=null&&Math.abs(per)>=1?`<div class="lean">About ${sgn(per)} pts per league across your ${nl} leagues</div>`:"";
-    const lns=(mv.hi||mv.lo)?`<div class="lines">${mv.hi?`<div><b class="lf">Helped most</b> ${esc(shortName(mv.hi.r.name))} ${sgn(mv.hi.v)}</div>`:""}${mv.lo?`<div><b class="la">Hurt most</b> ${esc(shortName(mv.lo.r.name))} ${sgn(mv.lo.v)}</div>`:""}</div>`:"";
+    const o=outcome(g),mv=movers(g),nl=(S.data&&S.data.leagues)||0;
+    const total=o.v!=null&&nl>1?`<div class="lean">${sgn(o.v)} pts in total across your ${nl} leagues</div>`:"";
+    const lns=moversHtml(mv.hi,mv.lo);
     const miss=mv.miss.length?`<div class="lean">No Sleeper stats for ${esc(mv.miss.slice(0,3).join(", "))}${mv.miss.length>3?` +${mv.miss.length-3} more`:""} (counted as 0).</div>`:"";
-    const pv=swingProj(g),aria=`${A.abbr} ${A.score}, ${H.abbr} ${H.score}. ${stText(sc)||"Final"}. ${o.t}${pv==null?"":`, projected ${sgn(pv)}`}`;
+    const hasSc=!!sc&&A.score!==""&&H.score!=="";
+    const pv=swingProj(g),aria=`${hasSc?`${A.abbr} ${A.score}, ${H.abbr} ${H.score}`:`${A.abbr} at ${H.abbr}`}. ${stText(sc)||"Final"}. ${o.t.replace("/lg"," points a league")}${pv==null?"":`, projected ${per(pv)} a league`}`;
     return `<div class="card fin${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head fh" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
-     <div class="cline"><b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span></div><span class="fr"><span class="pill ${o.c}">${o.t}</span>${pv==null?"":`<span class="vl">proj ${sgn(pv)}</span>`}</span></div>
+     <div class="cline">${hasSc?`<b>${esc(A.abbr)}</b><span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <b>${esc(H.abbr)}</b><span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:`<b>${esc(A.abbr)}</b>@ <b>${esc(H.abbr)}</b><span class="sub">Final</span>`}</div><span class="fr"><span class="pill ${o.c}">${o.t}</span>${pv==null?"":`<span class="vl">proj ${per(pv)}/lg</span>`}</span></div>
      <div class="body"><div class="fbody">${total}${lns}${miss}</div>${secs}</div></div>`;
   }
-  const tm=(t,l,n)=>`<div class="tm${l?" lead":""}"><span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span><span class="tl"><span class="sr">${esc(t.abbr)} </span>lean <b class="${netCls(n)}">${sgn(n)}</b></span></div>`;
-  const la=teamLean(g,A.abbr),lh=teamLean(g,H.abbr);
-  const hc=`<div class="hc"><b>${esc(A.abbr)}</b> ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b><span class="sub"> · ${esc(stText(sc)||(st==="post"?"Final":""))}</span>${la||lh?`<span class="hlean">lean ${esc(A.abbr)} <b class="${netCls(la)}">${sgn(la)}</b> / ${esc(H.abbr)} <b class="${netCls(lh)}">${sgn(lh)}</b></span>`:""}</div>`;
+  const si=sitOf(sc),slot=st==="in";
+  const tm=(t,l,n)=>`<div class="tm${l?" lead":""}">${slot?`<span class="po">${si&&si.pos===t.abbr?BALL+'<span class="sr">has the ball </span>':""}</span>`:""}<span class="ab">${esc(t.abbr)}</span><span class="sc">${show?esc(t.score):""}</span><span class="tl"><span class="sr">${esc(t.abbr)} </span>lean <b class="${netCls(n)}">${fv(n)}</b></span></div>`;
+  const la=D?g.rows.filter(r=>r.team===A.abbr).reduce((t,r)=>t+nv(r),0):teamLean(g,A.abbr),lh=D?g.rows.filter(r=>r.team===H.abbr).reduce((t,r)=>t+nv(r),0):teamLean(g,H.abbr);
+  const hc=`<div class="hc"><b>${esc(A.abbr)}</b> ${show?`<span class="${lead==="a"?"w":""}">${esc(A.score)}</span> – <span class="${lead==="h"?"w":""}">${esc(H.score)}</span>`:"@"} <b>${esc(H.abbr)}</b>${(stText(sc)||st==="post")?`<span class="sub"> · ${esc(stText(sc)||"Final")}</span>`:""}${la||lh?`<span class="hlean">lean ${esc(A.abbr)} <b class="${netCls(la)}">${fv(la)}</b> / ${esc(H.abbr)} <b class="${netCls(lh)}">${fv(lh)}</b></span>`:""}</div>`;
   const stc=st==="in"?`<span class="pill live">LIVE</span><span class="clk">${esc(stText(sc))}</span>`
     :st==="post"?`<span class="clk fin">${esc(stText(sc)||"Final")}</span>`:`<span class="clk">${esc(stText(sc))}</span>`;
-  const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+sgn(r.net)).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
+  const who=l=>l.slice(0,3).map(r=>shortName(r.name)+" "+fv(nv(r))).join(", ")+(l.length>3?`, and ${l.length-3} more`:"");
   const se=st==="in"?swingExact(g):null,sv=se==null?null:Math.round(se);
   const pv=st==="post"?null:swingProj(g);
-  const vd=sv!=null?`<div class="vd"><span class="vl">So far</span><span class="vs ${netCls(sv)}">${sgn(sv)}<small> pts</small></span><span class="vl">${pv!=null?"proj "+sgn(pv):sv>0?"helping you":sv<0?"hurting you":"even"}</span></div>`
-    :st==="pre"&&pv!=null?`<div class="vd"><span class="vl">Proj</span><span class="vs vp ${netCls(pv)}">${sgn(pv)}<small> pts</small></span></div>`:"";
-  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),sv==null?"":`So far ${sv>0?"helping you "+sgn(sv)+" points":sv<0?"hurting you "+sgn(sv)+" points":"even"}`,pv==null?"":`Projected ${sgn(pv)} points for the game`,`Team lean ${A.abbr} ${sgn(la)}, ${H.abbr} ${sgn(lh)}`,up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
+  const vd=sv!=null?`<div class="vd"><span class="vl">So far</span><span class="vs ${netCls(perN(se))}">${per(se)}<small>/lg</small></span><span class="vl">${sgn(sv)} total</span>${pv!=null?`<span class="vl">proj ${per(pv)}/lg</span>`:""}</div>`
+    :st==="pre"&&pv!=null?`<div class="vd"><span class="vl">Proj</span><span class="vs vp">${per(pv)}<small>/lg</small></span><span class="vl">${sgn(pv)} total</span></div>`:"";   // a pre-game guess stays muted; only live and final numbers get color
+  const aria=[`${A.abbr}${show?" "+A.score:""} at ${H.abbr}${show?" "+H.score:""}`,stText(sc),sitText(sc),sv==null?"":`So far ${sv>0?"helping you":sv<0?"hurting you":"even,"} ${per(se)} points a league, ${sgn(sv)} in total`,pv==null?"":`Projected ${per(pv)} points a league for the game`,`Team lean ${A.abbr} ${fv(la)}, ${H.abbr} ${fv(lh)}`,up.length?`Root for ${who(up)}`:"",dn.length?`Root against ${who(dn)}`:"",!up.length&&!dn.length?"Even, nothing to root for or against":""].filter(Boolean).join(". ");
   return `<div class="card${isOpen?" open":""}" data-gk="${esc(key)}"><div class="head" role="button" tabindex="0" aria-label="${esc(aria)}" aria-expanded="${isOpen}" data-fk="h:${esc(key)}">${CHEV}
    <div class="sb">${tm(A,lead==="a",la)}${tm(H,lead==="h",lh)}</div><div class="stc">${stc}</div>
    ${vd}${hc}
-   <div class="lines">${linesHtml(up,dn)}</div></div>
+   ${si&&(si.sh||si.spot)?`<div class="fld">${si.sh?`<span class="dn">${esc(si.sh)}</span>`:""}${si.sh&&si.spot?" · ":""}${si.spot?`<span class="spot">${esc(si.spot)}</span>`:""}${si.rz?' <span class="rz">Red zone</span>':""}</div>`:""}
+   ${rootLine(up,dn,nv,fv)}</div>
    <div class="body">${secs}</div></div>`;
 }
 
+function weekRecap(d){   // Games tab: any other week, or this week once every game is final
+  const gs=d.games||[];if(!gs.length)return"";
+  const fin=gs.filter(g=>effState(g)==="post"),c=tally(fin),pAll=gs.map(swingProj),hasP=pAll.every(v=>v!=null);
+  const pFin=fin.reduce((t,g)=>t+(swingProj(g)||0),0),pTot=hasP?pAll.reduce((t,v)=>t+v,0):null,nl=NL();
+  const cl=n=>n>0?"p":n<0?"n":"z",unit='<small> pts a league</small>';
+  let hd,lbl,sub=[];
+  if(fin.length&&c.known){
+    const part=fin.length<gs.length,ev=Math.abs(c.pts/nl)<0.5;   // same rule as outcome()
+    lbl=`Week ${d.week}${part?" so far":""}`;
+    hd=`${lbl}: <b class="${ev?"z":cl(c.pts)}">${ev?"even":c.pts>0?"helped":"hurt"} ${per(c.pts)}</b>${unit}`;
+    if(hasP){const df=c.pts-pFin,dv=perN(df);sub.push(`<div class="rvp"><b class="nw ${cl(dv)}">${dv===0?"Right on projection":`${Math.abs(dv)} a league ${df>0?"better":"worse"} than projected`}</b> <span class="nw sub">(projected ${per(pFin)})</span></div>`)}
+    sub.push(`<div class="sub">${[`<span class="nw">${sgn(c.pts)} pts in total across ${nl} leagues</span>`,c.h&&`<span class="nw">${c.h} game${c.h===1?"":"s"} helped</span>`,c.u&&`<span class="nw">${c.u} hurt</span>`,c.e&&`<span class="nw">${c.e} even</span>`].filter(Boolean).join(" · ")}${part?` · <span class="nw">${fin.length} of ${gs.length} final</span>`:""}</div>`);
+    const m=ptsMap()||{},all=fin.flatMap(g=>g.rows).map(r=>({r,v:Math.round(r.net*(m[r.pid]||0))})).filter(x=>x.v);
+    sub.push(moversHtml(all.filter(x=>x.v>0).sort((a,b)=>b.v-a.v)[0],all.filter(x=>x.v<0).sort((a,b)=>a.v-b.v)[0]));
+    if(part&&pTot!=null)sub.push(`<div class="sub">Whole week projected ${per(pTot)} a league</div>`);
+  }else if(fin.length){
+    lbl=`Week ${d.week}`;hd=`${lbl}: final`;sub.push('<div class="sub">Sleeper has no stats for this week yet.</div>');
+  }else{
+    lbl=`Week ${d.week} preview`;
+    hd=pTot!=null?`${lbl}: <b class="z">projected ${per(pTot)}</b>${unit}`:`${lbl}: no projection yet`;
+    sub.push(`<div class="sub">${pTot!=null?`${sgn(pTot)} pts in total · `:""}${gs.length} game${gs.length===1?"":"s"} with your players</div>`);
+  }
+  return `<section class="recap" aria-label="${esc(lbl)}"><h2 class="rh">${hd}</h2>${sub.join("")}</section>`;
+}
 function render(){
   const a=document.activeElement,fk=a&&a.dataset&&a.dataset.fk;
   renderInner();
@@ -843,8 +894,7 @@ function renderInner(){
   $("#sh").hidden=S.tab==="games";{const qi=$("#q"),mu=S.tab==="matchups",ph=mu?"League or opponent":"Player or team";if(qi.placeholder!==ph){qi.placeholder=ph;qi.setAttribute("aria-label",mu?"Search leagues or opponents":"Search players or teams")}}
   setText($("#an"),S.err||(d?`Week ${d.week} loaded`:""));
   const wk=S.week||(d&&d.week)||null;
-  setText($("#wk"),"Wk "+(wk||"–"));
-  $("#pw").disabled=!wk||wk<=1;$("#nw").disabled=!wk||wk>=18;
+  setWeeks(wk);
   if(!d){
     setCtl("");setFa("");setWarn("");$("#fb").hidden=true;
     setText($("#meta"),S.err?"":wk?`Loading Week ${wk}…`:"Loading your leagues…");
@@ -856,7 +906,7 @@ function renderInner(){
   setText($("#meta"),[`${d.leagues} leagues`,`${d.rows.length} players`,S.loading?"updating…":lv?"scores as of "+new Date(S.sb.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}).replace(/\s/g,"\u00a0"):"updated "+fmtAgo(ago),d.failed?`didn't load: ${fn.slice(0,2).join(", ")||d.failed+" "+(d.failed===1?"league":"leagues")}${fn.length>2?` +${fn.length-2} more`:""}`:""].filter(Boolean).join(" · "))}
   const liveOld=S.sb&&Object.values(S.sc).some(x=>x.state==="in")&&Date.now()-S.sb.at>5*60000;
   setWarn(S.err?`<span>${esc(S.err)}.</span><button data-retry="1">Try again</button>`
-    :S.curWeek&&S.week!==S.curWeek?`<span>Showing Week ${S.week}, not this week.</span><button data-gowk="1">Back to Week ${S.curWeek}</button>`
+    :S.sbErr&&!S.loading?`<span>Scores unavailable from ESPN. Lineups and signs are still right.</span><button data-retry="1">Try again</button>`
     :liveOld?`<span>Live scores are ${Math.round((Date.now()-S.sb.at)/60000)} min old.</span><button data-retry="1">Refresh</button>`:"");
   const onTab=S.tab;
   $("#sh").classList.toggle("stick",onTab==="players"&&!S.fopen);
@@ -904,7 +954,7 @@ function renderInner(){
     }else if(!q&&S.status==="all"&&ranked){
       const act=rows.filter(r=>{const x=rStateOf(r);return x==="in"||x==="pre"}),live=act.filter(r=>r.net),even=act.filter(r=>!r.net),byes=rows.filter(r=>rStateOf(r)==="none"),done=rows.filter(r=>rStateOf(r)==="post");
       const ins=live.filter(r=>rStateOf(r)==="in"),pres=live.filter(r=>rStateOf(r)==="pre");
-      html=(live.length?(ins.length&&pres.length?`<div class="card"><div class="gdiv">Live now</div>${ins.slice(0,200).map(r=>rowHtml(r,true)).join("")}<div class="gdiv">Upcoming</div>${pres.slice(0,200).map(r=>rowHtml(r,true)).join("")}</div>`:card(live)):"")+(even.length?grp("pe","Even · cancels out",even,S.peven??!live.length):"")+(byes.length?grp("pb","Bye / no game",byes,S.pbye??false):"")+(done.length?grp("pf","Finished",done,S.pfin??(!live.length&&!byes.length)):"");
+      html=(live.length?(ins.length&&pres.length?`<div class="card"><div class="gdiv">Live now</div>${ins.slice(0,200).map(r=>rowHtml(r,true)).join("")}<div class="gdiv">Upcoming</div>${pres.slice(0,200).map(r=>rowHtml(r,true)).join("")}</div>`:card(live)):"")+(even.length?grp("pe","Even · cancels out",even,S.peven??!live.length):"")+(byes.length?grp("pb","Bye / no game",byes,S.pbye??false):"")+(done.length?grp("pf","Finished",done,S.pfin??!act.length):"");
     }else if(S.sort==="game"&&!q&&!S.money){
       let h="",last=null;
       for(const r of rows.slice(0,200)){if(r.game!==last){last=r.game;const sc=r.game&&S.sc[r.game];
@@ -922,25 +972,32 @@ function renderInner(){
     live.sort((a,b)=>stake(b)-stake(a)||expo(b)-expo(a));
     upc.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||kick(a).localeCompare(kick(b))||expo(b)-expo(a));
     fin.sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")||kick(a).localeCompare(kick(b)));
+    const allFin=!!d.games.length&&!live.length&&!upc.length;
+    const recap=S.curWeek&&(d.week!==S.curWeek||allFin)?weekRecap(d):"";
+    let uc=d.games.length?`<div class="unit" role="group" aria-label="Count players by">${[["lg","#","Count leagues"],["usd","$","Count buy-in dollars"]].map(([k,l,a])=>`<button data-unit="${k}" data-fk="u:${k}" aria-label="${a}" title="${a}" aria-pressed="${S.money===(k==="usd")}" class="${S.money===(k==="usd")?"on":""}">${l}</button>`).join("")}</div>`:"";   // same # / $ switch as Players, beside the first heading
+    const hd=(cls,txt)=>{const u=uc;uc="";return `<div class="hrow"><div class="${cls}" role="heading" aria-level="2">${txt}</div>${u}</div>`};
     let html="",last="";
-    if(live.length)html+=`<div class="day livehd" role="heading" aria-level="2">Live now</div>`+live.map(g=>gameCard(g)).join("");
+    if(live.length)html+=hd("day livehd","Live now")+live.map(g=>gameCard(g)).join("");
     for(const g of upc){
-      const dn=dayName(g.date); if(dn!==last){html+=`<div class="day" role="heading" aria-level="2">${esc(dn)}</div>`;last=dn}
+      const dn=dayName(g.date); if(dn!==last){html+=hd("day",esc(dn));last=dn}
       html+=gameCard(g);
     }
     if(fin.length){
       const o=S.finalOpen??(!live.length&&!upc.length);
       const c=tally(fin),n=fin.length;
-      const ft=!c.known?"":` · <span class="${c.pts>0?"g":c.pts<0?"b":""}">${c.pts>0?"helped ":c.pts<0?"hurt ":"even "}${sgn(c.pts)} pts</span>${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`;
-      html+=`<button class="fint" data-fk="f" data-final="1" data-open="${o?1:0}" aria-expanded="${o}"><span>${n} final game${n===1?"":"s"}${ft}</span>${CHEV}</button>`;
+      const ft=!c.known||recap?"":` · <span class="nw ${c.pts>0?"g":c.pts<0?"b":""}">${c.pts>0?"helped ":c.pts<0?"hurt ":"even "}${per(c.pts)}<span class="nt">/lg</span></span>${c.h&&c.u?` · <span class="nw">${c.h} helped · ${c.u} hurt</span>`:""}`;   // the recap already says it
+      const fb=`<button class="fint" data-fk="f" data-final="1" data-open="${o?1:0}" aria-expanded="${o}"><span><span class="nw">${n} final game${n===1?"":"s"}</span>${ft}</span>${CHEV}</button>`;
+      html+=uc?`<div class="hrow">${fb}${uc}</div>`:fb;uc="";   // no live or upcoming heading: the # / $ switch sits beside this one
       if(o){
         const days={};for(const g of fin)(days[g.date||""]=days[g.date||""]||[]).push(g);
         for(const day in days){const c=tally(days[day]);
-          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))}${c.known&&Object.keys(days).length>1?` · ${sgn(c.pts)} pts${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
+          html+=`<div class="day" role="heading" aria-level="2">${esc(dayName(day))}${c.known&&Object.keys(days).length>1?` · ${per(c.pts)}<span class="nt">/lg</span>${c.h&&c.u?` · ${c.h} helped · ${c.u} hurt`:""}`:""}</div>`+days[day].map(g=>gameCard(g,true)).join("");}
       }
     }
-    const nudge=d.leagues&&!TANK.size&&!store.get("rfa-tanknudge")?`<div class="nudge"><p><b>Tanking a league?</b> Mark it in Settings and its signs flip.</p><button data-settings="1">Open Settings</button><button data-nudgex="1">Not now</button></div>`:"";
-    out.innerHTML=nudge+(html||`<div class="empty">${!d.leagues?`No active leagues have matchups for Week ${d.week} yet.<button data-settings="1">Check your username</button>`:!d.schedGames?`No NFL games are scheduled for Week ${d.week}.`:"None of your starters or your opponents' starters play this week."}</div>`);
+    const nudge=d.leagues&&!TANK.size&&!store.get("rfa-tanknudge")?`<div class="nudge1"><button class="lnk" data-settings="1"><b>Tanking a league?</b> Flip its signs in Settings</button><button class="ic nx" data-nudgex="1" aria-label="Dismiss the tanking tip" title="Dismiss"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button></div>`:"";
+    const noBuy=S.money&&!leaguesOf(d).some(l=>effBuy(l.id,l.name)>0);
+    const unit=html?`${S.money&&S.vmin&&!noBuy?`<div class="vnote">Counting only leagues with a buy-in of ${money(S.vmin)} or more.<button class="fclear" data-vminclr="1"><span>Count every buy-in</span>${CHEV.replace('class="chev"','class="chev side"')}</button></div>`:""}${noBuy?`<div class="vnote">No buy-ins set yet, so every player shows $0.<button class="fclear" data-settings="1"><span>Set league buy-ins</span>${CHEV.replace('class="chev"','class="chev side"')}</button></div>`:""}`:"";
+    out.innerHTML=nudge+recap+unit+(html||`<div class="empty">${!d.leagues?`No active leagues have matchups for Week ${d.week} yet.<button data-settings="1">Check your username</button>`:!d.schedGames?`No NFL games are scheduled for Week ${d.week}.`:"None of your starters or your opponents' starters play this week."}</div>`);
   }
 }
 
@@ -997,7 +1054,7 @@ async function signIn(raw){
 }
 document.addEventListener("submit",e=>{if(e.target.id==="signin"){e.preventDefault();signIn($("#su").value)}});
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-reload],[data-gowk],[data-goto],[data-tab],[data-view],[data-unit],[data-rank],[data-show],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],[data-tank],[data-lgs],[data-signout],[data-nudgex],[data-themepick],[data-setuplink],#fb,.head,.row");if(!t)return;
+  const t=e.target.closest("[data-reload],[data-gowk],[data-goto],[data-tab],[data-view],[data-unit],[data-rank],[data-show],[data-final],[data-pfin],[data-pbye],[data-peven],[data-clearf],[data-retry],[data-lg],[data-more],[data-help],[data-close],[data-mu],[data-mfin],[data-settings],[data-resetbuy],[data-showall],[data-tank],[data-lgs],[data-signout],[data-nudgex],[data-themepick],[data-setuplink],[data-vminclr],#fb,.head,.row");if(!t)return;
   if(t.dataset.reload){location.replace(location.pathname+"?v="+t.dataset.reload);return}
   if(t.dataset.help!==undefined)openSheet($("#sheet"),t);
   else if(t.dataset.close!==undefined)closeSheet();
@@ -1019,6 +1076,7 @@ document.addEventListener("click",e=>{
   else if(t.dataset.mfin!==undefined){S.mfin=t.dataset.open!=="1";render()}
   else if(t.dataset.rank){S.sort=t.dataset.rank;saveUI();render()}
   else if(t.dataset.show){S.status=t.dataset.show;saveUI();render();if(S.status==="done")loadFinished()}
+  else if(t.dataset.vminclr){S.vmin=0;saveUI();render()}
   else if(t.dataset.unit){S.money=t.dataset.unit==="usd";saveUI();render()}
   else if(t.dataset.view){S.view=t.dataset.view;saveUI();render()}
   else if(t.dataset.lg){S.lgOpen[t.dataset.lg]=!S.lgOpen[t.dataset.lg];render()}
@@ -1068,7 +1126,7 @@ async function refresh(week){
   try{
     const data=await load(w); if(tok!==S.tok)return;
     S.week=data.week;S.data=data;S.err=null;store.set("rfa-"+data.week,data);
-    for(let n=1;n<=18;n++)if(Math.abs(n-data.week)>2)try{localStorage.removeItem("rfa-"+n)}catch(e){}
+    for(let n=1;n<=18;n++)if(Math.abs(n-data.week)>2&&n!==S.curWeek)try{localStorage.removeItem("rfa-"+n)}catch(e){}
     await Promise.all([loadScores(true),loadPts(S.week,true)]); if(tok!==S.tok)return;
     S.loading=false;render();
     ensureLive(false);
@@ -1084,7 +1142,7 @@ async function refresh(week){
 }
 function go(n){
   if(n===S.week)return;
-  S.week=n;S.epoch++;S.mopen={};S.gs={};S.sc={};S.sb=null;S.mAt=0;S.data=store.get("rfa-"+n);S.err=null;S.loading=true;
+  S.week=n;S.epoch++;S.mopen={};S.gs={};S.sc={};S.sb=null;S.sbErr=false;S.mAt=0;S.data=store.get("rfa-"+n);S.err=null;S.loading=true;
   render();
   clearTimeout(S.stepT);S.stepT=setTimeout(()=>refresh(n),250);
 }
@@ -1092,11 +1150,17 @@ function loadFinished(){for(const g of (S.data&&S.data.games)||[])if(effState(g)
 function ensureLive(force){
   for(const g of (S.data&&S.data.games)||[])if(effState(g)==="in")loadGame(g.away+"@"+g.home,force);   // open or not: Players rows read these too
 }
-const step=d=>go(Math.min(18,Math.max(1,(S.week||(S.data&&S.data.week)||S.curWeek||1)+d)));
+let wksKey=null;
+function setWeeks(wk){   // week picker: every regular-season week, this week marked
+  const sel=$("#wks"),k=wk+"|"+S.curWeek;
+  if(k===wksKey){if(wk&&sel.value!==String(wk))sel.value=String(wk);return}wksKey=k;
+  const off=!!(wk&&S.curWeek&&wk!==S.curWeek);sel.classList.toggle("off",off);sel.setAttribute("aria-label",off?`Week, not this week (Week ${S.curWeek})`:"Week");
+  sel.innerHTML=wk?Array.from({length:18},(_,i)=>i+1).map(n=>`<option value="${n}"${n===wk?" selected":""}>Wk ${n}${n===S.curWeek?" · now":""}</option>`).join(""):"<option>Wk –</option>";
+  sel.disabled=!wk;
+}
 new ResizeObserver(()=>document.documentElement.style.setProperty("--hdr",$("header").offsetHeight+"px")).observe($("header"));
 $("#rf").onclick=()=>refresh(S.week);
-$("#pw").onclick=()=>step(-1);
-$("#nw").onclick=()=>step(1);
+$("#wks").onchange=e=>{const n=+e.target.value;if(n>=1&&n<=18)go(n)};
 setInterval(async()=>{
   if(document.hidden||!S.data||S.busy)return;
   const soon=x=>x.state==="in"||(x.state==="pre"&&new Date(x.date)-Date.now()<10*60000);
